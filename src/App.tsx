@@ -1,5 +1,4 @@
-import { GitHubBanner, Refine, WelcomePage } from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
+import { Authenticated, GitHubBanner, Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
 import {
@@ -16,7 +15,11 @@ import routerBindings, {
 import { dataProvider, liveProvider } from "@refinedev/supabase";
 import { BrowserRouter, Route, Routes } from "react-router";
 import authProvider from "./authProvider";
+import { AnonymousLogin } from "./components/auth/anonymous-login";
 import { ColorModeContextProvider } from "./contexts/color-mode";
+import { UserPublicList } from "./pages/lists/user-public-list.page";
+import { NewWishPage } from "./pages/wishes/new-wish.page";
+import { EditWishListPage } from "./pages/wishes/wish-list-edit.page";
 import { supabaseClient } from "./utility";
 
 function App() {
@@ -28,7 +31,6 @@ function App() {
           <CssBaseline />
           <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
           <RefineSnackbarProvider>
-            <DevtoolsProvider>
               <Refine
                 dataProvider={dataProvider(supabaseClient)}
                 liveProvider={liveProvider(supabaseClient)}
@@ -36,21 +38,34 @@ function App() {
                 routerProvider={routerBindings}
                 notificationProvider={useNotificationProvider}
                 options={{
-                  syncWithLocation: true,
                   warnWhenUnsavedChanges: true,
                   useNewQueryKeys: true,
+                  liveMode: 'auto',
                   projectId: "wPUVlS-YutdNT-PBBtUI",
                 }}
+                resources={[
+                  {
+                    name: "wishes",
+                    list: "/wishes",
+                    create: "/new-wish",
+                  },
+                ]}
               >
-                <Routes>
-                  <Route index element={<WelcomePage />} />
-                </Routes>
+                    <Authenticated key="protected" fallback={<AnonymousLogin/>}>
+                      <Routes>
+                          <Route path="/wishes" element={<EditWishListPage />} />
+                          <Route path="/new-wish" element={<NewWishPage />} />
+                          {/* <Route path="/:slug/:id" element={<WishShow />} /> */}
+                          {/* <Route path="/wishes/:id/edit" element={<WishEdit />} /> */}
+                      </Routes>
+                    </Authenticated>
+                    <Routes>
+                      <Route path="/l/:slug" element={<UserPublicList />} />
+                    </Routes>
                 <RefineKbar />
                 <UnsavedChangesNotifier />
                 <DocumentTitleHandler />
               </Refine>
-              <DevtoolsPanel />
-            </DevtoolsProvider>
           </RefineSnackbarProvider>
         </ColorModeContextProvider>
       </RefineKbarProvider>

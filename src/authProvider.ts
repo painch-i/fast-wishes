@@ -1,169 +1,143 @@
-import { AuthBindings } from "@refinedev/core";
-
+import { AuthProvider } from "@refinedev/core";
+import { customAlphabet } from "nanoid";
 import { supabaseClient } from "./utility";
 
-const authProvider: AuthBindings = {
-  login: async ({ email, password, providerName }) => {
-    // sign in with oauth
-    try {
-      if (providerName) {
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
-          provider: providerName,
-        });
+const nanoid = customAlphabet('1234567890abcdef', 5)
 
-        if (error) {
-          return {
-            success: false,
-            error,
-          };
-        }
-
-        if (data?.url) {
-          return {
-            success: true,
-            redirectTo: "/",
-          };
+const authProvider: AuthProvider = {
+  login: async (options: { redirectTo: string }) => {
+    const { redirectTo } = options;
+    const { data, error } = await supabaseClient.auth.signInAnonymously({
+      options: {
+        data: {
+          deviceId: crypto.randomUUID(),
         }
       }
+    });
 
-      // sign in with email and password
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        return {
-          success: false,
-          error,
-        };
-      }
-
-      if (data?.user) {
-        return {
-          success: true,
-          redirectTo: "/",
-        };
-      }
-    } catch (error: any) {
+    if (error) {
       return {
         success: false,
         error,
       };
     }
 
-    return {
-      success: false,
-      error: {
-        message: "Login failed",
-        name: "Invalid email or password",
-      },
-    };
-  },
-  register: async ({ email, password }) => {
-    try {
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        return {
-          success: false,
-          error,
-        };
-      }
-
-      if (data) {
-        return {
-          success: true,
-          redirectTo: "/",
-        };
-      }
-    } catch (error: any) {
-      return {
-        success: false,
-        error,
-      };
+    if (data.user?.id) {
+      await supabaseClient.from('user_slugs').insert({
+        id: data.user.id,
+        slug: nanoid()
+      })
     }
 
     return {
-      success: false,
-      error: {
-        message: "Register failed",
-        name: "Invalid email or password",
-      },
-    };
-  },
-  forgotPassword: async ({ email }) => {
-    try {
-      const { data, error } = await supabaseClient.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo: `${window.location.origin}/update-password`,
-        }
-      );
-
-      if (error) {
-        return {
-          success: false,
-          error,
-        };
-      }
-
-      if (data) {
-        return {
-          success: true,
-        };
-      }
-    } catch (error: any) {
-      return {
-        success: false,
-        error,
-      };
+      success: true,
+      redirectTo,
     }
-
-    return {
-      success: false,
-      error: {
-        message: "Forgot password failed",
-        name: "Invalid email",
-      },
-    };
   },
-  updatePassword: async ({ password }) => {
-    try {
-      const { data, error } = await supabaseClient.auth.updateUser({
-        password,
-      });
+  // register: async ({ email, password }) => {
+  //   try {
+  //     const { data, error } = await supabaseClient.auth.signUp({
+  //       email,
+  //       password,
+  //     });
 
-      if (error) {
-        return {
-          success: false,
-          error,
-        };
-      }
+  //     if (error) {
+  //       return {
+  //         success: false,
+  //         error,
+  //       };
+  //     }
 
-      if (data) {
-        return {
-          success: true,
-          redirectTo: "/",
-        };
-      }
-    } catch (error: any) {
-      return {
-        success: false,
-        error,
-      };
-    }
-    return {
-      success: false,
-      error: {
-        message: "Update password failed",
-        name: "Invalid password",
-      },
-    };
-  },
+  //     if (data) {
+  //       return {
+  //         success: true,
+  //         redirectTo: "/",
+  //       };
+  //     }
+  //   } catch (error: any) {
+  //     return {
+  //       success: false,
+  //       error,
+  //     };
+  //   }
+
+  //   return {
+  //     success: false,
+  //     error: {
+  //       message: "Register failed",
+  //       name: "Invalid email or password",
+  //     },
+  //   };
+  // },
+  // forgotPassword: async ({ email }) => {
+  //   try {
+  //     const { data, error } = await supabaseClient.auth.resetPasswordForEmail(
+  //       email,
+  //       {
+  //         redirectTo: `${window.location.origin}/update-password`,
+  //       }
+  //     );
+
+  //     if (error) {
+  //       return {
+  //         success: false,
+  //         error,
+  //       };
+  //     }
+
+  //     if (data) {
+  //       return {
+  //         success: true,
+  //       };
+  //     }
+  //   } catch (error: any) {
+  //     return {
+  //       success: false,
+  //       error,
+  //     };
+  //   }
+
+  //   return {
+  //     success: false,
+  //     error: {
+  //       message: "Forgot password failed",
+  //       name: "Invalid email",
+  //     },
+  //   };
+  // },
+  // updatePassword: async ({ password }) => {
+  //   try {
+  //     const { data, error } = await supabaseClient.auth.updateUser({
+  //       password,
+  //     });
+
+  //     if (error) {
+  //       return {
+  //         success: false,
+  //         error,
+  //       };
+  //     }
+
+  //     if (data) {
+  //       return {
+  //         success: true,
+  //         redirectTo: "/",
+  //       };
+  //     }
+  //   } catch (error: any) {
+  //     return {
+  //       success: false,
+  //       error,
+  //     };
+  //   }
+  //   return {
+  //     success: false,
+  //     error: {
+  //       message: "Update password failed",
+  //       name: "Invalid password",
+  //     },
+  //   };
+  // },
   logout: async () => {
     const { error } = await supabaseClient.auth.signOut();
 
@@ -228,10 +202,7 @@ const authProvider: AuthBindings = {
     const { data } = await supabaseClient.auth.getUser();
 
     if (data?.user) {
-      return {
-        ...data.user,
-        name: data.user.email,
-      };
+      return data.user;
     }
 
     return null;
