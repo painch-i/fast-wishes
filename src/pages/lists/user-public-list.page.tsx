@@ -1,16 +1,15 @@
-import { List } from "@refinedev/antd";
-import { useTable } from "@refinedev/antd";
-import { useUpdate } from "@refinedev/core";
-import {
-  Button,
-  Card,
-  List as AntdList,
-  Select,
-  Tag,
-  Typography,
-} from "antd";
+import { useList, useUpdate } from "@refinedev/core";
 import { useState } from "react";
 import { useParams } from "react-router";
+import { Button } from "../../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
+import { Select } from "../../components/ui/select";
 
 export type IWish = {
   id: number;
@@ -22,78 +21,60 @@ export type IWish = {
 };
 
 export const UserPublicList: React.FC = () => {
-  const params = useParams();
-  const slug = params.slug;
-
+  const { slug } = useParams();
   const [sortKey, setSortKey] = useState<"price" | "priority">("priority");
 
-  const { tableProps } = useTable<IWish>({
+  const { data } = useList<IWish>({
     resource: "wishes",
-    filters: {
-      permanent: [
-        {
-          field: "user_slugs.slug",
-          operator: "eq",
-          value: slug,
-        },
-        {
-          field: "is_public",
-          operator: "eq",
-          value: true,
-        },
-      ],
-    },
-    meta: {
-      select: "*, user_slugs!inner(slug)",
-    },
+    filters: [
+      { field: "user_slugs.slug", operator: "eq", value: slug },
+      { field: "is_public", operator: "eq", value: true },
+    ],
+    meta: { select: "*, user_slugs!inner(slug)" },
   });
 
-  const sortedData = [...(tableProps.dataSource ?? [])].sort(
+  const { mutate } = useUpdate();
+
+  const sortedData = [...(data?.data ?? [])].sort(
     (a, b) => a[sortKey] - b[sortKey]
   );
 
-  const { mutate } = useUpdate({
-    resource: "wishes",
-    mutationMode: "optimistic",
-  });
-
   return (
-    <List>
+    <div className="container mx-auto p-4">
       <Select
         value={sortKey}
-        onChange={(value) => setSortKey(value)}
-        style={{ width: 220, marginBottom: 16 }}
-        options={[
-          { label: "Sort by Priority", value: "priority" },
-          { label: "Sort by Price", value: "price" },
-        ]}
-      />
-      <AntdList
-        dataSource={sortedData}
-        renderItem={(item) => (
-          <AntdList.Item>
-            <Card
-              title={item.name}
-              extra={<Tag color="blue">€{item.price}</Tag>}
-              style={{ width: "100%" }}
-            >
-              <Typography.Paragraph>{item.description}</Typography.Paragraph>
-              <Tag color="volcano">Priority {item.priority}</Tag>
+        onChange={(e) => setSortKey(e.target.value as "price" | "priority")}
+        className="mb-4"
+      >
+        <option value="priority">Sort by Priority</option>
+        <option value="price">Sort by Price</option>
+      </Select>
+      <div className="grid gap-4">
+        {sortedData.map((item) => (
+          <Card key={item.id}>
+            <CardHeader className="flex items-center justify-between">
+              <CardTitle>{item.name}</CardTitle>
+              <Badge variant="outline">€{item.price}</Badge>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-2 text-sm text-slate-600">{item.description}</p>
+              <Badge className="mb-4">Priority {item.priority}</Badge>
               <Button
-                type="primary"
-                style={{ marginTop: 12 }}
                 disabled={item.is_reserved}
                 onClick={() =>
-                  mutate({ id: item.id, values: { is_reserved: true } })
+                  mutate({
+                    resource: "wishes",
+                    id: item.id,
+                    values: { is_reserved: true },
+                  })
                 }
               >
                 {item.is_reserved ? "Already reserved" : "Reserve"}
               </Button>
-            </Card>
-          </AntdList.Item>
-        )}
-      />
-    </List>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 };
-
