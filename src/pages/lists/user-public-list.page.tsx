@@ -1,34 +1,24 @@
-
-
-import {
-  EditButton,
-  List,
-  ShowButton,
-  useTable
-} from "@refinedev/antd";
-import { Space, Switch, Table } from "antd";
+import { List } from "@refinedev/antd";
+import { useList } from "@refinedev/core";
+import { Row, Col, Typography, Spin } from "antd";
 import { useParams } from "react-router";
+import { WishCard } from "../../components/wish-card";
 
-export type IWish = {
+export type Wish = {
   id: number;
+  name: string;
+  description?: string;
+  image_url?: string;
+  is_reserved?: boolean;
 };
-
-
-export type IUser = {
-  id: number;
-};
-
-
 
 export const UserPublicList: React.FC = () => {
-  const params = useParams();
-  const slug = params.slug;
+  const { slug } = useParams();
 
-  const { tableProps } = useTable<IWish>({
-    resource: 'wishes',
-    filters: {
-      permanent: [
-        {
+  const { data, isLoading } = useList<Wish>({
+    resource: "wishes",
+    filters: [
+      {
         field: "user_slugs.slug",
         operator: "eq",
         value: slug,
@@ -38,33 +28,67 @@ export const UserPublicList: React.FC = () => {
         operator: "eq",
         value: true,
       },
-    ]
-    },
+    ],
     meta: {
       select: "*, user_slugs!inner(slug)",
     },
   });
 
-  return (
-    <List>
-      <Table {...tableProps} rowKey="id">
-        <Table.Column key="name" dataIndex="name" title="Name" sorter />
-        <Table.Column key="description" dataIndex="description" title="Description" sorter/>
-        <Table.Column key="is_public" dataIndex="is_public" title="Is Public ?" sorter
-          render={(value: boolean) => <Switch checked={value} disabled />}
-        />
+  const wishes = data?.data ?? [];
+  const remaining = wishes.filter((w) => !w.is_reserved).length;
+  const allReserved = wishes.length > 0 && remaining === 0;
 
-        <Table.Column<IWish>
-          title="Actions"
-          dataIndex="actions"
-          render={(_, record) => (
-            <Space>
-              <EditButton hideText size="small" recordItemId={record.id} />
-              <ShowButton hideText size="small" recordItemId={record.id} />
-            </Space>
-          )}
-        />
-      </Table>
+  const headerTitle = slug ? `Anniversaire de ${slug} 🎂` : "Liste de souhaits";
+
+  return (
+    <List title={headerTitle} breadcrumb={false} headerButtons={null}>
+      <Typography.Paragraph type="secondary">
+        {allReserved ? (
+          <>Tout a été réservé, tu peux toujours faire une surprise 🎁</>
+        ) : (
+          <>
+            Choisis ce qui fera plaisir 💝<br />
+            {remaining} cadeaux restants à réserver
+          </>
+        )}
+      </Typography.Paragraph>
+
+      {isLoading ? (
+        <Spin />
+      ) : (
+        <Row gutter={[16, 16]}
+          style={{ marginTop: 16 }}>
+          {wishes.map((wish) => (
+            <Col xs={24} sm={12} md={8} key={wish.id}>
+              <WishCard
+                name={wish.name}
+                description={wish.description}
+                image={wish.image_url}
+                isReserved={wish.is_reserved}
+                onReserve={() => {}}
+                onProposeLink={() => {}}
+              />
+            </Col>
+          ))}
+        </Row>
+      )}
+
+      {!allReserved && (
+        <div
+          style={{
+            position: "sticky",
+            bottom: 0,
+            padding: "8px 0",
+            background: "#fff",
+            borderTop: "1px solid #f0f0f0",
+            textAlign: "center",
+            fontWeight: 500,
+            marginTop: 24,
+          }}
+        >
+          {remaining} cadeaux restants à réserver
+        </div>
+      )}
     </List>
   );
 };
