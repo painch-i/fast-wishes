@@ -27,7 +27,7 @@ export const QuickAddBar: React.FC<QuickAddBarProps> = ({ onAdd }) => {
     >
       <Space>
         <Input
-          placeholder="Colle un lien ou ajoute un souhait"
+          placeholder="Colle un lien…"
           value={link}
           onChange={(e) => setLink(e.target.value)}
           size="large"
