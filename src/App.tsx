@@ -14,17 +14,20 @@ import routerBindings, {
 } from "@refinedev/react-router";
 import { dataProvider, liveProvider } from "@refinedev/supabase";
 import { BrowserRouter, Route, Routes } from "react-router";
+import { ConfigProvider } from "antd";
 import authProvider from "./authProvider";
 import { AnonymousLogin } from "./components/auth/anonymous-login";
 import { ColorModeContextProvider } from "./contexts/color-mode";
-import { UserPublicList } from "./pages/lists/user-public-list.page";
+import { PublicWishlistPage } from "./pages/wishes/public-wishlist.page";
 import { NewWishPage } from "./pages/wishes/new-wish.page";
 import { EditWishListPage } from "./pages/wishes/wish-list-edit.page";
+import { theme } from "./theme";
 import { supabaseClient } from "./utility";
 
 function App() {
   return (
     <BrowserRouter>
+      <ConfigProvider theme={theme}>
       <GitHubBanner />
       <RefineKbarProvider>
         <ColorModeContextProvider>
@@ -60,7 +63,7 @@ function App() {
                       </Routes>
                     </Authenticated>
                     <Routes>
-                      <Route path="/l/:slug" element={<UserPublicList />} />
+                      <Route path="/l/:slug" element={<PublicWishlistPage />} />
                     </Routes>
                 <RefineKbar />
                 <UnsavedChangesNotifier />
@@ -69,6 +72,7 @@ function App() {
           </RefineSnackbarProvider>
         </ColorModeContextProvider>
       </RefineKbarProvider>
+      </ConfigProvider>
     </BrowserRouter>
   );
 }
