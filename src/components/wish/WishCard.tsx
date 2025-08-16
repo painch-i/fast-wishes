@@ -21,7 +21,9 @@ export const WishCard: React.FC<WishCardProps> = ({ wish, onReserve, onProposeLi
             <img src={wish.image} alt={wish.name} />
           ) : (
             <div className="placeholder" aria-hidden>
-              🎁
+              <span role="img" aria-label="cadeau">
+                🎁
+              </span>
             </div>
           )}
           {reserved && (
@@ -45,7 +47,12 @@ export const WishCard: React.FC<WishCardProps> = ({ wish, onReserve, onProposeLi
       >
         Réserver
       </Button>
-      <Button type="link" block onClick={() => onProposeLink?.(wish)}>
+      <Button
+        type="link"
+        block
+        className="secondary-link"
+        onClick={() => onProposeLink?.(wish)}
+      >
         Proposer un autre lien
       </Button>
     </Card>
