@@ -18,48 +18,52 @@ function writeExtras(store: WishExtraStore) {
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(store));
 }
 
-export const smartDataProvider: DataProvider = {
+export const smartDataProvider = {
   ...baseProvider,
-  async getList(resource, params) {
-    const supRes = await baseProvider.getList(resource, params);
-    if (resource !== "wishes") return supRes;
+  async getList(params: any) {
+    const supRes = await baseProvider.getList(params);
+    if (params.resource !== "wishes") return supRes;
     const extras = readExtras();
     return {
       ...supRes,
-      data: supRes.data.map((item: any) => ({ ...item, ...extras[item.id] })),
+      data: supRes.data.map((item: any) => ({
+        ...item,
+        ...extras[String(item.id)],
+      })),
     };
   },
-  async getOne(resource, params) {
-    const supRes = await baseProvider.getOne(resource, params);
-    if (resource !== "wishes") return supRes;
+  async getOne(params: any) {
+    const supRes = await baseProvider.getOne(params);
+    if (params.resource !== "wishes") return supRes;
     const extras = readExtras();
+    const idKey = String(supRes.data.id);
     return {
       ...supRes,
-      data: { ...supRes.data, ...extras[supRes.data.id] },
+      data: { ...supRes.data, ...extras[idKey] },
     };
   },
-  async create(resource, params) {
-    if (resource !== "wishes") return baseProvider.create(resource, params);
-    const { variables } = params;
-    const supRes = await baseProvider.create(resource, { variables });
+  async create(params: any) {
+    if (params.resource !== "wishes") return baseProvider.create(params);
+    const supRes = await baseProvider.create(params);
     const extras = readExtras();
-    extras[supRes.data.id] = { ...extras[supRes.data.id], ...variables };
+    const idKey = String(supRes.data.id);
+    extras[idKey] = { ...extras[idKey], ...params.variables };
     writeExtras(extras);
     return {
       ...supRes,
-      data: { ...supRes.data, ...extras[supRes.data.id] },
+      data: { ...supRes.data, ...extras[idKey] },
     };
   },
-  async update(resource, params) {
-    if (resource !== "wishes") return baseProvider.update(resource, params);
-    const { variables, id } = params;
-    const supRes = await baseProvider.update(resource, { id, variables });
+  async update(params: any) {
+    if (params.resource !== "wishes") return baseProvider.update(params);
+    const supRes = await baseProvider.update(params);
     const extras = readExtras();
-    extras[id as string] = { ...extras[id as string], ...variables };
+    const idKey = String(params.id);
+    extras[idKey] = { ...extras[idKey], ...params.variables };
     writeExtras(extras);
     return {
       ...supRes,
-      data: { ...supRes.data, ...extras[id as string] },
+      data: { ...supRes.data, ...extras[idKey] },
     };
   },
-};
+} as DataProvider;

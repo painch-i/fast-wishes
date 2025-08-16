@@ -3,7 +3,7 @@ import { WishUI } from "../../../types/wish";
 
 export const PreviewPublic: React.FC<{ wish: WishUI }> = ({ wish }) => {
   const mapped = {
-    id: wish.id,
+    id: Number(wish.id),
     name: wish.title,
     image: wish.imageUrl,
     meta: wish.url,
