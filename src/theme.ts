@@ -11,14 +11,14 @@ export const spacing = {
 
 export const radii = {
   sm: 12,
-  lg: 16,
+  card: 12,
 } as const;
 
 export const colors = {
-  headerBg: '#fff2e8', // pastel peach
-  textPrimary: '#222',
-  textSecondary: '#666',
-  primary: '#ff6f61',
+  headerBg: '#FFF7F4', // pastel peach
+  textPrimary: '#1F2937',
+  textSecondary: '#6B7280',
+  primary: '#FF6B6B',
   success: '#4caf50',
   reservedBg: '#f5f5f5',
 } as const;
@@ -31,13 +31,14 @@ export const theme: ThemeConfig = {
     colorTextSecondary: colors.textSecondary,
     borderRadius: radii.sm,
     fontFamily: 'system-ui, sans-serif',
+    controlHeight: 44,
   },
   components: {
     Button: {
       borderRadius: radii.sm,
     },
     Card: {
-      borderRadius: radii.lg,
+      borderRadius: radii.card,
       boxShadow: '0 6px 20px rgba(0,0,0,0.06)',
     },
     Tag: {

@@ -32,7 +32,13 @@ export const PublicWishlistPage: React.FC = () => {
       <header className="wishlist-header">
         <h1>Anniversaire de Ismael 🎂</h1>
         <p className="subtitle">Choisis ce qui fera plaisir 💝</p>
-        <Tag className="counter">🎁 {remaining} cadeaux restants</Tag>
+        <Tag className="counter">
+          <span role="img" aria-label="cadeau">
+            🎁
+          </span>
+          {" "}
+          {remaining} cadeaux restants
+        </Tag>
       </header>
       <div className="wish-grid">
         {isLoading
