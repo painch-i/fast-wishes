@@ -18,6 +18,9 @@ export const PublicWishlistPage: React.FC = () => {
       },
       { field: "is_public", operator: "eq", value: true },
     ],
+    meta: {
+      select: "*, user_slugs!inner(slug)",
+    },
   });
 
   const wishes = data?.data ?? [];
