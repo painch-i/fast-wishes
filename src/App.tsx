@@ -12,17 +12,18 @@ import routerBindings, {
   DocumentTitleHandler,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-import { dataProvider, liveProvider } from "@refinedev/supabase";
+  import { liveProvider } from "@refinedev/supabase";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { ConfigProvider } from "antd";
 import authProvider from "./authProvider";
 import { AnonymousLogin } from "./components/auth/anonymous-login";
 import { ColorModeContextProvider } from "./contexts/color-mode";
 import { PublicWishlistPage } from "./pages/wishes/public-wishlist.page";
-import { NewWishPage } from "./pages/wishes/new-wish.page";
-import { EditWishListPage } from "./pages/wishes/wish-list-edit.page";
-import { theme } from "./theme";
-import { supabaseClient } from "./utility";
+  import { NewWishPage } from "./pages/wishes/new-wish.page";
+  import { theme } from "./theme";
+  import { supabaseClient } from "./utility";
+  import { smartDataProvider } from "./providers/smartDataProvider";
+  import { WishesListPage } from "./pages/wishes/WishesListPage";
 
 function App() {
   return (
@@ -35,8 +36,8 @@ function App() {
           <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
           <RefineSnackbarProvider>
               <Refine
-                dataProvider={dataProvider(supabaseClient)}
-                liveProvider={liveProvider(supabaseClient)}
+                  dataProvider={smartDataProvider}
+                  liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
                 routerProvider={routerBindings}
                 notificationProvider={useNotificationProvider}
@@ -56,7 +57,7 @@ function App() {
               >
                     <Authenticated key="protected" fallback={<AnonymousLogin/>}>
                       <Routes>
-                          <Route path="/wishes" element={<EditWishListPage />} />
+                            <Route path="/wishes" element={<WishesListPage />} />
                           <Route path="/new-wish" element={<NewWishPage />} />
                           {/* <Route path="/:slug/:id" element={<WishShow />} /> */}
                           {/* <Route path="/wishes/:id/edit" element={<WishEdit />} /> */}
