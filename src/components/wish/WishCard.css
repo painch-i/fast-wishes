@@ -1,5 +1,6 @@
+
 .wish-card {
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
   transition: transform 0.2s;
@@ -21,7 +22,9 @@
 .image-wrapper {
   position: relative;
   padding-top: 75%;
-  background-color: #f0f0f0;
+  background-color: #f3f4f6;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
 }
 
 .image-wrapper img,
@@ -35,7 +38,8 @@
   align-items: center;
   justify-content: center;
   object-fit: cover;
-  font-size: 32px;
+  font-size: 24px;
+  color: #ff6b6b;
 }
 
 .reserved-badge {
@@ -54,6 +58,19 @@
 }
 
 .wish-meta {
-  color: #666;
+  color: #6b7280;
   margin-bottom: 16px;
+}
+
+.wish-card .ant-card-body {
+  padding: 16px;
+}
+
+.wish-card .ant-btn-primary {
+  background-color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.wish-card .secondary-link {
+  color: #6b7280;
 }
