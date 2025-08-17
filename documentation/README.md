@@ -18,3 +18,7 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 ## Accessibility
 - Interactive elements maintain a minimum touch area of 44px and include aria attributes for state changes.
 
+## Build
+- The project builds via `tsc && vite build` to ensure compatibility with Yarn PnP.
+- Extra runtime helpers rely on `@mui/system` for MUI Data Grid and `tslib` for TypeScript transpiled helpers.
+

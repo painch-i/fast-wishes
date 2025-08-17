@@ -64,7 +64,7 @@ export const WishesListPage: React.FC = () => {
       {
         onSuccess: (data) => {
           if (data?.data?.id) {
-            setExtras(data.data.id, { notePrivate, tags, metadata });
+            setExtras(String(data.data.id), { notePrivate, tags, metadata });
           }
           message.success("Enregistré ✨");
           setCreateOpen(false);
