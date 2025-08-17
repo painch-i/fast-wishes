@@ -168,7 +168,12 @@ export const WishesListPage: React.FC = () => {
         onCancel={() => setCreateOpen(false)}
         onSubmit={(values) => handleCreate(values)}
       />
-      <QuickAddBar onAdd={(url) => openCreate({ url })} />
+      {!createOpen && (
+        <QuickAddBar
+          onAdd={(url) => openCreate({ url })}
+          aria-hidden={createOpen}
+        />
+      )}
     </List>
   );
 };
