@@ -1,56 +1,161 @@
 import { useState } from "react";
-import { List, useTable } from "@refinedev/antd";
 import {
-  Table,
-  Image,
-  Switch,
-  Select,
-  InputNumber,
-  Tag,
-  Button,
   Typography,
-  Empty,
+  Skeleton,
+  Button,
   message,
-  Space,
 } from "antd";
-import { useCreate, useUpdate } from "@refinedev/core";
-import { useGetIdentity } from "@refinedev/core";
-import { CreateWishWizard } from "../../components/admin/wishes/CreateWishWizard";
+import {
+  useGetIdentity,
+  useList,
+  useCreate,
+  useUpdate,
+} from "@refinedev/core";
+
 import { EditWishDrawer } from "../../components/admin/wishes/EditWishDrawer";
-import { QuickAddBar } from "../../components/admin/wishes/QuickAddBar";
+import { CreateWishWizard } from "../../components/admin/wishes/CreateWishWizard";
 import { WishUI } from "../../types/wish";
 import { UserIdentity } from "../../types";
 import { mapDbToWishUI, getExtras, setExtras } from "../../utility";
 
+const formatPrice = (
+  price?: number | string | null,
+  currency?: string | null
+) => {
+  if (price == null || !currency) return null;
+  const numeric = typeof price === "string" ? parseFloat(price) : price;
+  if (isNaN(Number(numeric))) return null;
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency,
+  }).format(numeric);
+};
+
+type RowProps = {
+  item: WishUI;
+  onClick: (item: WishUI) => void;
+};
+
+const Row: React.FC<RowProps> = ({ item, onClick }) => {
+  const price = formatPrice(item.price, item.currency);
+  const [pressed, setPressed] = useState(false);
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label={`Modifier ${item.name}`}
+      onClick={() => onClick(item)}
+      onKeyDown={(e) =>
+        (e.key === "Enter" || e.key === " ") && onClick(item)
+      }
+      onPointerDown={() => setPressed(true)}
+      onPointerUp={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "12px 0",
+        borderBottom: "1px solid #F0F2F5",
+        background: pressed ? "#FAFAFA" : undefined,
+        cursor: "pointer",
+      }}
+    >
+      {item.image_url ? (
+        <img
+          src={item.image_url}
+          alt=""
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            objectFit: "cover",
+            flexShrink: 0,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            background: "#F6F7F9",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            fontSize: 24,
+          }}
+        >
+          🎁
+        </div>
+      )}
+      <div style={{ flex: 1, marginLeft: 12, overflow: "hidden" }}>
+        <div
+          style={{
+            fontWeight: 600,
+            fontSize: 16,
+            color: "#1F2937",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {item.name}
+        </div>
+        {item.description && (
+          <div
+            style={{
+              fontSize: 14,
+              color: "#6B7280",
+              lineHeight: 1.35,
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {item.description}
+          </div>
+        )}
+      </div>
+      {price && (
+        <div
+          style={{
+            marginLeft: 12,
+            fontSize: 16,
+            fontWeight: 600,
+            color: "#111827",
+            textAlign: "right",
+            flexShrink: 0,
+          }}
+        >
+          {price}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const WishesListPage: React.FC = () => {
   const { data: identity } = useGetIdentity<UserIdentity>();
-  const { tableProps } = useTable<WishUI>({
+
+  const { data, isLoading, isError, refetch } = useList<WishUI>({
     resource: "wishes",
-    queryOptions: {
-      enabled: !!identity,
-    },
-    filters: {
-      permanent: [
-        {
-          field: "user_id",
-          operator: "eq",
-          value: identity?.id,
-        },
-      ],
-    },
+    filters: [
+      { field: "user_id", operator: "eq", value: identity?.id },
+    ],
+    queryOptions: { enabled: !!identity },
   });
+
+  const wishes = data?.data ?? [];
+
   const { mutate: update } = useUpdate();
   const { mutate: create } = useCreate();
 
-  const [createOpen, setCreateOpen] = useState(false);
-  const [createInitial, setCreateInitial] = useState<Partial<WishUI> | undefined>();
   const [editOpen, setEditOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<WishUI | undefined>();
-
-  const openCreate = (initial?: Partial<WishUI>) => {
-    setCreateInitial(initial);
-    setCreateOpen(true);
-  };
 
   const openEdit = (record: WishUI) => {
     const extras = getExtras(String(record.id));
@@ -68,8 +173,12 @@ export const WishesListPage: React.FC = () => {
           setExtras(String(editing.id), { note_private, tags, metadata });
           message.success("Enregistré ✨");
           setEditOpen(false);
+          refetch();
         },
-        onError: () => message.error("Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement."),
+        onError: () =>
+          message.error(
+            "Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement."
+          ),
       }
     );
   };
@@ -85,94 +194,95 @@ export const WishesListPage: React.FC = () => {
           }
           message.success("Enregistré ✨");
           setCreateOpen(false);
+          refetch();
         },
-        onError: () => message.error("Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement."),
+        onError: () =>
+          message.error(
+            "Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement."
+          ),
       }
     );
   };
 
   return (
-    <List>
-      <div style={{ marginBottom: 24 }}>
-        <Typography.Title level={3}>Tes souhaits 🎁</Typography.Title>
-        <Typography.Paragraph>
-          Ajoute, organise et rends-les visibles à tes proches. On t’accompagne.
-        </Typography.Paragraph>
-        <Space>
-          <Button type="primary" onClick={() => openCreate()}>Créer un souhait</Button>
-          <Button onClick={() => openCreate()}>Importer depuis un lien</Button>
-        </Space>
+    <div style={{ padding: "0 16px" }}>
+      <div style={{ margin: "16px 0" }}>
+        <Typography.Title level={2} style={{ margin: 0, fontWeight: 600 }}>
+          Tes souhaits 🎁
+        </Typography.Title>
+        <Typography.Text type="secondary">
+          Ajoute ce qui compte, on garde le reste simple.
+        </Typography.Text>
       </div>
-      <Table {...tableProps} rowKey="id" scroll={{ x: true }}>
-        <Table.Column<WishUI>
-          title="Image"
-          dataIndex="image_url"
-          render={(value) => value ? <Image src={value} width={48} /> : null}
-        />
-        <Table.Column<WishUI> title="Titre" dataIndex="name" />
-        <Table.Column<WishUI>
-          title="Prix"
-          dataIndex="price"
-          render={(value, record) => (
-            <InputNumber
-              min={0}
-              defaultValue={value}
-              onBlur={(e) =>
-                update(
-                  { resource: "wishes", id: record.id, values: { price: Number(e.target.value) } },
-                  { onSuccess: () => message.success("C'est noté ✔️") }
-                )
-              }
-            />
-          )}
-        />
-        <Table.Column<WishUI>
-          title="Statut"
-          dataIndex="status"
-          render={(value, record) => (
-            <Select
-              defaultValue={value}
-              onChange={(val) =>
-                update(
-                  { resource: "wishes", id: record.id, values: { status: val } },
-                  { onSuccess: () => message.success("C'est noté ✔️") }
-                )
-              }
-              options={["draft", "available", "reserved", "received", "archived"].map(v => ({ value: v }))}
-            />
-          )}
-        />
-        <Table.Column<WishUI>
-          title="Public ?"
-          dataIndex="is_public"
-          render={(value, record) => (
-            <Switch
-              checked={value}
-              onChange={(val) =>
-                update(
-                  { resource: "wishes", id: record.id, values: { is_public: val } },
-                  { onSuccess: () => message.success("C'est noté ✔️") }
-                )
-              }
-            />
-          )}
-        />
-        <Table.Column<WishUI>
-          title="Tags"
-          dataIndex="tags"
-          render={(tags: string[] = []) => tags.map((t) => <Tag key={t}>{t}</Tag>)}
-        />
-        <Table.Column<WishUI>
-          title="Actions"
-          dataIndex="actions"
-          render={(_, record) => (
-            <Button onClick={() => openEdit(record)}>Éditer</Button>
-          )}
-        />
-      </Table>
-      {(!tableProps?.dataSource || tableProps.dataSource.length === 0) && (
-        <Empty description="Aucun souhait pour l’instant. Commence par un lien, c’est magique." />
+
+      {isLoading && (
+        <div>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "12px 0",
+                borderBottom: "1px solid #F0F2F5",
+              }}
+            >
+              <Skeleton.Avatar
+                active
+                shape="square"
+                size={56}
+                style={{ borderRadius: 12 }}
+              />
+              <div style={{ flex: 1, marginLeft: 12 }}>
+                <Skeleton.Input
+                  active
+                  style={{ width: "60%", marginBottom: 8 }}
+                  size="small"
+                />
+                <Skeleton.Input
+                  active
+                  style={{ width: "80%" }}
+                  size="small"
+                />
+              </div>
+              <Skeleton.Input
+                active
+                style={{ width: 80, marginLeft: 12 }}
+                size="small"
+              />
+            </div>
+          ))}
+        </div>
       )}
+
+      {!isLoading && isError && (
+        <div style={{ textAlign: "center", padding: "40px 0" }}>
+          <Typography.Text>
+            Oups, impossible d’afficher la liste.
+          </Typography.Text>
+          <div style={{ marginTop: 16 }}>
+            <Button onClick={() => refetch()}>Réessayer</Button>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && !isError && wishes.length === 0 && (
+        <div style={{ textAlign: "center", padding: "40px 0" }}>
+          <div style={{ fontSize: 48 }}>🎁</div>
+          <Typography.Paragraph>
+            Aucun souhait pour l’instant. Ajoute ton premier ✨
+          </Typography.Paragraph>
+        </div>
+      )}
+
+      {!isLoading && !isError && wishes.length > 0 && (
+        <div>
+          {wishes.map((w) => (
+            <Row key={w.id} item={w} onClick={openEdit} />
+          ))}
+        </div>
+      )}
+
       <EditWishDrawer
         open={editOpen}
         initialValues={editing}
@@ -181,16 +291,26 @@ export const WishesListPage: React.FC = () => {
       />
       <CreateWishWizard
         open={createOpen}
-        initialValues={createInitial}
         onCancel={() => setCreateOpen(false)}
         onSubmit={(values) => handleCreate(values)}
       />
       {!createOpen && (
-        <QuickAddBar
-          onAdd={(url) => openCreate({ url })}
-          aria-hidden={createOpen}
-        />
+        <Button
+          type="primary"
+          shape="circle"
+          size="large"
+          onClick={() => setCreateOpen(true)}
+          style={{
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          +
+        </Button>
       )}
-    </List>
+    </div>
   );
 };
+
