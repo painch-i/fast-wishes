@@ -26,3 +26,7 @@ Supabase Postgres powers persistence. Types are generated with `npx supabase gen
 - The project builds via `tsc && vite build` to ensure compatibility with Yarn PnP.
 - Extra runtime helpers rely on `@mui/system` for MUI Data Grid and `tslib` for TypeScript transpiled helpers.
 
+## Branding
+- Refine-specific banners and metadata were removed.
+- A custom star-themed favicon (`public/favicon.svg`) now represents the Fast Wishes brand.
+
