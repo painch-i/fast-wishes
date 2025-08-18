@@ -18,16 +18,40 @@ import { WishUI } from "../../types/wish";
 import { UserIdentity } from "../../types";
 import { mapDbToWishUI, getExtras, setExtras } from "../../utility";
 
+const browserLocale = () =>
+  typeof navigator !== "undefined" && navigator.language
+    ? navigator.language
+    : undefined;
+
+const defaultCurrency = (locale?: string) => {
+  if (!locale) return "EUR";
+  try {
+    const region = new Intl.Locale(locale).maximize().region;
+    const map: Record<string, string> = {
+      US: "USD",
+      GB: "GBP",
+      FR: "EUR",
+      DE: "EUR",
+      ES: "EUR",
+    };
+    return (region && map[region]) || "EUR";
+  } catch {
+    return "EUR";
+  }
+};
+
 const formatPrice = (
   price?: number | string | null,
   currency?: string | null
 ) => {
-  if (price == null || !currency) return null;
+  if (price == null) return null;
   const numeric = typeof price === "string" ? parseFloat(price) : price;
   if (isNaN(Number(numeric))) return null;
-  return new Intl.NumberFormat("fr-FR", {
+  const locale = browserLocale();
+  const cur = currency || defaultCurrency(locale);
+  return new Intl.NumberFormat(locale, {
     style: "currency",
-    currency,
+    currency: cur,
   }).format(numeric);
 };
 
