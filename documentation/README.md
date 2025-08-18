@@ -9,12 +9,15 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 - **Header background:** `#FFF7F4`
 - **Radius:** `12px` for cards and images
 
+## Theme
+- The interface is locked to a light theme across all pages. Dark mode and theme toggles were removed, and the `<meta name="color-scheme" content="light">` hint ensures consistent light rendering on every platform.
+
 ## Components
 - **Header** uses a light peach gradient and balanced title wrapping. The counter badge is centered beneath the subtitle.
 - **Wish grid** displays a single column on small screens and switches to two columns from 400px width with generous gaps.
   - **WishCard** features a 4:3 image placeholder, subdued coral CTA, secondary link styling, and a reserved state badge.
   - See `admin-wishes-ui.md` for details on the administration CRUD interface including the redesigned creation wizard with a sticky action bar and mobile progress pills.
-- **Wishes List** filters Supabase queries by `user_id` to show only the signed-in user's wishes, preventing leakage of public wishes from other accounts.
+- **Wishes List** filters Supabase queries by `user_id` to show only the signed-in user's wishes and renders a mobile-first list with image/placeholder, title, two-line description and a price formatted using the viewer's locale and currency. It handles skeleton loading, friendly empty and error states, and offers a single floating “+ Ajouter” button for creation.
 
 ## Accessibility
 - Interactive elements maintain a minimum touch area of 44px and include aria attributes for state changes.
