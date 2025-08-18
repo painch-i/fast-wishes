@@ -40,7 +40,7 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<WishUI>();
   const url = Form.useWatch("url", form);
-  const { metadata } = useLinkMetadata(url);
+  const { metadata } = useLinkMetadata(url ?? undefined);
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
 
@@ -64,8 +64,8 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
     if (metadata) {
       const existing = form.getFieldsValue();
       form.setFieldsValue({
-        title: existing.title || metadata.title,
-        imageUrl: existing.imageUrl || metadata.image,
+        name: existing.name || metadata.title,
+        image_url: existing.image_url || metadata.image,
       } as any);
     }
   }, [metadata, form]);
@@ -73,7 +73,7 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
   const validateStep = () => {
     if (current === 1) {
       form
-        .validateFields(["title", "price", "url"])
+        .validateFields(["name", "price", "url"])
         .then(() => setStepValid(true))
         .catch(() => setStepValid(false));
     } else {
@@ -193,7 +193,7 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
             {metadata.favicon && (
               <img src={metadata.favicon} alt="" width={16} height={16} />
             )}
-            <span>{metadata.title || metadata.siteName}</span>
+            <span>{metadata.title || metadata.site_name}</span>
           </Space>
         </div>
       )}
@@ -208,13 +208,13 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
             Ajoute ce qui compte : une jolie photo, un petit mot…
           </Typography.Paragraph>
           <Form.Item
-            name="title"
+            name="name"
             label="Titre"
             rules={[{ required: true, message: "Titre requis" }]}
           >
             <Input size="large" onBlur={validateStep} />
           </Form.Item>
-          <Form.Item name="imageUrl" label="Image">
+          <Form.Item name="image_url" label="Image">
             <Input size="large" onBlur={validateStep} />
           </Form.Item>
           <Form.Item
@@ -255,7 +255,7 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
               onChange={validateStep}
             />
           </Form.Item>
-          <Form.Item name="notePrivate" label="Note privée">
+          <Form.Item name="note_private" label="Note privée">
             <Input.TextArea rows={2} onBlur={validateStep} />
           </Form.Item>
         </Card>
@@ -277,7 +277,7 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
           onChange={validateStep}
         />
       </Form.Item>
-      <Form.Item name="isPublic" label="Public ?" valuePropName="checked">
+      <Form.Item name="is_public" label="Public ?" valuePropName="checked">
         <Switch onChange={validateStep} />
       </Form.Item>
     </Card>

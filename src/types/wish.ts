@@ -1,26 +1,20 @@
+import type { Tables } from "../../database.types";
+
 export type WishStatus = "draft" | "available" | "reserved" | "received" | "archived";
 
-export type WishUI = {
-  id: string;
-  title: string;
-  description?: string;
-  url?: string;
-  price?: number;
+export type WishUI = Tables<"wishes"> & {
   currency?: "EUR" | "USD" | "GBP";
-  imageUrl?: string;
+  image_url?: string;
   quantity?: number;
   priority?: 1 | 2 | 3;
-  isPublic?: boolean;
   status?: WishStatus;
-  notePrivate?: string;
+  note_private?: string;
   tags?: string[];
   metadata?: {
-    siteName?: string;
+    site_name?: string;
     favicon?: string;
     title?: string;
   };
-  createdAt?: string;
-  updatedAt?: string;
 };
 
 export type WishExtraStore = Record<string, Partial<WishUI>>;

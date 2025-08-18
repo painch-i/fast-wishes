@@ -36,19 +36,19 @@ export const WishesListPage: React.FC = () => {
   };
 
   const openEdit = (record: WishUI) => {
-    const extras = getExtras(record.id);
+    const extras = getExtras(String(record.id));
     setEditing(mapDbToWishUI(record, extras));
     setEditOpen(true);
   };
 
   const handleEditSave = async (values: WishUI) => {
     if (!editing) return;
-    const { notePrivate, tags, metadata, ...dbValues } = values;
+    const { note_private, tags, metadata, ...dbValues } = values;
     update(
       { resource: "wishes", id: editing.id, values: dbValues },
       {
         onSuccess: () => {
-          setExtras(editing.id, { notePrivate, tags, metadata });
+          setExtras(String(editing.id), { note_private, tags, metadata });
           message.success("Enregistré ✨");
           setEditOpen(false);
         },
@@ -58,13 +58,13 @@ export const WishesListPage: React.FC = () => {
   };
 
   const handleCreate = (values: WishUI) => {
-    const { notePrivate, tags, metadata, ...dbValues } = values;
+    const { note_private, tags, metadata, ...dbValues } = values;
     create(
       { resource: "wishes", values: dbValues },
       {
         onSuccess: (data) => {
           if (data?.data?.id) {
-            setExtras(String(data.data.id), { notePrivate, tags, metadata });
+            setExtras(String(data.data.id), { note_private, tags, metadata });
           }
           message.success("Enregistré ✨");
           setCreateOpen(false);
@@ -89,10 +89,10 @@ export const WishesListPage: React.FC = () => {
       <Table {...tableProps} rowKey="id" scroll={{ x: true }}>
         <Table.Column<WishUI>
           title="Image"
-          dataIndex="imageUrl"
+          dataIndex="image_url"
           render={(value) => value ? <Image src={value} width={48} /> : null}
         />
-        <Table.Column<WishUI> title="Titre" dataIndex="title" />
+        <Table.Column<WishUI> title="Titre" dataIndex="name" />
         <Table.Column<WishUI>
           title="Prix"
           dataIndex="price"
@@ -127,13 +127,13 @@ export const WishesListPage: React.FC = () => {
         />
         <Table.Column<WishUI>
           title="Public ?"
-          dataIndex="isPublic"
+          dataIndex="is_public"
           render={(value, record) => (
             <Switch
               checked={value}
               onChange={(val) =>
                 update(
-                  { resource: "wishes", id: record.id, values: { isPublic: val } },
+                  { resource: "wishes", id: record.id, values: { is_public: val } },
                   { onSuccess: () => message.success("C'est noté ✔️") }
                 )
               }

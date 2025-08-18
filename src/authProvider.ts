@@ -1,6 +1,7 @@
 import { AuthProvider } from "@refinedev/core";
 import { customAlphabet } from "nanoid";
 import { supabaseClient } from "./utility";
+import type { TablesInsert } from "../database.types";
 
 const nanoid = customAlphabet('1234567890abcdef', 5)
 
@@ -23,10 +24,12 @@ const authProvider: AuthProvider = {
     }
 
     if (data.user?.id) {
-      await supabaseClient.from('user_slugs').insert({
-        id: data.user.id,
-        slug: nanoid()
-      })
+      await supabaseClient
+        .from("user_slugs")
+        .insert<TablesInsert<"user_slugs">>({
+          id: data.user.id,
+          slug: nanoid(),
+        });
     }
 
     return {

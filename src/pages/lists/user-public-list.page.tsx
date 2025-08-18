@@ -8,10 +8,9 @@ import {
 } from "@refinedev/antd";
 import { Space, Switch, Table } from "antd";
 import { useParams } from "react-router";
+import type { Tables } from "../../../database.types";
 
-export type IWish = {
-  id: number;
-};
+export type IWish = Tables<"wishes">;
 
 
 export type IUser = {

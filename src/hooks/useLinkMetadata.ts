@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export type LinkMetadata = {
-  siteName?: string;
+  site_name?: string;
   title?: string;
   favicon?: string;
   image?: string;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export type Metadata = {
-  siteName?: string;
+  site_name?: string;
   title?: string;
   favicon?: string;
   image?: string;
@@ -17,7 +17,7 @@ export const useWishMetadata = (url?: string) => {
     const timer = setTimeout(() => {
       // Mocked metadata fetch
       setMetadata({
-        siteName: "Amazon",
+        site_name: "Amazon",
         title: "Titre détecté",
         favicon: "https://www.amazon.com/favicon.ico",
         image: `https://picsum.photos/seed/${encodeURIComponent(url)}/640/480`,
