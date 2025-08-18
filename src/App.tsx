@@ -8,6 +8,7 @@ import {
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
+import { ThemeProvider } from "@mui/material/styles";
 import routerBindings, {
   DocumentTitleHandler,
   UnsavedChangesNotifier,
@@ -17,22 +18,22 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { ConfigProvider } from "antd";
 import authProvider from "./authProvider";
 import { AnonymousLogin } from "./components/auth/anonymous-login";
-import { ColorModeContextProvider } from "./contexts/color-mode";
 import { PublicWishlistPage } from "./pages/wishes/public-wishlist.page";
-  import { NewWishPage } from "./pages/wishes/new-wish.page";
-  import { theme } from "./theme";
-  import { supabaseClient } from "./utility";
-  import { smartDataProvider } from "./providers/smartDataProvider";
-  import { WishesListPage } from "./pages/wishes/WishesListPage";
+import { NewWishPage } from "./pages/wishes/new-wish.page";
+import { theme } from "./theme";
+import { supabaseClient } from "./utility";
+import { smartDataProvider } from "./providers/smartDataProvider";
+import { WishesListPage } from "./pages/wishes/WishesListPage";
+import { RefineThemes } from "@refinedev/mui";
 
 function App() {
   return (
     <BrowserRouter>
       <ConfigProvider theme={theme}>
       <RefineKbarProvider>
-        <ColorModeContextProvider>
+        <ThemeProvider theme={RefineThemes.Blue}>
           <CssBaseline />
-          <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
+          <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto", colorScheme: "light" } }} />
           <RefineSnackbarProvider>
               <Refine
                   dataProvider={smartDataProvider}
@@ -70,7 +71,7 @@ function App() {
                 <DocumentTitleHandler />
               </Refine>
           </RefineSnackbarProvider>
-        </ColorModeContextProvider>
+        </ThemeProvider>
       </RefineKbarProvider>
       </ConfigProvider>
     </BrowserRouter>

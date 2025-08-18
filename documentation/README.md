@@ -9,6 +9,9 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 - **Header background:** `#FFF7F4`
 - **Radius:** `12px` for cards and images
 
+## Theme
+- The interface is locked to a light theme across all pages. Dark mode and theme toggles were removed, and the `<meta name="color-scheme" content="light">` hint ensures consistent light rendering on every platform.
+
 ## Components
 - **Header** uses a light peach gradient and balanced title wrapping. The counter badge is centered beneath the subtitle.
 - **Wish grid** displays a single column on small screens and switches to two columns from 400px width with generous gaps.
