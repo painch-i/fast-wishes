@@ -3,16 +3,15 @@ import {
   EditButton,
   List,
   ShowButton,
-  useTable
+  useTable,
 } from "@refinedev/antd";
 import { useGetIdentity, useOne, useUpdate } from "@refinedev/core";
 import { Space, Switch, Table } from "antd";
 import { Link } from "react-router";
 import { UserIdentity, UserSlug } from "../../types";
+import type { Tables } from "../../../database.types";
 
-export type IWish = {
-  id: number;
-};
+export type IWish = Tables<"wishes">;
 
 
 export type IUser = {

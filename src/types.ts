@@ -1,11 +1,5 @@
-export type User = {
-  id: string;
-};
+import type { Tables } from "../database.types";
 
-export type UserIdentity = User | null;
+export type UserIdentity = { id: string; role?: string } | null;
 
-export type UserSlug = {
-  created_at: string;
-  id: string;
-  slug: string;
-}
+export type UserSlug = Tables<"user_slugs">;

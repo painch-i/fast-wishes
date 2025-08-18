@@ -92,13 +92,13 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
             label: "Général",
             children: (
               <Form layout="vertical" form={form}>
-                <Form.Item name="title" label="Titre" rules={[{ required: true }]}> 
+                <Form.Item name="name" label="Titre" rules={[{ required: true }]}> 
                   <Input size="large" />
                 </Form.Item>
-                <Form.Item name="url" label="URL">
+                <Form.Item name="url" label="URL"> 
                   <Input size="large" />
                 </Form.Item>
-                <Form.Item name="imageUrl" label="Image">
+                <Form.Item name="image_url" label="Image"> 
                   <Input size="large" />
                 </Form.Item>
               </Form>
@@ -124,7 +124,7 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
                 <Form.Item name="tags" label="Tags">
                   <Select mode="tags" tokenSeparators={[","]} />
                 </Form.Item>
-                <Form.Item name="notePrivate" label="Note privée">
+                <Form.Item name="note_private" label="Note privée"> 
                   <Input.TextArea rows={3} />
                 </Form.Item>
                 <Form.Item name="priority" label="Priorité">
@@ -141,7 +141,7 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
                 <Form.Item name="status" label="Statut">
                   <Select options={["draft", "available", "reserved", "received", "archived"].map((v) => ({ value: v }))} />
                 </Form.Item>
-                <Form.Item name="isPublic" label="Public ?" valuePropName="checked">
+                <Form.Item name="is_public" label="Public ?" valuePropName="checked">
                   <Switch />
                 </Form.Item>
               </Form>

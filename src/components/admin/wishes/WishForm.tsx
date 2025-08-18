@@ -19,26 +19,26 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
   });
 
   const url = watch("url");
-  const { metadata } = useWishMetadata(url);
+  const { metadata } = useWishMetadata(url ?? undefined);
 
   useEffect(() => {
-    if (metadata?.title && !watch("title")) {
-      setValue("title", metadata.title);
+    if (metadata?.title && !watch("name")) {
+      setValue("name", metadata.title);
     }
-    if (metadata?.image && !watch("imageUrl")) {
-      setValue("imageUrl", metadata.image);
+    if (metadata?.image && !watch("image_url")) {
+      setValue("image_url", metadata.image);
     }
   }, [metadata, watch, setValue]);
 
   return (
     <Form layout="vertical" form={form} onFinish={handleSubmit(onSubmit)}>
       <Controller
-        name="title"
+        name="name"
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
           <Form.Item label="Titre" required>
-            <Input size="large" {...field} />
+              <Input size="large" {...field} value={field.value ?? ""} />
           </Form.Item>
         )}
       />
@@ -47,19 +47,19 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         control={control}
         render={({ field }) => (
           <Form.Item label="URL">
-            <Input size="large" {...field} />
+              <Input size="large" {...field} value={field.value ?? ""} />
           </Form.Item>
         )}
       />
       {metadata && (
-        <Typography.Text type="secondary">{metadata.siteName}</Typography.Text>
+        <Typography.Text type="secondary">{metadata.site_name}</Typography.Text>
       )}
       <Controller
-        name="imageUrl"
+        name="image_url"
         control={control}
         render={({ field }) => (
           <Form.Item label="Image URL">
-            <Input size="large" {...field} />
+              <Input size="large" {...field} value={field.value ?? ""} />
           </Form.Item>
         )}
       />
@@ -86,7 +86,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         control={control}
         render={({ field }) => (
           <Form.Item label="Description">
-            <TextArea rows={3} {...field} />
+              <TextArea rows={3} {...field} value={field.value ?? ""} />
           </Form.Item>
         )}
       />
@@ -118,7 +118,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         )}
       />
       <Controller
-        name="notePrivate"
+        name="note_private"
         control={control}
         render={({ field }) => (
           <Form.Item label="Note privée">
@@ -136,7 +136,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         )}
       />
       <Controller
-        name="isPublic"
+        name="is_public"
         control={control}
         render={({ field }) => (
           <Form.Item label="Public ?" valuePropName="checked">
