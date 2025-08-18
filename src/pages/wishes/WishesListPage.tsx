@@ -14,14 +14,31 @@ import {
   Space,
 } from "antd";
 import { useCreate, useUpdate } from "@refinedev/core";
+import { useGetIdentity } from "@refinedev/core";
 import { CreateWishWizard } from "../../components/admin/wishes/CreateWishWizard";
 import { EditWishDrawer } from "../../components/admin/wishes/EditWishDrawer";
 import { QuickAddBar } from "../../components/admin/wishes/QuickAddBar";
 import { WishUI } from "../../types/wish";
+import { UserIdentity } from "../../types";
 import { mapDbToWishUI, getExtras, setExtras } from "../../utility";
 
 export const WishesListPage: React.FC = () => {
-  const { tableProps } = useTable<WishUI>({ resource: "wishes" });
+  const { data: identity } = useGetIdentity<UserIdentity>();
+  const { tableProps } = useTable<WishUI>({
+    resource: "wishes",
+    queryOptions: {
+      enabled: !!identity,
+    },
+    filters: {
+      permanent: [
+        {
+          field: "user_id",
+          operator: "eq",
+          value: identity?.id,
+        },
+      ],
+    },
+  });
   const { mutate: update } = useUpdate();
   const { mutate: create } = useCreate();
 

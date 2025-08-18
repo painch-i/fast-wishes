@@ -14,6 +14,7 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 - **Wish grid** displays a single column on small screens and switches to two columns from 400px width with generous gaps.
   - **WishCard** features a 4:3 image placeholder, subdued coral CTA, secondary link styling, and a reserved state badge.
   - See `admin-wishes-ui.md` for details on the administration CRUD interface including the redesigned creation wizard with a sticky action bar and mobile progress pills.
+- **Wishes List** filters Supabase queries by `user_id` to show only the signed-in user's wishes, preventing leakage of public wishes from other accounts.
 
 ## Accessibility
 - Interactive elements maintain a minimum touch area of 44px and include aria attributes for state changes.
