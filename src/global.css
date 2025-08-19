@@ -1,0 +1,19 @@
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+input,
+textarea,
+select,
+.ant-input,
+.ant-select-selector,
+.ant-select-selection-item,
+.ant-select-selection-placeholder {
+  font-size: 16px !important;
+}
+
+input::placeholder,
+textarea::placeholder,
+.ant-select-selection-placeholder {
+  font-size: 16px !important;
+}
