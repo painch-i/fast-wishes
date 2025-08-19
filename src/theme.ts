@@ -19,6 +19,10 @@ export const colors = {
   textPrimary: '#1F2937',
   textSecondary: '#6B7280',
   primary: '#FF6B6B',
+  accentPeach: '#FFE7E1',
+  accentMint: '#E7FFF4',
+  accentLavender: '#EFE7FF',
+  accentYellow: '#FFF7D6',
   success: '#4caf50',
   reservedBg: '#f5f5f5',
 } as const;

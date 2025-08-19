@@ -6,6 +6,7 @@ import {
   Tag,
   message,
 } from "antd";
+import { colors } from "../../theme";
 import {
   useGetIdentity,
   useList,
@@ -74,6 +75,106 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
   })();
   const [pressed, setPressed] = useState(false);
 
+  const accents = [
+    colors.accentPeach,
+    colors.accentMint,
+    colors.accentLavender,
+    colors.accentYellow,
+  ];
+
+  const hashColor = (seed: string) => {
+    let sum = 0;
+    for (let i = 0; i < seed.length; i++) sum += seed.charCodeAt(i);
+    return accents[sum % accents.length];
+  };
+
+  const getEmoji = (name?: string) => {
+    const n = (name || "").toLowerCase();
+    if (/livre|book/.test(n)) return "📚";
+    if (/tech|usb|phone|laptop|ordinateur|électronique/.test(n)) return "🔌";
+    if (/cuisine|kitchen|cook|casserole|poêle/.test(n)) return "🍳";
+    if (/maison|home|déco/.test(n)) return "🏠";
+    if (/pull|shirt|robe|vêt/.test(n)) return "👕";
+    return "🎁";
+  };
+
+  const renderThumb = () => {
+    const accent = hashColor(domain || item.name || "");
+    if (item.image_url) {
+      return (
+        <img
+          src={item.image_url}
+          alt=""
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            objectFit: "cover",
+            flexShrink: 0,
+          }}
+        />
+      );
+    }
+    if (item.metadata?.favicon) {
+      return (
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            background: accent,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <img src={item.metadata.favicon} alt="" style={{ width: 24, height: 24 }} />
+        </div>
+      );
+    }
+    const emoji = getEmoji(item.name);
+    if (emoji !== "🎁") {
+      return (
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            background: accent,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            fontSize: 24,
+          }}
+        >
+          {emoji}
+        </div>
+      );
+    }
+    const initial = item.name?.[0]?.toUpperCase() || "?";
+    return (
+      <div
+        style={{
+          width: 56,
+          height: 56,
+          borderRadius: 12,
+          background: accent,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          fontSize: 24,
+          fontWeight: 600,
+          color: colors.textPrimary,
+        }}
+      >
+        {initial}
+      </div>
+    );
+  };
+
   const handleClick = () => {
     if (navigator.vibrate) navigator.vibrate(10);
     onOpen(item);
@@ -94,47 +195,18 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
         alignItems: "center",
         minHeight: 64,
         padding: "12px 0",
-        borderBottom: "1px solid #F0F2F5",
-        background: pressed ? "#FAFAFA" : undefined,
-        boxShadow: pressed ? "0 1px 2px rgba(0,0,0,0.05)" : undefined,
+        borderBottom: "1px solid #EEF0F3",
+        background: pressed ? colors.accentPeach : undefined,
         cursor: "pointer",
       }}
     >
-      {item.image_url ? (
-        <img
-          src={item.image_url}
-          alt=""
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 12,
-            objectFit: "cover",
-            flexShrink: 0,
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 12,
-            background: "#F6F7F9",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            fontSize: 24,
-          }}
-        >
-          🎁
-        </div>
-      )}
+      {renderThumb()}
       <div style={{ flex: 1, marginLeft: 12, overflow: "hidden" }}>
         <div
           style={{
             fontWeight: 600,
             fontSize: 16,
-            color: "#1F2937",
+            color: colors.textPrimary,
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -144,26 +216,50 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
         </div>
         <div
           style={{
-            fontSize: 14,
-            color: "#6B7280",
-            lineHeight: 1.35,
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            whiteSpace: "nowrap",
             overflow: "hidden",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpen(item, "description");
           }}
         >
-          {item.description || "Ajoute un petit mot pour guider 💌"}
+          {domain && (
+            <Tag
+              style={{
+                background: colors.accentMint,
+                border: "none",
+                color: colors.textPrimary,
+                flexShrink: 0,
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen(item, "url");
+              }}
+            >
+              {domain}
+            </Tag>
+          )}
+          <span
+            style={{
+              fontSize: 14,
+              color: colors.textSecondary,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpen(item, "description");
+            }}
+          >
+            {item.description || "Ajoute un petit mot pour guider 💌"}
+          </span>
         </div>
         {!domain && (
           <div
             style={{
               fontSize: 14,
-              color: "#6B7280",
+              color: colors.textSecondary,
               marginTop: 4,
             }}
             onClick={(e) => {
@@ -175,25 +271,14 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
           </div>
         )}
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        {domain && (
-          <Tag
-            style={{ cursor: "pointer" }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpen(item, "url");
-            }}
-          >
-            {domain}
-          </Tag>
-        )}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
         {price ? (
           <Tag
             style={{
-              background: "#F3F4F6",
+              background: colors.accentPeach,
               border: "none",
               fontWeight: 600,
-              color: "#111827",
+              color: colors.textPrimary,
               cursor: "pointer",
             }}
             onClick={(e) => {
@@ -206,9 +291,9 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
         ) : (
           <Tag
             style={{
-              background: "transparent",
-              border: "1px dashed #D1D5DB",
-              color: "#6B7280",
+              background: colors.accentPeach,
+              border: `1px dashed ${colors.primary}`,
+              color: colors.primary,
               cursor: "pointer",
             }}
             onClick={(e) => {
@@ -389,7 +474,7 @@ export const WishesListPage: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 padding: "12px 0",
-                borderBottom: "1px solid #F0F2F5",
+                borderBottom: "1px solid #EEF0F3",
               }}
             >
               <Skeleton.Avatar
@@ -463,7 +548,7 @@ export const WishesListPage: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     padding: "12px 0",
-                    borderBottom: "1px solid #F0F2F5",
+                    borderBottom: "1px solid #EEF0F3",
                     cursor: "pointer",
                     minHeight: 64,
                   }}
@@ -473,17 +558,18 @@ export const WishesListPage: React.FC = () => {
                       width: 56,
                       height: 56,
                       borderRadius: 12,
-                      background: "#F6F7F9",
+                      background: i % 2 === 0 ? colors.accentPeach : colors.accentMint,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
                       fontSize: 24,
+                      color: colors.primary,
                     }}
                   >
                     +
                   </div>
-                  <div style={{ marginLeft: 12, color: "#6B7280" }}>{placeholder}</div>
+                  <div style={{ marginLeft: 12, color: colors.textSecondary }}>{placeholder}</div>
                 </div>
               ))}
             </>

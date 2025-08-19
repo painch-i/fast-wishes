@@ -8,20 +8,20 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 - When at least one wish exists, a count badge shows `{n} souhait(s)`.
 
 ## Rows
-- Full-width, minimum 64px height, and react to press with a light background and slight elevation.
-- Left: 56×56 image or 🎁 placeholder.
-- Center: one-line title then contextual hints:
-  - Description or fallback "Ajoute un petit mot pour guider 💌".
-  - If no link provided, extra line "+ Lien pour aider à trouver".
-- Right side pills:
-  - Domain pill when a link exists.
-  - Price pill or dashed "Ajouter un prix" pill.
-  - Chevron `›` to indicate navigation.
+- Full-width tap area, minimum 64px height. Pressing briefly highlights the row with a peach tint.
+- Left: 56×56 vignette with 12px radius.
+  - Priority: `image_url` → site favicon on a hashed pastel background → initial letter → category emoji.
+- Center: title on one line then a single meta-line:
+  - The domain chip (mint background) is always at the start when a link exists.
+  - Description or fallback "Ajoute un petit mot pour guider 💌" truncates to the right of the chip.
+  - If no link provided, an extra line "+ Lien pour aider à trouver" appears.
+- Right column: price pill (peach) or dashed "Ajouter un prix" pill. Chevron `›` signals navigation.
+- Layout rules prevent chips from overlapping and everything ellipsizes instead of wrapping.
 - Tapping any part opens the edit drawer, focusing the relevant field.
 
 ## Empty and Sparse States
 - Zero items: centered 🎁 with text "Aucun souhait pour l’instant. Ajoute ton premier ✨".
-- One or two items: two tappable ghost rows encouraging new wishes.
+- One or two items: two tappable ghost rows with pastel thumbnails inviting new wishes.
 
 ## Tip Bar
 - On first visit a dismissable tip appears: "Astuce : colle un lien Amazon/Etsy, on préremplit ✨".
