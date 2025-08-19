@@ -14,6 +14,7 @@ export type WishUI = Tables<"wishes"> & {
     site_name?: string;
     favicon?: string;
     title?: string;
+    ogImage?: string;
   };
 };
 
