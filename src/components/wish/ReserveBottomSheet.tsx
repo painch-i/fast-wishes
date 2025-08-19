@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Drawer, Form, Input, message } from "antd";
 import type { Wish } from "./types";
+import "./ReserveBottomSheet.css";
 
 interface ReserveBottomSheetProps {
   open: boolean;
@@ -17,7 +18,7 @@ export const ReserveBottomSheet: React.FC<ReserveBottomSheetProps> = ({
   const [form] = Form.useForm();
 
   const handleReserve = () => {
-    message.success("Réservé ! Merci 🤍 On garde la surprise.");
+    message.success("Réservé ! Merci 💝");
     onClose();
   };
 
@@ -36,49 +37,56 @@ export const ReserveBottomSheet: React.FC<ReserveBottomSheetProps> = ({
       height="auto"
       destroyOnClose
       title={wish?.name}
-      extra={mode === "propose" ? null : (
-        <Button type="link" onClick={switchToPropose}>
-          Je veux plutôt proposer un autre lien
-        </Button>
-      )}
     >
-      <p>On garde la surprise 🤫</p>
-      <Form
-        layout="vertical"
-        form={form}
-        onFinish={mode === "reserve" ? handleReserve : handlePropose}
-      >
-        {mode === "reserve" && (
-          <>
-            <Form.Item name="name" label="Prénom">
-              <Input />
-            </Form.Item>
-            <Form.Item name="email" label="Email">
-              <Input type="email" />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" block>
-                Confirmer la réservation
-              </Button>
-            </Form.Item>
-          </>
-        )}
-        {mode === "propose" && (
-          <>
-            <Form.Item name="url" label="Lien">
-              <Input type="url" />
-            </Form.Item>
-            <Form.Item name="note" label="Note">
-              <Input />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" block>
-                Envoyer
-              </Button>
-            </Form.Item>
-          </>
-        )}
-      </Form>
+      {wish && (
+        <div className="sheet-content">
+          <div className="sheet-thumb">
+            {wish.image ? (
+              <img src={wish.image} alt="" />
+            ) : (
+              <span className="placeholder">{wish.name.charAt(0)}</span>
+            )}
+          </div>
+          {wish.price && <div className="sheet-price">{wish.price}</div>}
+          {wish.url && (
+            <a
+              href={wish.url}
+              className="sheet-domain"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {new URL(wish.url).hostname.replace(/^www\./, "")}
+            </a>
+          )}
+          {wish.description && <p>{wish.description}</p>}
+        </div>
+      )}
+      {mode === "reserve" && (
+        <>
+          <Button type="primary" block onClick={handleReserve}>
+            Réserver
+          </Button>
+          <Button type="link" block onClick={switchToPropose}>
+            Proposer un autre lien
+          </Button>
+          <p className="sheet-caption">On garde la surprise 🤫</p>
+        </>
+      )}
+      {mode === "propose" && (
+        <Form layout="vertical" form={form} onFinish={handlePropose}>
+          <Form.Item name="url" label="Lien">
+            <Input type="url" />
+          </Form.Item>
+          <Form.Item name="note" label="Note">
+            <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Envoyer
+            </Button>
+          </Form.Item>
+        </Form>
+      )}
     </Drawer>
   );
 };
