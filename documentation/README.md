@@ -20,7 +20,8 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 ## Components
 - **Header** uses a light peach gradient and balanced title wrapping. The counter badge is centered beneath the subtitle.
 - **Wish grid** displays a single column on small screens and switches to two columns from 400px width with generous gaps.
-  - **WishCard** features a 4:3 image placeholder, subdued coral CTA, secondary link styling, and a reserved state badge.
+  - **GiftTile** uses a 56px vignette, domain pill, optional note and price text, and a reserved badge that desaturates the tile.
+  - See `public-wishlist-offers.md` for the offerer-facing public page.
   - See `admin-wishes-ui.md` for details on the administration CRUD interface including the redesigned creation wizard with a sticky action bar and mobile progress pills.
 - **Wishes List** filters Supabase queries by `user_id` to show only the signed-in user's wishes and renders a mobile-first list with image/placeholder, chevron and tappable rows. Each row shows a title, contextual prompts for missing description, link and price pills or placeholders. A count badge appears in the header, the first visit shows a dismissable clipboard tip and up to two ghost rows encourage adding more wishes. A visible “Voir la liste publique” button with Share/Copy support links to `/l/{slug}` and an info banner appears if no wish is public. Skeleton loading, friendly empty/error states and a single centered “+” FAB round out the experience. See `wishes-list-page.md` for details.
 - **Add Wish Sheet** provides a bottom sheet/drawer with just four fields (Titre, Description, Prix+Devise, Lien) and warm microcopy. When a wish is saved, the current user's `user_id` is sent with the creation request so the record is linked to their account. Drafts persist locally until submission. See `add-wish-sheet.md` for details.
@@ -41,4 +42,3 @@ Supabase Postgres powers persistence. Types are generated with `npx supabase gen
 ## Branding
 - Refine-specific banners and metadata were removed.
 - A custom star-themed favicon (`public/favicon.svg`) now represents the Fast Wishes brand.
-

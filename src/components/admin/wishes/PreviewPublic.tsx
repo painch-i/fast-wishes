@@ -1,4 +1,4 @@
-import { WishCard } from "../../wish/WishCard";
+import { GiftTile } from "../../wish/GiftTile";
 import type { Wish } from "../../wish/types";
 import { WishUI } from "../../../types/wish";
 
@@ -14,7 +14,7 @@ export const PreviewPublic: React.FC<{ wish: WishUI }> = ({ wish }) => {
 
   return (
     <div style={{ padding: 16 }}>
-      <WishCard wish={mapped} />
+      <GiftTile wish={mapped} />
     </div>
   );
 };

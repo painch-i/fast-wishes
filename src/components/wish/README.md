@@ -14,7 +14,7 @@ These components provide the public wishlist UI.
 ## Usage
 
 ```tsx
-import { WishCard } from "../components";
+import { GiftTile } from "../components";
 ```
 
-Stories in `WishCard.stories.tsx` showcase the different states.
+Stories in `GiftTile.stories.tsx` showcase the different states.
