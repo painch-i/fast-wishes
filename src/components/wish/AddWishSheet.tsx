@@ -1,5 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Drawer, Form, Input, InputNumber, Button, Select, Space, Tag, Typography, message } from "antd";
+import {
+  Drawer,
+  Form,
+  Input,
+  Button,
+  Select,
+  Space,
+  Tag,
+  Typography,
+  message,
+} from "antd";
 import type { InputRef } from "antd";
 import { useMediaQuery } from "@mui/material";
 import type { WishUI } from "../../types/wish";
@@ -19,6 +29,7 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
   const [linkDomain, setLinkDomain] = useState<string | null>(null);
   const [showPasteTip, setShowPasteTip] = useState(false);
   const linkInputRef = useRef<InputRef | null>(null);
+  const initialViewport = useRef<string | null>(null);
 
   const url = Form.useWatch("url", form);
   const { metadata } = useLinkMetadata(url ?? undefined);
@@ -47,6 +58,24 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
       setShowPasteTip(false);
     }
   }, [open, form]);
+
+  useEffect(() => {
+    const metaViewport = document.querySelector(
+      'meta[name="viewport"]'
+    ) as HTMLMetaElement | null;
+    if (!metaViewport) return;
+    if (initialViewport.current === null) {
+      initialViewport.current = metaViewport.getAttribute("content") || "";
+    }
+    if (open) {
+      metaViewport.setAttribute(
+        "content",
+        `${initialViewport.current}, maximum-scale=1`
+      );
+    } else {
+      metaViewport.setAttribute("content", initialViewport.current);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (metadata && !form.getFieldValue("name")) {
@@ -106,7 +135,12 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
       width={isMobile ? undefined : 360}
       title="Ajouter un souhait 🎁"
       extra={<span style={{ color: "#6B7280" }}>Note l’essentiel, tu pourras peaufiner après.</span>}
-      bodyStyle={{ display: "flex", flexDirection: "column", paddingBottom: 0 }}
+      bodyStyle={{
+        display: "flex",
+        flexDirection: "column",
+        paddingBottom: 0,
+        overscrollBehavior: "contain",
+      }}
     >
       {isMobile && (
         <div
@@ -132,7 +166,10 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
           rules={[{ required: true, min: 2, message: "Un titre est requis" }]}
           extra="Un nom clair aide tes proches à choisir."
         >
-          <Input placeholder="Bouilloire inox silencieuse" />
+          <Input
+            placeholder="Bouilloire inox silencieuse"
+            style={{ fontSize: 16 }}
+          />
         </Form.Item>
 
         <Form.Item
@@ -143,6 +180,7 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
           <Input.TextArea
             placeholder="Pourquoi ça me ferait plaisir ? Une petite note pour guider (couleur, taille, usage…)."
             autoSize={{ minRows: 3, maxRows: 4 }}
+            style={{ fontSize: 16 }}
           />
         </Form.Item>
 
@@ -151,20 +189,21 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
           label="Prix"
           extra="Indique un budget pour faciliter le choix."
         >
-          <Space.Compact>
-            <InputNumber
-              min={0}
-              style={{ width: "100%" }}
-              placeholder="0"
-            />
-            <Form.Item name="currency" initialValue="EUR" noStyle>
-              <Select style={{ width: 80 }}>
-                <Select.Option value="EUR">EUR</Select.Option>
-                <Select.Option value="GBP">GBP</Select.Option>
-                <Select.Option value="USD">USD</Select.Option>
-              </Select>
-            </Form.Item>
-          </Space.Compact>
+          <Input
+            type="text"
+            inputMode="decimal"
+            placeholder="0"
+            style={{ fontSize: 16 }}
+            addonAfter={
+              <Form.Item name="currency" initialValue="EUR" noStyle>
+                <Select style={{ width: 80, fontSize: 16 }}>
+                  <Select.Option value="EUR">EUR</Select.Option>
+                  <Select.Option value="GBP">GBP</Select.Option>
+                  <Select.Option value="USD">USD</Select.Option>
+                </Select>
+              </Form.Item>
+            }
+          />
         </Form.Item>
 
         <Form.Item name="url" label="Lien" extra="Ajoute un lien pour aider à trouver le bon produit.">
@@ -174,9 +213,11 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
               placeholder="https://amazon.fr/… (ou autre site)"
               inputMode="url"
               onChange={handleLinkChange}
-              style={{ flex: 1 }}
+              style={{ flex: 1, fontSize: 16 }}
             />
-            <Button onClick={handlePaste}>Coller</Button>
+            <Button onClick={handlePaste} style={{ fontSize: 16 }}>
+              Coller
+            </Button>
           </Space>
           {showPasteTip && (
             <Typography.Text type="secondary">

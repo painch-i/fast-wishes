@@ -27,6 +27,9 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 
 ## Accessibility
 - Interactive elements maintain a minimum touch area of 44px and include aria attributes for state changes.
+- Form controls default to a 16px font size to avoid iOS Safari's automatic zoom. Placeholders and select values match this size.
+- The global viewport is `width=device-width, initial-scale=1, viewport-fit=cover`. Bottom sheets temporarily append `maximum-scale=1` while open to suppress pinch-zoom then restore the original viewport.
+- Scroll containers inside sheets use `overscroll-behavior: contain` to prevent accidental pull-to-refresh.
 
 ## Database
 Supabase Postgres powers persistence. Types are generated with `npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > database.types.ts` and imported across the codebase to ensure queries match the schema.
