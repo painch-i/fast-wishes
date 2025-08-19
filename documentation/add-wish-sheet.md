@@ -6,7 +6,7 @@ A mobile-first bottom sheet (drawer on desktop) that lets users quickly add a wi
 1. **Titre** – required, placeholder "Bouilloire inox silencieuse" with inline help.
 2. **Description** – multiline, placeholder: "Pourquoi ça me ferait plaisir ? Une petite note pour guider (couleur, taille, usage…)."
 3. **Prix + Devise** – single control combining an amount and a currency chip (EUR default, tap to change).
-4. **Lien** – optional URL field. Displays the domain with a shortcut to open the link after entry.
+4. **Lien** – optional URL field with a **Coller** button that pastes the clipboard on user gesture. Displays the domain with a shortcut to open the link after entry and gently falls back with the tip “Maintiens dans le champ puis Coller” when clipboard access is refused.
 
 All fields except the title are optional. Invalid links trigger a gentle warning but never block submission. Drafts persist in `localStorage` under `add-wish-draft` so unfinished entries survive accidental closure.
 

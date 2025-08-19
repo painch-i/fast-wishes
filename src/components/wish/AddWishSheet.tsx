@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Drawer, Form, Input, InputNumber, Button, Select, Space, Tag, message } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import { Drawer, Form, Input, InputNumber, Button, Select, Space, Tag, Typography, message } from "antd";
+import type { InputRef } from "antd";
 import { useMediaQuery } from "@mui/material";
 import type { WishUI } from "../../types/wish";
+import { useLinkMetadata } from "../../hooks/useLinkMetadata";
 
 export interface AddWishSheetProps {
   open: boolean;
@@ -15,6 +17,11 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
   const [form] = Form.useForm<WishUI>();
   const isMobile = useMediaQuery("(max-width:600px)");
   const [linkDomain, setLinkDomain] = useState<string | null>(null);
+  const [showPasteTip, setShowPasteTip] = useState(false);
+  const linkInputRef = useRef<InputRef | null>(null);
+
+  const url = Form.useWatch("url", form);
+  const { metadata } = useLinkMetadata(url ?? undefined);
 
   useEffect(() => {
     if (open) {
@@ -36,7 +43,16 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
         }
       }
     }
+    if (!open) {
+      setShowPasteTip(false);
+    }
   }, [open, form]);
+
+  useEffect(() => {
+    if (metadata && !form.getFieldValue("name")) {
+      form.setFieldsValue({ name: metadata.title } as any);
+    }
+  }, [metadata, form]);
 
   // Save as draft on each change
   const handleValuesChange = (_: any, values: WishUI) => {
@@ -50,6 +66,21 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
       setLinkDomain(url.hostname);
     } catch {
       setLinkDomain(null);
+    }
+  };
+
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        form.setFieldsValue({ url: text } as any);
+        handleLinkChange({ target: { value: text } } as any);
+        message.success("Lien ajouté ✨");
+        setShowPasteTip(false);
+      }
+    } catch {
+      setShowPasteTip(true);
+      linkInputRef.current?.focus();
     }
   };
 
@@ -71,12 +102,30 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
       open={open}
       onClose={onCancel}
       placement={isMobile ? "bottom" : "right"}
-      height={isMobile ? "auto" : undefined}
+      height={isMobile ? "90vh" : undefined}
       width={isMobile ? undefined : 360}
       title="Ajouter un souhait 🎁"
       extra={<span style={{ color: "#6B7280" }}>Note l’essentiel, tu pourras peaufiner après.</span>}
+      bodyStyle={{ display: "flex", flexDirection: "column", paddingBottom: 0 }}
     >
-      <Form layout="vertical" form={form} onFinish={handleFinish} onValuesChange={handleValuesChange}>
+      {isMobile && (
+        <div
+          style={{
+            width: 40,
+            height: 4,
+            background: "#ccc",
+            borderRadius: 2,
+            margin: "8px auto",
+          }}
+        />
+      )}
+      <Form
+        layout="vertical"
+        form={form}
+        onFinish={handleFinish}
+        onValuesChange={handleValuesChange}
+        style={{ flex: 1, overflowY: "auto", padding: "0 0 16px" }}
+      >
         <Form.Item
           name="name"
           label="Titre"
@@ -119,11 +168,21 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
         </Form.Item>
 
         <Form.Item name="url" label="Lien" extra="Ajoute un lien pour aider à trouver le bon produit.">
-          <Input
-            placeholder="https://amazon.fr/… (ou autre site)"
-            inputMode="url"
-            onChange={handleLinkChange}
-          />
+          <Space>
+            <Input
+              ref={linkInputRef}
+              placeholder="https://amazon.fr/… (ou autre site)"
+              inputMode="url"
+              onChange={handleLinkChange}
+              style={{ flex: 1 }}
+            />
+            <Button onClick={handlePaste}>Coller</Button>
+          </Space>
+          {showPasteTip && (
+            <Typography.Text type="secondary">
+              Maintiens dans le champ puis Coller
+            </Typography.Text>
+          )}
         </Form.Item>
         {linkDomain && (
           <Tag style={{ marginBottom: 16 }}>
@@ -133,16 +192,18 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
             </a>
           </Tag>
         )}
-
-        <div style={{
-          position: "sticky",
-          bottom: 0,
-          background: "#fff",
-          padding: "8px 0",
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: 8,
-        }}>
+        <div
+          style={{
+            position: "sticky",
+            bottom: 0,
+            background: "#fff",
+            padding: "8px 0",
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 8,
+            paddingBottom: "calc(8px + env(safe-area-inset-bottom))",
+          }}
+        >
           <Button onClick={onCancel}>Annuler</Button>
           <Button type="primary" htmlType="submit">
             Ajouter
