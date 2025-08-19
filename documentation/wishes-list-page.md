@@ -7,6 +7,12 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 - Subtitle "Appuie sur un souhait pour le modifier.".
 - When at least one wish exists, a count badge shows `{n} souhait(s)`.
 
+## Public List Access
+- When the user has a slug, a **"Voir la liste publique"** button opens `/l/{slug}` in a new tab.
+- A sibling **Partager** button triggers the native share sheet or copies the link.
+- Inline note: "Ce lien ne montre que tes souhaits publics.".
+- If no wish is public, an info banner states: "Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
+
 ## Rows
 - Full-width tap area, minimum 64px height. Pressing briefly highlights the row with a peach tint.
 - Left: 56×56 vignette with 12px radius.

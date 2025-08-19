@@ -5,6 +5,7 @@ import {
   Button,
   Tag,
   message,
+  Alert,
 } from "antd";
 import { colors } from "../../theme";
 import {
@@ -12,12 +13,13 @@ import {
   useList,
   useCreate,
   useUpdate,
+  useOne,
 } from "@refinedev/core";
 
 import { EditWishDrawer } from "../../components/admin/wishes/EditWishDrawer";
 import { AddWishSheet } from "../../components/wish/AddWishSheet";
 import { WishUI } from "../../types/wish";
-import { UserIdentity } from "../../types";
+import { UserIdentity, UserSlug } from "../../types";
 import { mapDbToWishUI, getExtras, setExtras } from "../../utility";
 
 const DRAFT_KEY = "add-wish-draft";
@@ -323,6 +325,17 @@ export const WishesListPage: React.FC = () => {
 
   const wishes = data?.data ?? [];
 
+  const { data: slugData } = useOne<UserSlug>({
+    resource: "user_slugs",
+    id: identity?.id,
+    queryOptions: { enabled: !!identity },
+  });
+
+  const publicUrl = slugData?.data.slug
+    ? `${window.location.origin}/l/${slugData.data.slug}`
+    : undefined;
+  const hasPublic = wishes.some((w) => w.is_public);
+
   const { mutate: update } = useUpdate();
   const { mutate: create } = useCreate();
 
@@ -332,6 +345,20 @@ export const WishesListPage: React.FC = () => {
   const [focusField, setFocusField] = useState<keyof WishUI | undefined>();
   const [showTip, setShowTip] = useState(false);
   const [clipUrl, setClipUrl] = useState<string | null>(null);
+
+  const handleShare = () => {
+    if (!publicUrl) return;
+    if (navigator.share) {
+      navigator
+        .share({ title: "Ma liste de souhaits", url: publicUrl })
+        .catch(() => {});
+    } else {
+      navigator.clipboard
+        ?.writeText(publicUrl)
+        .then(() => message.success("Lien copié ✨"))
+        .catch(() => message.error("Impossible de copier le lien"));
+    }
+  };
 
   useEffect(() => {
     if (!localStorage.getItem("wish-tip-dismissed")) {
@@ -437,6 +464,30 @@ export const WishesListPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {publicUrl && (
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button href={publicUrl} target="_blank">
+              Voir la liste publique
+            </Button>
+            <Button onClick={handleShare}>Partager</Button>
+          </div>
+          <div>
+            <Typography.Text type="secondary">
+              Ce lien ne montre que tes souhaits publics.
+            </Typography.Text>
+          </div>
+          {!hasPublic && (
+            <Alert
+              style={{ marginTop: 8 }}
+              message="Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
+              type="info"
+              showIcon
+            />
+          )}
+        </div>
+      )}
 
       {showTip && (
         <div
