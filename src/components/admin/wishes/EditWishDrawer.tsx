@@ -18,6 +18,7 @@ import { WishUI } from "../../../types/wish";
 export type EditWishDrawerProps = {
   open: boolean;
   initialValues?: Partial<WishUI>;
+  focusField?: keyof WishUI;
   onClose: () => void;
   onSave: (values: WishUI) => Promise<void> | void;
 };
@@ -25,6 +26,7 @@ export type EditWishDrawerProps = {
 export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
   open,
   initialValues,
+  focusField,
   onClose,
   onSave,
 }) => {
@@ -35,8 +37,15 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
     if (open) {
       form.resetFields();
       if (initialValues) form.setFieldsValue(initialValues as any);
+      if (focusField) {
+        setTimeout(() => {
+          form.scrollToField(focusField);
+          const instance = form.getFieldInstance?.(focusField as any);
+          if (instance?.focus) instance.focus();
+        }, 0);
+      }
     }
-  }, [open, initialValues, form]);
+  }, [open, initialValues, focusField, form]);
 
   const handleClose = () => {
     if (form.isFieldsTouched()) {
