@@ -1,19 +1,7 @@
-import { useEffect, useState } from "react";
-import {
-  Drawer,
-  Tabs,
-  Button,
-  Space,
-  Form,
-  Modal,
-  Typography,
-  Input,
-  InputNumber,
-  Select,
-  Switch,
-  Segmented,
-} from "antd";
+import { useState } from "react";
+import { Button, Drawer, Form, Space, Typography } from "antd";
 import { WishUI } from "../../../types/wish";
+import { WishForm } from "./WishForm";
 
 export type EditWishDrawerProps = {
   open: boolean;
@@ -31,31 +19,11 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
   const [form] = Form.useForm<WishUI>();
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (open) {
-      form.resetFields();
-      if (initialValues) form.setFieldsValue(initialValues as any);
-    }
-  }, [open, initialValues, form]);
-
-  const handleClose = () => {
-    if (form.isFieldsTouched()) {
-      Modal.confirm({
-        title: "Des modifications non sauvegardées",
-        onOk: onClose,
-      });
-    } else {
-      onClose();
-    }
-  };
-
-  const submit = async () => {
+  const submit = async (values: WishUI) => {
+    setSaving(true);
     try {
-      const values = (await form.validateFields()) as WishUI;
-      setSaving(true);
       await onSave(values);
-      setSaving(false);
-    } catch {
+    } finally {
       setSaving(false);
     }
   };
@@ -65,90 +33,31 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
       width={520}
       open={open}
       destroyOnClose
-      onClose={handleClose}
+      onClose={onClose}
       title={
         <Space direction="vertical" size={0} style={{ width: "100%" }}>
           <Typography.Title level={4} style={{ margin: 0 }}>
             Éditer le souhait
           </Typography.Title>
           <Typography.Text type="secondary">
-            Peaufine ton souhait, on s'occupe du reste 💡
+            Modifie les informations de ton souhait
           </Typography.Text>
         </Space>
       }
       extra={
         <Space>
-          <Button onClick={handleClose}>Annuler</Button>
-          <Button type="primary" loading={saving} onClick={submit}>
+          <Button onClick={onClose}>Annuler</Button>
+          <Button
+            type="primary"
+            loading={saving}
+            onClick={() => form.submit()}
+          >
             Enregistrer
           </Button>
         </Space>
       }
     >
-      <Tabs
-        items={[
-          {
-            key: "general",
-            label: "Général",
-            children: (
-              <Form layout="vertical" form={form}>
-                <Form.Item name="name" label="Titre" rules={[{ required: true }]}> 
-                  <Input size="large" />
-                </Form.Item>
-                <Form.Item name="url" label="URL"> 
-                  <Input size="large" />
-                </Form.Item>
-                <Form.Item name="image_url" label="Image"> 
-                  <Input size="large" />
-                </Form.Item>
-              </Form>
-            ),
-          },
-          {
-            key: "details",
-            label: "Détails",
-            children: (
-              <Form layout="vertical" form={form}>
-                <Form.Item name="price" label="Prix">
-                  <InputNumber min={0} style={{ width: "100%" }} />
-                </Form.Item>
-                <Form.Item name="currency" label="Devise">
-                  <Select options={["EUR", "USD", "GBP"].map((v) => ({ value: v }))} />
-                </Form.Item>
-                <Form.Item name="description" label="Description">
-                  <Input.TextArea rows={3} />
-                </Form.Item>
-                <Form.Item name="quantity" label="Quantité">
-                  <InputNumber min={1} style={{ width: "100%" }} />
-                </Form.Item>
-                <Form.Item name="tags" label="Tags">
-                  <Select mode="tags" tokenSeparators={[","]} />
-                </Form.Item>
-                <Form.Item name="note_private" label="Note privée"> 
-                  <Input.TextArea rows={3} />
-                </Form.Item>
-                <Form.Item name="priority" label="Priorité">
-                  <Segmented options={[1, 2, 3]} />
-                </Form.Item>
-              </Form>
-            ),
-          },
-          {
-            key: "visibility",
-            label: "Visibilité",
-            children: (
-              <Form layout="vertical" form={form}>
-                <Form.Item name="status" label="Statut">
-                  <Select options={["draft", "available", "reserved", "received", "archived"].map((v) => ({ value: v }))} />
-                </Form.Item>
-                <Form.Item name="is_public" label="Public ?" valuePropName="checked">
-                  <Switch />
-                </Form.Item>
-              </Form>
-            ),
-          },
-        ]}
-      />
+      <WishForm form={form} initialValues={initialValues} onSubmit={submit} />
     </Drawer>
   );
 };
