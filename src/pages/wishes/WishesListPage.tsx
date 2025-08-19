@@ -13,7 +13,7 @@ import {
 } from "@refinedev/core";
 
 import { EditWishDrawer } from "../../components/admin/wishes/EditWishDrawer";
-import { CreateWishWizard } from "../../components/admin/wishes/CreateWishWizard";
+import { AddWishSheet } from "../../components/wish/AddWishSheet";
 import { WishUI } from "../../types/wish";
 import { UserIdentity } from "../../types";
 import { mapDbToWishUI, getExtras, setExtras } from "../../utility";
@@ -178,7 +178,7 @@ export const WishesListPage: React.FC = () => {
   const { mutate: create } = useCreate();
 
   const [editOpen, setEditOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<WishUI | undefined>();
 
   const openEdit = (record: WishUI) => {
@@ -207,7 +207,7 @@ export const WishesListPage: React.FC = () => {
     );
   };
 
-  const handleCreate = (values: WishUI) => {
+  const handleAdd = (values: WishUI) => {
     const { note_private, tags, metadata, ...dbValues } = values;
     create(
       { resource: "wishes", values: dbValues },
@@ -216,13 +216,13 @@ export const WishesListPage: React.FC = () => {
           if (data?.data?.id) {
             setExtras(String(data.data.id), { note_private, tags, metadata });
           }
-          message.success("Enregistré ✨");
-          setCreateOpen(false);
+          message.success("Souhait ajouté ✨");
+          setAddOpen(false);
           refetch();
         },
         onError: () =>
           message.error(
-            "Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement."
+            "Oups, on n’a pas pu enregistrer. Tes infos sont gardées en brouillon."
           ),
       }
     );
@@ -313,17 +313,17 @@ export const WishesListPage: React.FC = () => {
         onClose={() => setEditOpen(false)}
         onSave={handleEditSave}
       />
-      <CreateWishWizard
-        open={createOpen}
-        onCancel={() => setCreateOpen(false)}
-        onSubmit={(values) => handleCreate(values)}
+      <AddWishSheet
+        open={addOpen}
+        onCancel={() => setAddOpen(false)}
+        onSubmit={(values) => handleAdd(values)}
       />
-      {!createOpen && (
+      {!addOpen && (
         <Button
           type="primary"
           shape="circle"
           size="large"
-          onClick={() => setCreateOpen(true)}
+          onClick={() => setAddOpen(true)}
           style={{
             position: "fixed",
             bottom: 24,
