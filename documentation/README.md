@@ -7,6 +7,11 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 - **Text primary:** `#1F2937`
 - **Text secondary:** `#6B7280`
 - **Header background:** `#FFF7F4`
+- **Accent peach:** `#FFE7E1`
+- **Accent mint:** `#E7FFF4`
+- **Accent lavender:** `#EFE7FF`
+- **Accent yellow:** `#FFF7D6`
+- **Separators:** `#EEF0F3`
 - **Radius:** `12px` for cards and images
 
 ## Theme
