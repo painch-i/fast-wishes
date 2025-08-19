@@ -11,5 +11,5 @@ A mobile-first bottom sheet (drawer on desktop) that lets users quickly add a wi
 All fields except the title are optional. Invalid links trigger a gentle warning but never block submission. Drafts persist in `localStorage` under `add-wish-draft` so unfinished entries survive accidental closure.
 
 ## Usage
-The component is opened from the floating “+” button on the wishes list. On save it shows the success toast “Souhait ajouté ✨” and refreshes the list. Errors display “Oups, on n’a pas pu enregistrer. Tes infos sont gardées en brouillon.”
+The component is opened from the floating “+” button on the wishes list. When submitted, it attaches the signed-in user's `user_id` to the new wish so it belongs to their account. On save it shows the success toast “Souhait ajouté ✨” and refreshes the list. Errors display “Oups, on n’a pas pu enregistrer. Tes infos sont gardées en brouillon.”
 

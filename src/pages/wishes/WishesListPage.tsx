@@ -208,9 +208,13 @@ export const WishesListPage: React.FC = () => {
   };
 
   const handleAdd = (values: WishUI) => {
+    if (!identity?.id) {
+      message.error("Impossible de créer le souhait : utilisateur inconnu");
+      return;
+    }
     const { note_private, tags, metadata, ...dbValues } = values;
     create(
-      { resource: "wishes", values: dbValues },
+      { resource: "wishes", values: { ...dbValues, user_id: identity.id } },
       {
         onSuccess: (data) => {
           if (data?.data?.id) {
