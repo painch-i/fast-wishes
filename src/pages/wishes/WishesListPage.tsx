@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  Typography,
-  Skeleton,
-  Button,
-  Tag,
-  message,
-  Alert,
-} from "antd";
+import { Typography, Skeleton, Button, Tag, message, Alert } from "antd";
+import { OpenInNew, Share } from "@mui/icons-material";
+import "./WishesListPage.css";
 import { colors } from "../../theme";
 import {
   useGetIdentity,
@@ -21,8 +16,6 @@ import { AddWishSheet } from "../../components/wish/AddWishSheet";
 import { WishUI } from "../../types/wish";
 import { UserIdentity, UserSlug } from "../../types";
 import { mapDbToWishUI, getExtras, setExtras } from "../../utility";
-
-const DRAFT_KEY = "add-wish-draft";
 
 const browserLocale = () =>
   typeof navigator !== "undefined" && navigator.language
@@ -343,11 +336,17 @@ export const WishesListPage: React.FC = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<WishUI | undefined>();
   const [focusField, setFocusField] = useState<keyof WishUI | undefined>();
-  const [showTip, setShowTip] = useState(false);
-  const [clipUrl, setClipUrl] = useState<string | null>(null);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("public-banner-dismissed")) {
+      setBannerDismissed(true);
+    }
+  }, []);
 
   const handleShare = () => {
     if (!publicUrl) return;
+    navigator.vibrate?.(10);
     if (navigator.share) {
       navigator
         .share({ title: "Ma liste de souhaits", url: publicUrl })
@@ -360,22 +359,16 @@ export const WishesListPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (!localStorage.getItem("wish-tip-dismissed")) {
-      setShowTip(true);
-      navigator.clipboard
-        ?.readText()
-        .then((text) => {
-          try {
-            const url = new URL(text);
-            setClipUrl(url.toString());
-          } catch {
-            setClipUrl(null);
-          }
-        })
-        .catch(() => setClipUrl(null));
-    }
-  }, []);
+  const handleOpenPublic = () => {
+    if (!publicUrl) return;
+    navigator.vibrate?.(10);
+    window.open(publicUrl, "_blank");
+  };
+
+  const dismissBanner = () => {
+    localStorage.setItem("public-banner-dismissed", "1");
+    setBannerDismissed(true);
+  };
 
   const openEdit = (record: WishUI, field?: keyof WishUI) => {
     const extras = getExtras(String(record.id));
@@ -429,24 +422,46 @@ export const WishesListPage: React.FC = () => {
     );
   };
 
-  const dismissTip = () => {
-    localStorage.setItem("wish-tip-dismissed", "1");
-    setShowTip(false);
-  };
-
-  const handlePaste = () => {
-    if (!clipUrl) return;
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({ url: clipUrl }));
-    setAddOpen(true);
-    dismissTip();
-  };
-
   return (
     <div style={{ padding: "0 16px" }}>
       <div style={{ margin: "16px 0" }}>
-        <Typography.Title level={2} style={{ margin: 0, fontWeight: 600 }}>
-          Tes souhaits 🎁
-        </Typography.Title>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 8,
+          }}
+        >
+          <Typography.Title level={2} style={{ margin: 0, fontWeight: 600 }}>
+            Tes souhaits 🎁
+          </Typography.Title>
+          {hasPublic && (
+            <div className="header-icons">
+              <button
+                className="icon-btn"
+                aria-label="Voir la boutique (page publique)"
+                onClick={handleOpenPublic}
+                disabled={!publicUrl}
+              >
+                <span className="icon-btn-inner">
+                  <OpenInNew style={{ width: 20, height: 20 }} />
+                </span>
+              </button>
+              <button
+                className="icon-btn"
+                aria-label="Partager le lien public"
+                onClick={handleShare}
+                disabled={!publicUrl}
+              >
+                <span className="icon-btn-inner">
+                  <Share style={{ width: 20, height: 20 }} />
+                </span>
+              </button>
+            </div>
+          )}
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Typography.Text type="secondary">
             Appuie sur un souhait pour le modifier.
@@ -465,55 +480,15 @@ export const WishesListPage: React.FC = () => {
         </div>
       </div>
 
-      {publicUrl && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: "flex", gap: 8 }}>
-            <Button href={publicUrl} target="_blank">
-              Voir la liste publique
-            </Button>
-            <Button onClick={handleShare}>Partager</Button>
-          </div>
-          <div>
-            <Typography.Text type="secondary">
-              Ce lien ne montre que tes souhaits publics.
-            </Typography.Text>
-          </div>
-          {!hasPublic && (
-            <Alert
-              style={{ marginTop: 8 }}
-              message="Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
-              type="info"
-              showIcon
-            />
-          )}
-        </div>
-      )}
-
-      {showTip && (
-        <div
-          style={{
-            background: "#FFF7F4",
-            padding: "8px 12px",
-            borderRadius: 8,
-            marginBottom: 16,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 8,
-          }}
-        >
-          <span>Astuce : colle un lien Amazon/Etsy, on préremplit ✨</span>
-          <span style={{ display: "flex", gap: 8 }}>
-            {clipUrl && (
-              <Button size="small" onClick={handlePaste}>
-                Coller
-              </Button>
-            )}
-            <Button size="small" type="text" onClick={dismissTip}>
-              Fermer
-            </Button>
-          </span>
-        </div>
+      {!bannerDismissed && wishes.length > 0 && !hasPublic && (
+        <Alert
+          style={{ marginBottom: 16 }}
+          message="Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
+          type="info"
+          showIcon
+          closable
+          onClose={dismissBanner}
+        />
       )}
 
       {isLoading && (

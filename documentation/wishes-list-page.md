@@ -8,10 +8,12 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 - When at least one wish exists, a count badge shows `{n} souhait(s)`.
 
 ## Public List Access
-- When the user has a slug, a **"Voir la liste publique"** button opens `/l/{slug}` in a new tab.
-- A sibling **Partager** button triggers the native share sheet or copies the link.
-- Inline note: "Ce lien ne montre que tes souhaits publics.".
-- If no wish is public, an info banner states: "Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
+- If at least one wish is public, two icon buttons appear in the header:
+  - External link opens `/l/{slug}` in a new tab.
+  - Share button uses the Web Share API with clipboard fallback.
+- Icons are 20–22 px inside 36 px circles, spaced by 8 px and aligned right.
+- Icons stay hidden when no wish is public.
+- When there are wishes but none are public, a dismissable info banner reminds the user to make at least one wish public.
 
 ## Rows
 - Full-width tap area, minimum 64px height. Pressing briefly highlights the row with a peach tint.
@@ -30,9 +32,7 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 - One or two items: two tappable ghost rows with pastel thumbnails inviting new wishes.
 
 ## Tip Bar
-- On first visit a dismissable tip appears: "Astuce : colle un lien Amazon/Etsy, on préremplit ✨".
-- If the clipboard holds a URL, a **Coller** button opens the add sheet prefilled with that link.
-- Dismissal stores `wish-tip-dismissed` in `localStorage` to avoid showing again.
+- Removed; no tip or paste helper is shown.
 
 ## Floating Action Button
 - Single centered “+” FAB opens the add sheet.
