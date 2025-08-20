@@ -5,7 +5,7 @@ import {
   Button,
   Tag,
   message,
-  Alert,
+  Modal,
 } from "antd";
 import { colors } from "../../theme";
 import {
@@ -117,6 +117,22 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
         />
       );
     }
+    const og = item.metadata?.ogImage || (item.metadata as any)?.["og:image"];
+    if (og) {
+      return (
+        <img
+          src={og}
+          alt=""
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            objectFit: "cover",
+            flexShrink: 0,
+          }}
+        />
+      );
+    }
     if (item.metadata?.favicon) {
       return (
         <div
@@ -124,7 +140,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
             width: 56,
             height: 56,
             borderRadius: 12,
-            background: accent,
+            background: `linear-gradient(135deg, ${accent}, #fff)`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -135,44 +151,44 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
         </div>
       );
     }
-    const emoji = getEmoji(item.name);
-    if (emoji !== "🎁") {
+    const initial = item.name?.[0]?.toUpperCase();
+    if (initial) {
       return (
         <div
           style={{
             width: 56,
             height: 56,
             borderRadius: 12,
-            background: accent,
+            background: `linear-gradient(135deg, ${accent}, #fff)`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
             fontSize: 24,
+            fontWeight: 600,
+            color: colors.textPrimary,
           }}
         >
-          {emoji}
+          {initial}
         </div>
       );
     }
-    const initial = item.name?.[0]?.toUpperCase() || "?";
+    const emoji = getEmoji(item.name);
     return (
       <div
         style={{
           width: 56,
           height: 56,
           borderRadius: 12,
-          background: accent,
+          background: `linear-gradient(135deg, ${accent}, #fff)`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
           fontSize: 24,
-          fontWeight: 600,
-          color: colors.textPrimary,
         }}
       >
-        {initial}
+        {emoji || "✨"}
       </div>
     );
   };
@@ -198,7 +214,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
         minHeight: 64,
         padding: "12px 0",
         borderBottom: "1px solid #EEF0F3",
-        background: pressed ? colors.accentPeach : undefined,
+        background: pressed ? "rgba(255,107,107,0.05)" : undefined,
         cursor: "pointer",
       }}
     >
@@ -228,7 +244,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
           {domain && (
             <Tag
               style={{
-                background: colors.accentMint,
+                background: "#F3F4F6",
                 border: "none",
                 color: colors.textPrimary,
                 flexShrink: 0,
@@ -248,6 +264,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
               color: colors.textSecondary,
               overflow: "hidden",
               textOverflow: "ellipsis",
+              flexGrow: 1,
             }}
             onClick={(e) => {
               e.stopPropagation();
@@ -256,29 +273,30 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
           >
             {item.description || "Ajoute un petit mot pour guider 💌"}
           </span>
+          {!domain && (
+            <span
+              style={{
+                fontSize: 14,
+                color: colors.textSecondary,
+                flexShrink: 0,
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen(item, "url");
+              }}
+            >
+              + Lien pour aider à trouver
+            </span>
+          )}
         </div>
-        {!domain && (
-          <div
-            style={{
-              fontSize: 14,
-              color: colors.textSecondary,
-              marginTop: 4,
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpen(item, "url");
-            }}
-          >
-            + Lien pour aider à trouver
-          </div>
-        )}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
         {price ? (
           <Tag
             style={{
-              background: colors.accentPeach,
-              border: "none",
+              background: "#F9FAFB",
+              border: "1px solid #E5E7EB",
               fontWeight: 600,
               color: colors.textPrimary,
               cursor: "pointer",
@@ -291,20 +309,22 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
             {price}
           </Tag>
         ) : (
-          <Tag
+          <span
             style={{
-              background: colors.accentPeach,
-              border: `1px dashed ${colors.primary}`,
               color: colors.primary,
+              fontWeight: 600,
               cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
             }}
             onClick={(e) => {
               e.stopPropagation();
               onOpen(item, "price");
             }}
           >
-            Ajouter un prix
-          </Tag>
+            <span style={{ fontSize: 16 }}>➕</span> Ajouter un prix
+          </span>
         )}
         <span style={{ color: "#9CA3AF", fontSize: 16 }}>›</span>
       </div>
@@ -345,6 +365,7 @@ export const WishesListPage: React.FC = () => {
   const [focusField, setFocusField] = useState<keyof WishUI | undefined>();
   const [showTip, setShowTip] = useState(false);
   const [clipUrl, setClipUrl] = useState<string | null>(null);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   const handleShare = () => {
     if (!publicUrl) return;
@@ -443,51 +464,115 @@ export const WishesListPage: React.FC = () => {
 
   return (
     <div style={{ padding: "0 16px" }}>
-      <div style={{ margin: "16px 0" }}>
-        <Typography.Title level={2} style={{ margin: 0, fontWeight: 600 }}>
-          Tes souhaits 🎁
-        </Typography.Title>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Typography.Text type="secondary">
-            Appuie sur un souhait pour le modifier.
-          </Typography.Text>
-          {wishes.length > 0 && (
-            <Tag
+      <div
+        style={{
+          margin: "16px 0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+        }}
+      >
+        <div>
+          <Typography.Title level={2} style={{ margin: 0, fontWeight: 600 }}>
+            Tes souhaits 🎁
+          </Typography.Title>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Typography.Text type="secondary">
+              Appuie sur un souhait pour le modifier.
+            </Typography.Text>
+            {wishes.length > 0 && (
+              <Tag
+                style={{
+                  background: "#F3F4F6",
+                  border: "none",
+                  color: "#111827",
+                }}
+              >
+                {wishes.length} souhait{wishes.length > 1 ? "s" : ""}
+              </Tag>
+            )}
+          </div>
+        </div>
+        {publicUrl && (
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button
+              type="text"
+              href={publicUrl}
+              target="_blank"
+              aria-label="Voir la liste publique"
               style={{
-                background: "#F3F4F6",
-                border: "none",
-                color: "#111827",
+                width: 44,
+                height: 44,
+                padding: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {wishes.length} souhait{wishes.length > 1 ? "s" : ""}
-            </Tag>
-          )}
-        </div>
+              <span style={{ fontSize: 20 }}>👁️</span>
+              <span style={{ fontSize: 12 }}>Voir</span>
+            </Button>
+            <Button
+              type="text"
+              onClick={handleShare}
+              aria-label="Partager"
+              style={{
+                width: 44,
+                height: 44,
+                padding: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span style={{ fontSize: 20 }}>⤴️</span>
+              <span style={{ fontSize: 12 }}>Partager</span>
+            </Button>
+          </div>
+        )}
       </div>
 
       {publicUrl && (
         <div style={{ marginBottom: 16 }}>
-          <div style={{ display: "flex", gap: 8 }}>
-            <Button href={publicUrl} target="_blank">
-              Voir la liste publique
-            </Button>
-            <Button onClick={handleShare}>Partager</Button>
-          </div>
-          <div>
-            <Typography.Text type="secondary">
-              Ce lien ne montre que tes souhaits publics.
-            </Typography.Text>
-          </div>
+          <Typography.Text
+            type="secondary"
+            style={{ display: "flex", alignItems: "center", gap: 4 }}
+          >
+            <span role="img" aria-label="lock">
+              🔒
+            </span>
+            Ce lien ne montre que tes souhaits publics.{' '}
+            <a onClick={() => setInfoOpen(true)}>En savoir plus</a>
+          </Typography.Text>
           {!hasPublic && (
-            <Alert
-              style={{ marginTop: 8 }}
-              message="Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
-              type="info"
-              showIcon
-            />
+            <div style={{ marginTop: 8 }}>
+              <Tag
+                style={{
+                  background: "#DBEAFE",
+                  border: "none",
+                  color: "#1E40AF",
+                }}
+              >
+                Rends certains souhaits publics pour les montrer
+              </Tag>
+            </div>
           )}
         </div>
       )}
+
+      <Modal
+        open={infoOpen}
+        onCancel={() => setInfoOpen(false)}
+        footer={null}
+        centered
+      >
+        <Typography.Paragraph style={{ marginBottom: 0 }}>
+          Le lien partagé affiche uniquement les souhaits marqués comme
+          publics. Tes souhaits privés restent invisibles.
+        </Typography.Paragraph>
+      </Modal>
 
       {showTip && (
         <div
