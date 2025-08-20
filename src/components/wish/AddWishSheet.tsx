@@ -30,6 +30,7 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
   const [showPasteTip, setShowPasteTip] = useState(false);
   const linkInputRef = useRef<InputRef | null>(null);
   const initialViewport = useRef<string | null>(null);
+  const headerStyleRef = useRef<{ position: string; zIndex: string } | null>(null);
 
   const url = Form.useWatch("url", form);
   const { metadata } = useLinkMetadata(url ?? undefined);
@@ -83,6 +84,33 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
     }
   }, [metadata, form]);
 
+  // Lock background scroll and lower header z-index when the sheet is open
+  useEffect(() => {
+    const body = document.body;
+    const header = document.querySelector(
+      ".MuiAppBar-root"
+    ) as HTMLElement | null;
+    if (open) {
+      headerStyleRef.current = {
+        position: header?.style.position || "",
+        zIndex: header?.style.zIndex || "",
+      };
+      if (header) {
+        header.style.position = "relative";
+        header.style.zIndex = "0";
+      }
+      body.style.overflow = "hidden";
+      body.style.overscrollBehavior = "contain";
+    } else {
+      if (header && headerStyleRef.current) {
+        header.style.position = headerStyleRef.current.position;
+        header.style.zIndex = headerStyleRef.current.zIndex;
+      }
+      body.style.overflow = "";
+      body.style.overscrollBehavior = "";
+    }
+  }, [open]);
+
   // Save as draft on each change
   const handleValuesChange = (_: any, values: WishUI) => {
     localStorage.setItem(DRAFT_KEY, JSON.stringify(values));
@@ -133,13 +161,30 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
       placement={isMobile ? "bottom" : "right"}
       height={isMobile ? "90vh" : undefined}
       width={isMobile ? undefined : 360}
-      title="Ajouter un souhait 🎁"
+      title="Ajouter un souhait"
       extra={<span style={{ color: "#6B7280" }}>Note l’essentiel, tu pourras peaufiner après.</span>}
+      headerStyle={{
+        background: "#fff",
+        borderBottom: "1px solid #f0f0f0",
+        position: "sticky",
+        top: 0,
+        zIndex: 1,
+      }}
       bodyStyle={{
         display: "flex",
         flexDirection: "column",
         paddingBottom: 0,
         overscrollBehavior: "contain",
+      }}
+      maskStyle={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      zIndex={1001}
+      rootClassName="add-wish-sheet"
+      getContainer={document.body}
+      contentWrapperStyle={{
+        maxHeight: isMobile ? "90vh" : undefined,
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        background: "#fff",
       }}
     >
       {isMobile && (
@@ -196,7 +241,14 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
             style={{ fontSize: 16 }}
             addonAfter={
               <Form.Item name="currency" initialValue="EUR" noStyle>
-                <Select style={{ width: 80, fontSize: 16 }}>
+                <Select
+                  style={{ width: 80, fontSize: 16 }}
+                  getPopupContainer={(trigger) =>
+                    (trigger.closest(".add-wish-sheet") as HTMLElement) ||
+                    document.body
+                  }
+                  dropdownStyle={{ zIndex: 1002 }}
+                >
                   <Select.Option value="EUR">EUR</Select.Option>
                   <Select.Option value="GBP">GBP</Select.Option>
                   <Select.Option value="USD">USD</Select.Option>
