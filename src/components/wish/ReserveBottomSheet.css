@@ -1,0 +1,28 @@
+.sheet-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.sheet-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.sheet-price {
+  font-weight: 600;
+}
+
+.sheet-domain a {
+  color: #1f2937;
+}
+
+.caption {
+  text-align: center;
+  margin-top: 16px;
+  color: #6b7280;
+}
