@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Typography, Skeleton, Button, Tag, message, Alert } from "antd";
 import { OpenInNew, Share } from "@mui/icons-material";
 import "./WishesListPage.css";
@@ -9,6 +9,7 @@ import {
   useCreate,
   useUpdate,
   useOne,
+  useDelete,
 } from "@refinedev/core";
 
 import { EditWishDrawer } from "../../components/admin/wishes/EditWishDrawer";
@@ -57,9 +58,10 @@ const formatPrice = (
 type RowProps = {
   item: WishUI;
   onOpen: (item: WishUI, field?: keyof WishUI) => void;
+  onDelete: (item: WishUI) => void;
 };
 
-const Row: React.FC<RowProps> = ({ item, onOpen }) => {
+const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
   const price = formatPrice(item.price, item.currency);
   const domain = (() => {
     try {
@@ -69,6 +71,13 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
     }
   })();
   const [pressed, setPressed] = useState(false);
+  const [danger, setDanger] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const longPress = useRef<number>();
+  const longPressed = useRef(false);
+  const confirmTimer = useRef<number>();
+  const rowRef = useRef<HTMLDivElement>(null);
+  const chipRef = useRef<HTMLButtonElement>(null);
 
   const accents = [
     colors.accentPeach,
@@ -171,30 +180,100 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
   };
 
   const handleClick = () => {
-    if (navigator.vibrate) navigator.vibrate(10);
+    if (longPressed.current) {
+      longPressed.current = false;
+      return;
+    }
+    if (danger) {
+      setDanger(false);
+      setConfirm(false);
+      return;
+    }
+    navigator.vibrate?.(10);
     onOpen(item);
+  };
+
+  const startPress = () => {
+    setPressed(true);
+    longPress.current = window.setTimeout(() => {
+      longPressed.current = true;
+      setPressed(false);
+      setDanger(true);
+      navigator.vibrate?.(10);
+    }, 600);
+  };
+
+  const cancelPress = () => {
+    setPressed(false);
+    if (longPress.current) {
+      clearTimeout(longPress.current);
+      longPress.current = undefined;
+    }
+  };
+
+  useEffect(() => {
+    if (danger) {
+      const handleOutside = (e: PointerEvent) => {
+        if (rowRef.current && !rowRef.current.contains(e.target as Node)) {
+          setDanger(false);
+          setConfirm(false);
+        }
+      };
+      document.addEventListener("pointerdown", handleOutside);
+      chipRef.current?.focus();
+      return () => document.removeEventListener("pointerdown", handleOutside);
+    }
+  }, [danger]);
+
+  const handleDelete = () => {
+    if (!confirm) {
+      setConfirm(true);
+      confirmTimer.current = window.setTimeout(() => {
+        setConfirm(false);
+        setDanger(false);
+      }, 3000);
+      return;
+    }
+    if (confirmTimer.current) clearTimeout(confirmTimer.current);
+    setConfirm(false);
+    setDanger(false);
+    onDelete(item);
   };
 
   return (
     <div
+      ref={rowRef}
       role="button"
       tabIndex={0}
       aria-label={`Modifier ${item.name}`}
       onClick={handleClick}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClick()}
-      onPointerDown={() => setPressed(true)}
-      onPointerUp={() => setPressed(false)}
-      onPointerLeave={() => setPressed(false)}
+      onPointerDown={startPress}
+      onPointerUp={cancelPress}
+      onPointerLeave={cancelPress}
       style={{
         display: "flex",
         alignItems: "center",
         minHeight: 64,
         padding: "12px 0",
         borderBottom: "1px solid #EEF0F3",
-        background: pressed ? colors.accentPeach : undefined,
+        background: danger
+          ? "rgba(255,107,107,0.08)"
+          : pressed
+            ? colors.accentPeach
+            : undefined,
         cursor: "pointer",
       }}
     >
+      <button
+        className="visually-hidden"
+        aria-label={`Supprimer ${item.name}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          setDanger(true);
+          navigator.vibrate?.(10);
+        }}
+      />
       {renderThumb()}
       <div style={{ flex: 1, marginLeft: 12, overflow: "hidden" }}>
         <div
@@ -266,41 +345,72 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
           </div>
         )}
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
-        {price ? (
-          <Tag
-            style={{
-              background: colors.accentPeach,
-              border: "none",
-              fontWeight: 600,
-              color: colors.textPrimary,
-              cursor: "pointer",
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpen(item, "price");
-            }}
-          >
-            {price}
-          </Tag>
-        ) : (
-          <Tag
-            style={{
-              background: colors.accentPeach,
-              border: `1px dashed ${colors.primary}`,
-              color: colors.primary,
-              cursor: "pointer",
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpen(item, "price");
-            }}
-          >
-            Ajouter un prix
-          </Tag>
-        )}
-        <span style={{ color: "#9CA3AF", fontSize: 16 }}>›</span>
-      </div>
+      {danger ? (
+        <button
+          ref={chipRef}
+          aria-label={confirm ? "Confirmer" : `Supprimer ${item.name}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete();
+          }}
+          style={{
+            background: confirm ? colors.primary : "transparent",
+            border: `1px solid ${colors.primary}`,
+            color: confirm ? "#fff" : colors.primary,
+            borderRadius: 16,
+            height: 32,
+            padding: "0 12px",
+            marginLeft: 8,
+            fontWeight: 600,
+            transition: "all 150ms",
+          }}
+        >
+          {confirm ? "Confirmer" : "Supprimer"}
+        </button>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            marginLeft: 8,
+          }}
+        >
+          {price ? (
+            <Tag
+              style={{
+                background: colors.accentPeach,
+                border: "none",
+                fontWeight: 600,
+                color: colors.textPrimary,
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen(item, "price");
+              }}
+            >
+              {price}
+            </Tag>
+          ) : (
+            <Tag
+              style={{
+                background: colors.accentPeach,
+                border: `1px dashed ${colors.primary}`,
+                color: colors.primary,
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen(item, "price");
+              }}
+            >
+              Ajouter un prix
+            </Tag>
+          )}
+          <span style={{ color: "#9CA3AF", fontSize: 16 }}>›</span>
+        </div>
+      )}
     </div>
   );
 };
@@ -315,8 +425,10 @@ export const WishesListPage: React.FC = () => {
     ],
     queryOptions: { enabled: !!identity },
   });
-
-  const wishes = data?.data ?? [];
+  const [wishes, setWishes] = useState<WishUI[]>([]);
+  useEffect(() => {
+    if (data?.data) setWishes(data.data);
+  }, [data]);
 
   const { data: slugData } = useOne<UserSlug>({
     resource: "user_slugs",
@@ -331,12 +443,14 @@ export const WishesListPage: React.FC = () => {
 
   const { mutate: update } = useUpdate();
   const { mutate: create } = useCreate();
+  const { mutate: deleteOne } = useDelete();
 
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<WishUI | undefined>();
   const [focusField, setFocusField] = useState<keyof WishUI | undefined>();
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const pendingDelete = useRef<{ item: WishUI; index: number; timeout: number } | null>(null);
 
   useEffect(() => {
     if (localStorage.getItem("public-banner-dismissed")) {
@@ -420,6 +534,53 @@ export const WishesListPage: React.FC = () => {
           ),
       }
     );
+  };
+
+  const handleDelete = (wish: WishUI) => {
+    if (wish.status === "reserved") {
+      message.warning("Déjà réservé — impossible de supprimer.");
+      return;
+    }
+    const index = wishes.findIndex((w) => w.id === wish.id);
+    if (index === -1) return;
+    const newList = [...wishes];
+    newList.splice(index, 1);
+    setWishes(newList);
+    const key = `delete-${wish.id}`;
+    const undo = () => {
+      if (pendingDelete.current) clearTimeout(pendingDelete.current.timeout);
+      message.destroy(key);
+      const restored = [...newList];
+      restored.splice(index, 0, wish);
+      setWishes(restored);
+      pendingDelete.current = null;
+    };
+    message.open({
+      key,
+      type: "info",
+      duration: 5,
+      content: (
+        <span aria-live="polite">
+          Souhait supprimé. {" "}
+          <Button type="link" onClick={undo} style={{ padding: 0 }}>
+            Annuler
+          </Button>
+        </span>
+      ),
+    });
+    const timeout = window.setTimeout(() => {
+      deleteOne(
+        { resource: "wishes", id: wish.id },
+        {
+          onError: () => {
+            undo();
+            message.error("Oups, impossible de supprimer. Réessayer.");
+          },
+        }
+      );
+      pendingDelete.current = null;
+    }, 5000);
+    pendingDelete.current = { item: wish, index, timeout };
   };
 
   return (
@@ -554,7 +715,7 @@ export const WishesListPage: React.FC = () => {
       {!isLoading && !isError && wishes.length > 0 && (
         <div>
           {wishes.map((w) => (
-            <Row key={w.id} item={w} onOpen={openEdit} />
+            <Row key={w.id} item={w} onOpen={openEdit} onDelete={handleDelete} />
           ))}
           {wishes.length <= 2 && (
             <>

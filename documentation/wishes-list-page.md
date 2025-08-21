@@ -27,6 +27,15 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 - Layout rules prevent chips from overlapping and everything ellipsizes instead of wrapping.
 - Tapping any part opens the edit drawer, focusing the relevant field.
 
+### Suppression rapide
+- Appui long (600 ms) sur une ligne pour afficher une puce rouge **Supprimer** sur cet item uniquement.
+- Taper ailleurs annule le mode danger.
+- Premier tap sur la puce → devient **Confirmer** (rouge plein) pendant ~2 s.
+- Second tap supprime l’élément de façon optimiste et affiche un toast "Souhait supprimé. Annuler".
+- Le toast reste 5 s ; cliquer sur **Annuler** réinsère l’élément à sa position d’origine.
+- Tentative sur un souhait réservé → toast "Déjà réservé — impossible de supprimer.".
+- Un bouton invisible `aria-label="Supprimer {titre}"` permet l’accès clavier/lecteur d’écran.
+
 ## Empty and Sparse States
 - Zero items: centered 🎁 with text "Aucun souhait pour l’instant. Ajoute ton premier ✨".
 - One or two items: two tappable ghost rows with pastel thumbnails inviting new wishes.
