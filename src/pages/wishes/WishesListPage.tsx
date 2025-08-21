@@ -495,7 +495,13 @@ export const WishesListPage: React.FC = () => {
     if (!editing) return;
     const { note_private, tags, metadata, ...dbValues } = values;
     update(
-      { resource: "wishes", id: editing.id, values: dbValues },
+      {
+        resource: "wishes",
+        id: editing.id,
+        values: dbValues,
+        successNotification: false,
+        errorNotification: false,
+      },
       {
         onSuccess: () => {
           setExtras(String(editing.id), { note_private, tags, metadata });
@@ -518,7 +524,12 @@ export const WishesListPage: React.FC = () => {
     }
     const { note_private, tags, metadata, ...dbValues } = values;
     create(
-      { resource: "wishes", values: { ...dbValues, user_id: identity.id } },
+      {
+        resource: "wishes",
+        values: { ...dbValues, user_id: identity.id },
+        successNotification: false,
+        errorNotification: false,
+      },
       {
         onSuccess: (data) => {
           if (data?.data?.id) {
@@ -570,7 +581,12 @@ export const WishesListPage: React.FC = () => {
     });
     const timeout = window.setTimeout(() => {
       deleteOne(
-        { resource: "wishes", id: wish.id },
+        {
+          resource: "wishes",
+          id: wish.id,
+          successNotification: false,
+          errorNotification: false,
+        },
         {
           onError: () => {
             undo();

@@ -25,6 +25,11 @@ This document tracks high-level technical decisions and UI guidelines for the pr
   - **Wishes List** filters Supabase queries by `user_id` to show only the signed-in user's wishes and renders a mobile-first list with image/placeholder, chevron and tappable rows. Each row shows a title, contextual prompts for missing description, link and price pills or placeholders. A count badge appears in the header and up to two ghost rows encourage adding more wishes. When at least one wish is public, external-link and share icon buttons in the header link to `/l/{slug}` and trigger the native share sheet or copy the link. A dismissable info banner reminds the user to make wishes public when none are. Skeleton loading, friendly empty/error states and a single centered “+” FAB round out the experience. Long press on a row reveals an inline **Supprimer → Confirmer** chip with undoable deletion. See `wishes-list-page.md` for details.
 - **Add Wish Sheet** provides a bottom sheet/drawer with just four fields (Titre, Description, Prix+Devise, Lien) and warm microcopy. When a wish is saved, the current user's `user_id` is sent with the creation request so the record is linked to their account. Drafts persist locally until submission. See `add-wish-sheet.md` for details.
 
+## Notifications
+- Built-in Refine snackbars are disabled so only our custom toasts appear.
+- Success and error messages use Ant Design's `message` API (e.g. "Souhait ajouté ✨").
+- Mutations opt out of library notifications with `successNotification: false` and `errorNotification: false`. See `notifications.md` for guidance.
+
 ## Accessibility
 - Interactive elements maintain a minimum touch area of 44px and include aria attributes for state changes.
 - Form controls default to a 16px font size to avoid iOS Safari's automatic zoom. Placeholders and select values match this size.
