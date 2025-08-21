@@ -46,3 +46,12 @@
   outline: 2px solid #4B5563;
   outline-offset: 2px;
 }
+
+.wish-row,
+.wish-row * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}

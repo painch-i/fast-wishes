@@ -78,6 +78,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
   const confirmTimer = useRef<number>();
   const rowRef = useRef<HTMLDivElement>(null);
   const chipRef = useRef<HTMLButtonElement>(null);
+  const startPos = useRef<{ x: number; y: number }>();
 
   const accents = [
     colors.accentPeach,
@@ -193,14 +194,30 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
     onOpen(item);
   };
 
-  const startPress = () => {
+  const startPress = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!e.isPrimary) {
+      cancelPress();
+      return;
+    }
     setPressed(true);
+    startPos.current = { x: e.clientX, y: e.clientY };
     longPress.current = window.setTimeout(() => {
       longPressed.current = true;
       setPressed(false);
+      if (item.status === "reserved") {
+        message.warning("Déjà réservé — impossible de supprimer.");
+        return;
+      }
       setDanger(true);
       navigator.vibrate?.(10);
     }, 600);
+  };
+
+  const movePress = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!longPress.current || !startPos.current) return;
+    const dx = Math.abs(e.clientX - startPos.current.x);
+    const dy = Math.abs(e.clientY - startPos.current.y);
+    if (dx > 10 || dy > 10) cancelPress();
   };
 
   const cancelPress = () => {
@@ -209,6 +226,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
       clearTimeout(longPress.current);
       longPress.current = undefined;
     }
+    startPos.current = undefined;
   };
 
   useEffect(() => {
@@ -243,14 +261,18 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
   return (
     <div
       ref={rowRef}
+      className="wish-row"
       role="button"
       tabIndex={0}
       aria-label={`Modifier ${item.name}`}
       onClick={handleClick}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClick()}
       onPointerDown={startPress}
+      onPointerMove={movePress}
       onPointerUp={cancelPress}
       onPointerLeave={cancelPress}
+      onPointerCancel={cancelPress}
+      onContextMenu={(e) => e.preventDefault()}
       style={{
         display: "flex",
         alignItems: "center",
