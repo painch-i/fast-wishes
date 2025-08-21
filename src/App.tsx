@@ -1,10 +1,7 @@
 import { Authenticated, Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
-import {
-  RefineSnackbarProvider,
-  useNotificationProvider,
-} from "@refinedev/mui";
+import { RefineThemes } from "@refinedev/mui";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
@@ -24,7 +21,6 @@ import { theme } from "./theme";
 import { supabaseClient } from "./utility";
 import { smartDataProvider } from "./providers/smartDataProvider";
 import { WishesListPage } from "./pages/wishes/WishesListPage";
-import { RefineThemes } from "@refinedev/mui";
 
 function App() {
   return (
@@ -34,13 +30,11 @@ function App() {
         <ThemeProvider theme={RefineThemes.Blue}>
           <CssBaseline />
           <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto", colorScheme: "light" } }} />
-          <RefineSnackbarProvider>
               <Refine
                   dataProvider={smartDataProvider}
                   liveProvider={liveProvider(supabaseClient)}
                 authProvider={authProvider}
                 routerProvider={routerBindings}
-                notificationProvider={useNotificationProvider}
                 options={{
                   warnWhenUnsavedChanges: true,
                   useNewQueryKeys: true,
@@ -70,7 +64,6 @@ function App() {
                 <UnsavedChangesNotifier />
                 <DocumentTitleHandler />
               </Refine>
-          </RefineSnackbarProvider>
         </ThemeProvider>
       </RefineKbarProvider>
       </ConfigProvider>
