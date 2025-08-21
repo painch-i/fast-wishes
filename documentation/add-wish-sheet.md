@@ -2,6 +2,9 @@
 
 A mobile-first bottom sheet (drawer on desktop) that lets users quickly add a wish with minimal friction.
 
+## Header
+The header stacks a short title and subtitle vertically with a small gap. The title truncates after two lines with an ellipsis and sits above a secondary colored subtitle. On mobile a centered drag handle appears above the text. The layout avoids any absolute positioning or negative margins, ensuring no overlap even when the title wraps.
+
 ## Fields
 1. **Titre** – required, placeholder "Bouilloire inox silencieuse" with inline help.
 2. **Description** – multiline, placeholder: "Pourquoi ça me ferait plaisir ? Une petite note pour guider (couleur, taille, usage…)."
