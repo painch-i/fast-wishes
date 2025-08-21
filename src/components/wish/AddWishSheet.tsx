@@ -161,8 +161,59 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
       placement={isMobile ? "bottom" : "right"}
       height={isMobile ? "90vh" : undefined}
       width={isMobile ? undefined : 360}
-      title="Ajouter un souhait"
-      extra={<span style={{ color: "#6B7280" }}>Note l’essentiel, tu pourras peaufiner après.</span>}
+      title={
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            width: "100%",
+          }}
+        >
+          {isMobile && (
+            <div
+              style={{
+                width: 40,
+                height: 4,
+                background: "#ccc",
+                borderRadius: 2,
+                margin: "0 auto",
+              }}
+            />
+          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <Typography.Title
+              level={4}
+              style={{
+                margin: 0,
+                lineHeight: 1.2,
+                fontSize: "clamp(20px, 5vw, 22px)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              }}
+            >
+              Ajouter un souhait
+            </Typography.Title>
+            <Typography.Text
+              style={{
+                margin: 0,
+                lineHeight: 1.35,
+                color: "#6B7280",
+                display: "block",
+                fontSize: 16,
+                whiteSpace: "normal",
+                wordBreak: "normal",
+                overflowWrap: "anywhere",
+              }}
+            >
+              Note l’essentiel, tu pourras peaufiner après.
+            </Typography.Text>
+          </div>
+        </div>
+      }
       headerStyle={{
         background: "#fff",
         borderBottom: "1px solid #f0f0f0",
@@ -187,17 +238,6 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
         background: "#fff",
       }}
     >
-      {isMobile && (
-        <div
-          style={{
-            width: 40,
-            height: 4,
-            background: "#ccc",
-            borderRadius: 2,
-            margin: "8px auto",
-          }}
-        />
-      )}
       <Form
         layout="vertical"
         form={form}
