@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { Typography, Skeleton, Button, Tag, message, Alert } from "antd";
+import { useEffect, useState, useRef } from "react";
+import { Typography, Skeleton, Button, Tag, message, Alert, Modal } from "antd";
 import { OpenInNew, Share } from "@mui/icons-material";
+import { Snackbar, Button as MuiButton } from "@mui/material";
 import "./WishesListPage.css";
 import { colors } from "../../theme";
 import {
@@ -8,6 +9,7 @@ import {
   useList,
   useCreate,
   useUpdate,
+  useDelete,
   useOne,
 } from "@refinedev/core";
 
@@ -57,9 +59,10 @@ const formatPrice = (
 type RowProps = {
   item: WishUI;
   onOpen: (item: WishUI, field?: keyof WishUI) => void;
+  onDelete: (item: WishUI) => void;
 };
 
-const Row: React.FC<RowProps> = ({ item, onOpen }) => {
+const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
   const price = formatPrice(item.price, item.currency);
   const domain = (() => {
     try {
@@ -68,7 +71,25 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
       return null;
     }
   })();
-  const [pressed, setPressed] = useState(false);
+  const timerRef = useRef<number | null>(null);
+  const longPressRef = useRef(false);
+
+  const startPress = () => {
+    longPressRef.current = false;
+    timerRef.current = window.setTimeout(() => {
+      longPressRef.current = true;
+      navigator.vibrate?.(10);
+      onDelete(item);
+    }, 600);
+  };
+
+  const cancelPress = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
 
   const accents = [
     colors.accentPeach,
@@ -170,28 +191,32 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
     );
   };
 
-  const handleClick = () => {
-    if (navigator.vibrate) navigator.vibrate(10);
-    onOpen(item);
-  };
+    const handleRowClick = () => {
+      if (!longPressRef.current) {
+        navigator.vibrate?.(10);
+        onOpen(item);
+      }
+    };
 
   return (
     <div
       role="button"
       tabIndex={0}
       aria-label={`Modifier ${item.name}`}
-      onClick={handleClick}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClick()}
-      onPointerDown={() => setPressed(true)}
-      onPointerUp={() => setPressed(false)}
-      onPointerLeave={() => setPressed(false)}
+      onClick={handleRowClick}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleRowClick()}
+      onMouseDown={startPress}
+      onTouchStart={startPress}
+      onMouseUp={cancelPress}
+      onMouseLeave={cancelPress}
+      onTouchEnd={cancelPress}
+      onTouchMove={cancelPress}
       style={{
         display: "flex",
         alignItems: "center",
         minHeight: 64,
         padding: "12px 0",
         borderBottom: "1px solid #EEF0F3",
-        background: pressed ? colors.accentPeach : undefined,
         cursor: "pointer",
       }}
     >
@@ -299,7 +324,28 @@ const Row: React.FC<RowProps> = ({ item, onOpen }) => {
             Ajouter un prix
           </Tag>
         )}
-        <span style={{ color: "#9CA3AF", fontSize: 16 }}>›</span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(item);
+          }}
+          aria-label={`Supprimer ${item.name}`}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: 20,
+            width: 32,
+            height: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginLeft: -4,
+          }}
+        >
+          ⋮
+        </button>
+        <span style={{ color: "#9CA3AF", fontSize: 16, marginLeft: 4 }}>›</span>
       </div>
     </div>
   );
@@ -331,12 +377,14 @@ export const WishesListPage: React.FC = () => {
 
   const { mutate: update } = useUpdate();
   const { mutate: create } = useCreate();
+  const { mutate: remove } = useDelete();
 
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<WishUI | undefined>();
   const [focusField, setFocusField] = useState<keyof WishUI | undefined>();
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [snackWish, setSnackWish] = useState<WishUI | null>(null);
 
   useEffect(() => {
     if (localStorage.getItem("public-banner-dismissed")) {
@@ -420,6 +468,37 @@ export const WishesListPage: React.FC = () => {
           ),
       }
     );
+  };
+
+  const confirmDelete = (wish: WishUI) => {
+    Modal.confirm({
+      title: "Supprimer ce souhait ?",
+      content: "Cette action peut être annulée pendant quelques secondes.",
+      okText: "Supprimer",
+      cancelText: "Annuler",
+      okButtonProps: { danger: true },
+      onOk: () => handleDelete(wish),
+    });
+  };
+
+  const handleDelete = (wish: WishUI) => {
+    remove(
+      { resource: "wishes", id: wish.id },
+      {
+        onSuccess: () => {
+          setSnackWish(wish);
+          refetch();
+        },
+        onError: () => message.error("Oups, impossible de supprimer. Réessayer."),
+      }
+    );
+  };
+
+  const handleUndo = () => {
+    if (snackWish) {
+      create({ resource: "wishes", values: snackWish }, { onSuccess: () => refetch() });
+    }
+    setSnackWish(null);
   };
 
   return (
@@ -554,7 +633,7 @@ export const WishesListPage: React.FC = () => {
       {!isLoading && !isError && wishes.length > 0 && (
         <div>
           {wishes.map((w) => (
-            <Row key={w.id} item={w} onOpen={openEdit} />
+            <Row key={w.id} item={w} onOpen={openEdit} onDelete={confirmDelete} />
           ))}
           {wishes.length <= 2 && (
             <>
@@ -614,6 +693,19 @@ export const WishesListPage: React.FC = () => {
         open={addOpen}
         onCancel={() => setAddOpen(false)}
         onSubmit={(values) => handleAdd(values)}
+      />
+      <Snackbar
+        open={!!snackWish}
+        message="Souhait supprimé."
+        onClose={() => setSnackWish(null)}
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        ContentProps={{ "aria-live": "polite" }}
+        action={
+          <MuiButton color="secondary" size="small" onClick={handleUndo}>
+            Annuler
+          </MuiButton>
+        }
       />
       {!addOpen && !editOpen && (
         <Button

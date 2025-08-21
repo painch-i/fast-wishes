@@ -25,7 +25,7 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
   - If no link provided, an extra line "+ Lien pour aider à trouver" appears.
 - Right column: price pill (peach) or dashed "Ajouter un prix" pill. Chevron `›` signals navigation.
 - Layout rules prevent chips from overlapping and everything ellipsizes instead of wrapping.
-- Tapping any part opens the edit drawer, focusing the relevant field.
+- Tapping any part opens the edit drawer, focusing the relevant field. A long press (600 ms) vibrates then opens a confirmation dialog to delete the wish. An accessible `⋮` button provides the same action for keyboard and screen reader users.
 
 ## Empty and Sparse States
 - Zero items: centered 🎁 with text "Aucun souhait pour l’instant. Ajoute ton premier ✨".
@@ -37,3 +37,6 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 ## Floating Action Button
 - Single centered “+” FAB opens the add sheet.
 - Hidden whenever an edit or add modal is active.
+
+## Deletion & Undo
+- Deleting a wish is confirmed before removal. After deletion, a bottom snackbar displays **"Souhait supprimé. Annuler"** for five seconds. Clicking **Annuler** restores the item.

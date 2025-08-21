@@ -17,11 +17,11 @@ All fields except the title are optional. Invalid links trigger a gentle warning
 - Every input and select renders at a minimum of 16px so iOS Safari never auto-zooms on focus.
 - The price field uses a text input with `inputmode="decimal"` and an inline currency selector to avoid native number steppers.
 - While the sheet is open a `maximum-scale=1` attribute is temporarily added to the viewport meta tag to prevent pinch-zoom and is restored on close.
-- The drawer body applies `overscroll-behavior: contain` to block pull-to-refresh gestures.
+- The drawer body applies `overscroll-behavior: contain` while the document body is scroll-locked with `overscroll-behavior: none` to block pull-to-refresh.
 
 ### Overlay and layering
-- The sheet and its overlay render in a portal attached to `document.body`.
-- A fixed mask with ~50% opacity covers the page and captures all clicks; the sheet panel sits above the mask with a higher `z-index`.
+- The sheet and its overlay render in a portal attached directly to `document.body`.
+- A fixed mask with ~50% opacity covers the page and captures all clicks; the sheet panel sits above the mask with `z-index` 1001 (mask 1000, dropdowns 1002).
 - When open the document body is scroll-locked and the admin header loses its sticky positioning so nothing bleeds through.
 - Dropdowns like the currency selector render inside the sheet with an even higher `z-index` to appear above the header and footer.
 

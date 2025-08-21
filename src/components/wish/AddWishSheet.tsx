@@ -100,7 +100,7 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
         header.style.zIndex = "0";
       }
       body.style.overflow = "hidden";
-      body.style.overscrollBehavior = "contain";
+      body.style.overscrollBehavior = "none";
     } else {
       if (header && headerStyleRef.current) {
         header.style.position = headerStyleRef.current.position;
@@ -225,12 +225,16 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
         display: "flex",
         flexDirection: "column",
         paddingBottom: 0,
-        overscrollBehavior: "contain",
       }}
-      maskStyle={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      maskStyle={{
+        backgroundColor: "rgba(0,0,0,0.5)",
+        position: "fixed",
+        inset: 0,
+        zIndex: 1000,
+      }}
       zIndex={1001}
       rootClassName="add-wish-sheet"
-      getContainer={document.body}
+      getContainer={() => document.body}
       contentWrapperStyle={{
         maxHeight: isMobile ? "90vh" : undefined,
         borderTopLeftRadius: 16,
@@ -243,7 +247,13 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
         form={form}
         onFinish={handleFinish}
         onValuesChange={handleValuesChange}
-        style={{ flex: 1, overflowY: "auto", padding: "0 0 16px" }}
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "0 0 16px",
+          overscrollBehavior: "contain",
+          scrollPaddingBottom: "calc(80px + env(safe-area-inset-bottom))",
+        }}
       >
         <Form.Item
           name="name"
