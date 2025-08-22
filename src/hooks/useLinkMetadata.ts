@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { supabaseClient } from "../utility";
 
 export type LinkMetadata = {
   site_name?: string;
@@ -20,10 +21,10 @@ export const useLinkMetadata = (url?: string) => {
     if (!url) return;
     let active = true;
     setLoading(true);
-    fetch(`/api/metadata?url=${encodeURIComponent(url)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (active) setMetadata(data);
+    supabaseClient.functions
+      .invoke("enrich-wish", { body: { url } })
+      .then(({ data }) => {
+        if (active) setMetadata(data as LinkMetadata);
       })
       .catch(() => {
         if (active) setMetadata(null);

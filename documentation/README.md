@@ -48,6 +48,10 @@ Before starting any task, regenerate the database types to keep them in sync:
 
 The resulting `database.types.ts` file is imported across the codebase to ensure queries match the schema.
 
+## Edge Functions
+- **enrich-wish** fetches basic metadata for a supplied URL to prefill wish details. See `wish-enrichment-edge-function.md` for implementation notes.
+- Edge functions deploy automatically to Supabase when commits land on `main` via the `deploy-edge-functions.yml` GitHub workflow.
+
 ## Build
 - The project builds via `tsc && vite build` to ensure compatibility with Yarn PnP.
 - Extra runtime helpers rely on `@mui/system` for MUI Data Grid and `tslib` for TypeScript transpiled helpers.
