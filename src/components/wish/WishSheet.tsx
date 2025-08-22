@@ -10,13 +10,14 @@ import {
   Checkbox,
   Segmented,
   AutoComplete,
-  Tag,
   message,
 } from "antd";
 import type { InputRef } from "antd";
+import { CloseCircleFilled, ExportOutlined } from "@ant-design/icons";
 import { useMediaQuery } from "@mui/material";
 import type { WishUI } from "../../types/wish";
 import { useLinkMetadata } from "../../hooks/useLinkMetadata";
+import { colors } from "../../theme";
 
 export interface WishSheetProps {
   open: boolean;
@@ -37,12 +38,14 @@ export const WishSheet: React.FC<WishSheetProps> = ({
   const isMobile = useMediaQuery("(max-width:600px)");
   const [linkDomain, setLinkDomain] = useState<string | null>(null);
   const [showPasteTip, setShowPasteTip] = useState(false);
+  const [isUrlValid, setIsUrlValid] = useState(true);
+  const [debouncedUrl, setDebouncedUrl] = useState<string | undefined>(undefined);
   const linkInputRef = useRef<InputRef | null>(null);
   const initialViewport = useRef<string | null>(null);
   const headerStyleRef = useRef<{ position: string; zIndex: string } | null>(null);
 
   const url = Form.useWatch("url", form);
-  const { metadata } = useLinkMetadata(url ?? undefined);
+  const { metadata } = useLinkMetadata(debouncedUrl);
 
   useEffect(() => {
     if (open) {
@@ -138,25 +141,43 @@ export const WishSheet: React.FC<WishSheetProps> = ({
     }
   };
 
-  const handleLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    try {
-      const url = new URL(value);
-      const domain = url.hostname.replace(/^www\./, "");
-      setLinkDomain(domain);
-      form.setFieldsValue({ merchant_domain: domain } as any);
-    } catch {
-      setLinkDomain(null);
-      form.setFieldsValue({ merchant_domain: undefined } as any);
-    }
-  };
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (!url) {
+        setLinkDomain(null);
+        form.setFieldsValue({ merchant_domain: undefined } as any);
+        setIsUrlValid(true);
+        setDebouncedUrl(undefined);
+        return;
+      }
+      let value = url.trim();
+      if (!/^https?:\/\//i.test(value)) {
+        value = `https://${value}`;
+        form.setFieldsValue({ url: value } as any);
+      }
+      try {
+        const parsed = new URL(value);
+        const domain = parsed.hostname.replace(/^www\./, "");
+        setLinkDomain(domain);
+        form.setFieldsValue({ merchant_domain: domain } as any);
+        setIsUrlValid(true);
+        setDebouncedUrl(value);
+      } catch {
+        setLinkDomain(null);
+        form.setFieldsValue({ merchant_domain: undefined } as any);
+        setIsUrlValid(false);
+        setDebouncedUrl(undefined);
+      }
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [url, form]);
 
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
       if (text) {
         form.setFieldsValue({ url: text } as any);
-        handleLinkChange({ target: { value: text } } as any);
+        linkInputRef.current?.focus({ cursor: "end" });
         message.success("Lien ajouté ✨");
         setShowPasteTip(false);
       }
@@ -334,27 +355,88 @@ export const WishSheet: React.FC<WishSheetProps> = ({
           </Space.Compact>
         </Form.Item>
 
-        <Form.Item name="url" label="Lien marchand">
-          <Space>
+        <Form.Item
+          name="url"
+          label="Lien marchand"
+          validateStatus={!isUrlValid ? "error" : undefined}
+          help={
+            !isUrlValid
+              ? "Lien invalide"
+              : showPasteTip
+              ? "Maintiens dans le champ puis \"Coller\""
+              : undefined
+          }
+        >
+          <Space.Compact style={{ width: "100%" }}>
             <Input
               ref={linkInputRef}
-              placeholder="https://… (Amazon, Etsy, marque…)"
+              placeholder="https://… (Amazon, Etsy, site de la marque)"
               inputMode="url"
-              onChange={handleLinkChange}
-              style={{ flex: 1, fontSize: 16 }}
+              onChange={() => setShowPasteTip(false)}
+              style={{ fontSize: 16 }}
+              suffix={
+                <Space size={4}>
+                  {url && (
+                    <CloseCircleFilled
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        form.setFieldsValue({ url: undefined, merchant_domain: undefined } as any);
+                        setLinkDomain(null);
+                        setIsUrlValid(true);
+                        setShowPasteTip(false);
+                        setDebouncedUrl(undefined);
+                      }}
+                      style={{ color: colors.textSecondary }}
+                    />
+                  )}
+                  {url && isUrlValid && (
+                    <ExportOutlined
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }}
+                      style={{ color: colors.textSecondary }}
+                    />
+                  )}
+                </Space>
+              }
             />
             <Button onClick={handlePaste} style={{ fontSize: 16 }}>
               Coller
             </Button>
-          </Space>
-          {showPasteTip && (
-            <Typography.Text type="secondary">
-              Maintiens puis Coller
-            </Typography.Text>
-          )}
+          </Space.Compact>
         </Form.Item>
-        {linkDomain && (
-          <Tag style={{ marginBottom: 16 }}>{linkDomain}</Tag>
+        {!showPasteTip && isUrlValid && (linkDomain || metadata?.title) && (
+          <Typography.Text
+            type="secondary"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              marginBottom: 16,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {metadata?.favicon && (
+              <img
+                src={metadata.favicon}
+                alt=""
+                width={16}
+                height={16}
+                style={{ flexShrink: 0 }}
+              />
+            )}
+            {linkDomain && (
+              <span style={{ color: colors.textPrimary }}>{linkDomain}</span>
+            )}
+            {metadata?.title && (
+              <span style={{ color: colors.textSecondary, overflow: "hidden", textOverflow: "ellipsis" }}>
+                {metadata.title}
+              </span>
+            )}
+          </Typography.Text>
         )}
 
         <Form.Item name="description" label="Commentaire perso">

@@ -14,11 +14,19 @@ locked and `overscroll-behavior: contain` prevents pull-to-refresh.
 2. **Prix + Devise** – text input with `inputmode="decimal"`, a currency
    selector (EUR by default) and a toggle “≈” that sets
    `price_is_approx=true`.
-3. **Lien marchand** – URL field with a right-side **Coller** button that
-   uses the Clipboard API. On user input it fills `merchant_domain`
-   (sans `www.`) and tries to derive `image_url` and `brand` from Open
-   Graph metadata. A fallback tip “Maintiens puis Coller” appears when
-   clipboard access is refused.
+3. **Lien marchand** – single editable URL field (`type="url"`,
+   `inputmode="url"`, font-size ≥16px) with a right-side **Coller**
+   button using the Clipboard API. The text is the only source of truth
+   and no domain badge is rendered. On each change (debounced 400 ms) the
+   host sans `www.` populates `merchant_domain`; it also attempts to pull
+   Open Graph metadata to fill `image_url` and estimate `brand` when
+   empty. Under the field, an optional one-line helper shows favicon,
+   domain and extracted title. An “external link” icon opens the URL in a
+   new tab when valid, and a clear icon resets the field. Scheme-less
+   inputs are prefixed with `https://`. Clipboard refusal focuses the
+   field and displays the tip “Maintiens dans le champ puis “Coller””. An
+   invalid URL triggers a light error state but the field remains
+   optional.
 4. **Commentaire perso** – short textarea placeholder “Pourquoi ça me
    ferait plaisir ? Couleur, taille, usage… 💌”.
 5. **Priorité** – three chips with one always selected: ⭐ Essentiel,
