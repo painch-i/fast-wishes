@@ -3,7 +3,7 @@ import type { Tables } from "../../database.types";
 export type WishStatus = "draft" | "available" | "reserved" | "received" | "archived";
 
 export type WishUI = Tables<"wishes"> & {
-  currency?: "EUR" | "USD" | "GBP";
+  currency?: string;
   image_url?: string;
   quantity?: number;
   priority?: 1 | 2 | 3;

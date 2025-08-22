@@ -22,23 +22,6 @@ const browserLocale = () =>
     ? navigator.language
     : undefined;
 
-const defaultCurrency = (locale?: string) => {
-  if (!locale) return "EUR";
-  try {
-    const region = new Intl.Locale(locale).maximize().region;
-    const map: Record<string, string> = {
-      US: "USD",
-      GB: "GBP",
-      FR: "EUR",
-      DE: "EUR",
-      ES: "EUR",
-    };
-    return (region && map[region]) || "EUR";
-  } catch {
-    return "EUR";
-  }
-};
-
 const formatPrice = (
   price?: number | string | null,
   currency?: string | null
@@ -47,7 +30,7 @@ const formatPrice = (
   const numeric = typeof price === "string" ? parseFloat(price) : price;
   if (isNaN(Number(numeric))) return null;
   const locale = browserLocale();
-  const cur = currency || defaultCurrency(locale);
+  const cur = currency || "USD";
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: cur,
@@ -808,6 +791,7 @@ export const WishesListPage: React.FC = () => {
         open={sheetOpen}
         mode={editing ? "edit" : "create"}
         initialValues={editing}
+        previousWishCurrency={wishes.find((w) => w.currency)?.currency}
         onCancel={() => setSheetOpen(false)}
         onSubmit={handleSave}
       />

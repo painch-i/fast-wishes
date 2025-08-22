@@ -77,7 +77,13 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         control={control}
         render={({ field }) => (
           <Form.Item label="Devise">
-            <Select {...field} options={["EUR", "USD", "GBP"].map(v => ({ value: v }))} />
+            <Select
+              {...field}
+              options={[field.value, "EUR", "USD", "GBP"]
+                .filter((v): v is string => !!v)
+                .filter((v, i, arr) => arr.indexOf(v) === i)
+                .map((v) => ({ value: v }))}
+            />
           </Form.Item>
         )}
       />

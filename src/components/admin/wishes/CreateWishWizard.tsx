@@ -230,7 +230,10 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
           </Form.Item>
           <Form.Item name="currency" label="Devise">
             <Select
-              options={["EUR", "USD", "GBP"].map((v) => ({ value: v }))}
+              options={[form.getFieldValue("currency"), "EUR", "USD", "GBP"]
+                .filter((v): v is string => !!v)
+                .filter((v, i, arr) => arr.indexOf(v) === i)
+                .map((v) => ({ value: v }))}
               onChange={validateStep}
             />
           </Form.Item>
