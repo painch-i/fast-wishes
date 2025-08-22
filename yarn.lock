@@ -3890,6 +3890,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"country-to-currency@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "country-to-currency@npm:2.0.2"
+  checksum: 10c0/4c3d896e8cf4abcb568432c4e588f7eb301078ef85f077edda3a4c57f04ed9a7a2073c006be9532c3f3ec41182523a030613450a0426c398a57614fb7b50e0bf
+  languageName: node
+  linkType: hard
+
 "cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3, cross-spawn@npm:^7.0.6":
   version: 7.0.6
   resolution: "cross-spawn@npm:7.0.6"
@@ -4933,6 +4940,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^5.57.1"
     "@vitejs/plugin-react": "npm:^4.0.0"
     antd: "npm:^5.26.7"
+    country-to-currency: "npm:^2.0.2"
     eslint: "npm:^8.38.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.3.4"

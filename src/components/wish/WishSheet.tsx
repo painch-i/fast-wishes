@@ -18,11 +18,14 @@ import { useMediaQuery } from "@mui/material";
 import type { WishUI } from "../../types/wish";
 import { useLinkMetadata } from "../../hooks/useLinkMetadata";
 import { colors } from "../../theme";
+import { guessUserCurrency } from "../../utility";
+import { useGetIdentity } from "@refinedev/core";
 
 export interface WishSheetProps {
   open: boolean;
   mode: "create" | "edit";
   initialValues?: Partial<WishUI>;
+  previousWishCurrency?: string;
   onCancel: () => void;
   onSubmit: (values: WishUI) => void;
 }
@@ -31,6 +34,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
   open,
   mode,
   initialValues,
+  previousWishCurrency,
   onCancel,
   onSubmit,
 }) => {
@@ -43,6 +47,11 @@ export const WishSheet: React.FC<WishSheetProps> = ({
   const linkInputRef = useRef<InputRef | null>(null);
   const initialViewport = useRef<string | null>(null);
   const headerStyleRef = useRef<{ position: string; zIndex: string } | null>(null);
+  const { data: identity } = useGetIdentity<
+    { currency?: string; country_code?: string } | undefined
+  >();
+
+  const currency = Form.useWatch("currency", form);
 
   const url = Form.useWatch("url", form);
   const { metadata } = useLinkMetadata(debouncedUrl);
@@ -70,11 +79,19 @@ export const WishSheet: React.FC<WishSheetProps> = ({
             /* ignore */
           }
         }
+        if (!form.getFieldValue("currency")) {
+          const guessed = guessUserCurrency({
+            profileCurrency: identity?.currency,
+            profileCountry: identity?.country_code,
+            previousWishCurrency,
+          });
+          form.setFieldsValue({ currency: guessed } as any);
+        }
       }
     } else {
       setShowPasteTip(false);
     }
-  }, [open, initialValues, form, mode]);
+  }, [open, initialValues, form, mode, identity, previousWishCurrency]);
 
   // iOS anti-zoom
   useEffect(() => {
@@ -326,7 +343,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
                 style={{ fontSize: 16 }}
               />
             </Form.Item>
-            <Form.Item name="currency" initialValue="EUR" noStyle>
+            <Form.Item name="currency" noStyle>
               <Select
                 style={{ width: 80, fontSize: 16 }}
                 getPopupContainer={(trigger) =>
@@ -335,9 +352,16 @@ export const WishSheet: React.FC<WishSheetProps> = ({
                 }
                 dropdownStyle={{ zIndex: 1002 }}
               >
-                <Select.Option value="EUR">EUR</Select.Option>
-                <Select.Option value="GBP">GBP</Select.Option>
-                <Select.Option value="USD">USD</Select.Option>
+                {[currency, "EUR", "GBP", "USD"]
+                  .filter((v): v is string => !!v)
+                  .filter(
+                    (v, i, arr) => arr.indexOf(v) === i
+                  )
+                  .map((v) => (
+                    <Select.Option key={v} value={v}>
+                      {v}
+                    </Select.Option>
+                  ))}
               </Select>
             </Form.Item>
             <Form.Item

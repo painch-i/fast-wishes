@@ -23,7 +23,7 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
   - The domain appears as plain text at the start when a link exists.
   - Description or fallback "Ajoute un petit mot pour guider 💌" truncates to the right of it.
   - If no link provided, an extra line "+ Lien pour aider à trouver" appears.
-- Right column: price pill (peach) or dashed "Ajouter un prix" pill. Chevron `›` signals navigation.
+- Right column: price pill (peach) formatted with `Intl.NumberFormat` and the wish's currency, or dashed "Ajouter un prix" pill. Chevron `›` signals navigation.
 - Layout rules prevent chips from overlapping and everything ellipsizes instead of wrapping.
 - Tapping any part opens the edit drawer, focusing the relevant field.
 

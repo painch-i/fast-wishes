@@ -122,7 +122,12 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
                   <InputNumber min={0} style={{ width: "100%" }} />
                 </Form.Item>
                 <Form.Item name="currency" label="Devise">
-                  <Select options={["EUR", "USD", "GBP"].map((v) => ({ value: v }))} />
+                  <Select
+                    options={[form.getFieldValue("currency"), "EUR", "USD", "GBP"]
+                      .filter((v): v is string => !!v)
+                      .filter((v, i, arr) => arr.indexOf(v) === i)
+                      .map((v) => ({ value: v }))}
+                  />
                 </Form.Item>
                 <Form.Item name="description" label="Description">
                   <Input.TextArea rows={3} />

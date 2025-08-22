@@ -12,8 +12,10 @@ locked and `overscroll-behavior: contain` prevents pull-to-refresh.
 1. **Titre** – required. Placeholder “Arrosoir inox Haws 1 L” with the
    help text “Un nom clair aide tes proches à choisir.”
 2. **Prix + Devise** – text input with `inputmode="decimal"`, a currency
-   selector (EUR by default) and a toggle “≈” that sets
-   `price_is_approx=true`.
+   selector pre-filled by `guessUserCurrency()` (profile → country → last
+   wish → browser locale) using `country-to-currency` with USD fallback,
+   and a toggle “≈” that sets `price_is_approx=true`. Editing an existing
+   wish preserves its stored currency.
 3. **Lien marchand** – single editable URL field (`type="url"`,
    `inputmode="url"`, font-size ≥16px) with a right-side **Coller**
    button using the Clipboard API. The text is the only source of truth
