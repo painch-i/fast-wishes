@@ -345,11 +345,9 @@ export const WishSheet: React.FC<WishSheetProps> = ({
             </Form.Item>
             <Form.Item name="currency" noStyle>
               <Select
+                aria-haspopup="listbox"
                 style={{ width: 80, fontSize: 16 }}
-                getPopupContainer={(trigger) =>
-                  (trigger.closest(".wish-sheet") as HTMLElement) ||
-                  document.body
-                }
+                getPopupContainer={() => document.body}
                 dropdownStyle={{ zIndex: 1002 }}
               >
                 {[currency, "EUR", "GBP", "USD"]
@@ -358,7 +356,11 @@ export const WishSheet: React.FC<WishSheetProps> = ({
                     (v, i, arr) => arr.indexOf(v) === i
                   )
                   .map((v) => (
-                    <Select.Option key={v} value={v}>
+                    <Select.Option
+                      key={v}
+                      value={v}
+                      onMouseDown={(e: React.MouseEvent) => e.preventDefault()}
+                    >
                       {v}
                     </Select.Option>
                   ))}
