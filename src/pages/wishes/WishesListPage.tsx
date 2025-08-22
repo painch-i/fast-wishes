@@ -12,8 +12,7 @@ import {
   useDelete,
 } from "@refinedev/core";
 
-import { EditWishDrawer } from "../../components/admin/wishes/EditWishDrawer";
-import { AddWishSheet } from "../../components/wish/AddWishSheet";
+import { WishSheet } from "../../components/wish/WishSheet";
 import { WishUI } from "../../types/wish";
 import { UserIdentity, UserSlug } from "../../types";
 import { mapDbToWishUI, getExtras, setExtras } from "../../utility";
@@ -467,10 +466,8 @@ export const WishesListPage: React.FC = () => {
   const { mutate: create } = useCreate();
   const { mutate: deleteOne } = useDelete();
 
-  const [editOpen, setEditOpen] = useState(false);
-  const [addOpen, setAddOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<WishUI | undefined>();
-  const [focusField, setFocusField] = useState<keyof WishUI | undefined>();
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const pendingDelete = useRef<{ item: WishUI; index: number; timeout: number } | null>(null);
 
@@ -506,67 +503,73 @@ export const WishesListPage: React.FC = () => {
     setBannerDismissed(true);
   };
 
-  const openEdit = (record: WishUI, field?: keyof WishUI) => {
+  const openEdit = (record: WishUI, _field?: keyof WishUI) => {
     const extras = getExtras(String(record.id));
     setEditing(mapDbToWishUI(record, extras));
-    setFocusField(field);
-    setEditOpen(true);
+    setSheetOpen(true);
   };
 
-  const handleEditSave = async (values: WishUI) => {
-    if (!editing) return;
-    const { note_private, tags, metadata, ...dbValues } = values;
-    update(
-      {
-        resource: "wishes",
-        id: editing.id,
-        values: dbValues,
-        successNotification: false,
-        errorNotification: false,
-      },
-      {
-        onSuccess: () => {
-          setExtras(String(editing.id), { note_private, tags, metadata });
-          message.success("Enregistré ✨");
-          setEditOpen(false);
-          refetch();
+  const openAdd = () => {
+    setEditing(undefined);
+    setSheetOpen(true);
+  };
+
+  const handleSave = (values: WishUI) => {
+    const { note_private, tags, metadata, price_cents, ...dbValues } = values as any;
+    if (values.id) {
+      update(
+        {
+          resource: "wishes",
+          id: values.id,
+          values: { ...dbValues, price: price_cents != null ? String(price_cents / 100) : null },
+          successNotification: false,
+          errorNotification: false,
         },
-        onError: () =>
-          message.error(
-            "Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement."
-          ),
+        {
+          onSuccess: () => {
+            setExtras(String(values.id), { note_private, tags, metadata });
+            message.success("Modifications enregistrées ✨");
+            setSheetOpen(false);
+            refetch();
+          },
+          onError: () =>
+            message.error(
+              "Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement."
+            ),
+        }
+      );
+    } else {
+      if (!identity?.id) {
+        message.error("Impossible de créer le souhait : utilisateur inconnu");
+        return;
       }
-    );
-  };
-
-  const handleAdd = (values: WishUI) => {
-    if (!identity?.id) {
-      message.error("Impossible de créer le souhait : utilisateur inconnu");
-      return;
+      create(
+        {
+          resource: "wishes",
+          values: {
+            ...dbValues,
+            price: price_cents != null ? String(price_cents / 100) : null,
+            user_id: identity.id,
+          },
+          successNotification: false,
+          errorNotification: false,
+        },
+        {
+          onSuccess: (data) => {
+            if (data?.data?.id) {
+              setExtras(String(data.data.id), { note_private, tags, metadata });
+            }
+            message.success("Souhait ajouté ✨");
+            setSheetOpen(false);
+            refetch();
+          },
+          onError: () =>
+            message.error(
+              "Oups, on n’a pas pu enregistrer. Tes infos sont gardées en brouillon."
+            ),
+        }
+      );
     }
-    const { note_private, tags, metadata, ...dbValues } = values;
-    create(
-      {
-        resource: "wishes",
-        values: { ...dbValues, user_id: identity.id },
-        successNotification: false,
-        errorNotification: false,
-      },
-      {
-        onSuccess: (data) => {
-          if (data?.data?.id) {
-            setExtras(String(data.data.id), { note_private, tags, metadata });
-          }
-          message.success("Souhait ajouté ✨");
-          setAddOpen(false);
-          refetch();
-        },
-        onError: () =>
-          message.error(
-            "Oups, on n’a pas pu enregistrer. Tes infos sont gardées en brouillon."
-          ),
-      }
-    );
   };
 
   const handleDelete = (wish: WishUI) => {
@@ -765,9 +768,9 @@ export const WishesListPage: React.FC = () => {
                   key={`ghost-${i}`}
                   role="button"
                   tabIndex={0}
-                  onClick={() => setAddOpen(true)}
+                  onClick={openAdd}
                   onKeyDown={(e) =>
-                    (e.key === "Enter" || e.key === " ") && setAddOpen(true)
+                    (e.key === "Enter" || e.key === " ") && openAdd()
                   }
                   style={{
                     display: "flex",
@@ -802,24 +805,19 @@ export const WishesListPage: React.FC = () => {
         </div>
       )}
 
-      <EditWishDrawer
-        open={editOpen}
+      <WishSheet
+        open={sheetOpen}
+        mode={editing ? "edit" : "create"}
         initialValues={editing}
-        focusField={focusField}
-        onClose={() => setEditOpen(false)}
-        onSave={handleEditSave}
+        onCancel={() => setSheetOpen(false)}
+        onSubmit={handleSave}
       />
-      <AddWishSheet
-        open={addOpen}
-        onCancel={() => setAddOpen(false)}
-        onSubmit={(values) => handleAdd(values)}
-      />
-      {!addOpen && !editOpen && (
+      {!sheetOpen && (
         <Button
           type="primary"
           shape="circle"
           size="large"
-          onClick={() => setAddOpen(true)}
+          onClick={openAdd}
           style={{
             position: "fixed",
             bottom: 24,
