@@ -6,8 +6,11 @@ import {
   Button,
   Select,
   Space,
-  Tag,
   Typography,
+  Checkbox,
+  Segmented,
+  AutoComplete,
+  Tag,
   message,
 } from "antd";
 import type { InputRef } from "antd";
@@ -15,15 +18,21 @@ import { useMediaQuery } from "@mui/material";
 import type { WishUI } from "../../types/wish";
 import { useLinkMetadata } from "../../hooks/useLinkMetadata";
 
-export interface AddWishSheetProps {
+export interface WishSheetProps {
   open: boolean;
+  mode: "create" | "edit";
+  initialValues?: Partial<WishUI>;
   onCancel: () => void;
   onSubmit: (values: WishUI) => void;
 }
 
-const DRAFT_KEY = "add-wish-draft";
-
-export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSubmit }) => {
+export const WishSheet: React.FC<WishSheetProps> = ({
+  open,
+  mode,
+  initialValues,
+  onCancel,
+  onSubmit,
+}) => {
   const [form] = Form.useForm<WishUI>();
   const isMobile = useMediaQuery("(max-width:600px)");
   const [linkDomain, setLinkDomain] = useState<string | null>(null);
@@ -37,29 +46,34 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
 
   useEffect(() => {
     if (open) {
-      const raw = localStorage.getItem(DRAFT_KEY);
-      if (raw) {
-        try {
-          const data = JSON.parse(raw);
-          form.setFieldsValue(data);
-          if (data.url) {
-            try {
-              const url = new URL(data.url);
-              setLinkDomain(url.hostname);
-            } catch {
-              setLinkDomain(null);
-            }
+      form.resetFields();
+      if (initialValues) {
+        form.setFieldsValue(initialValues as any);
+        if (initialValues.url) {
+          try {
+            const hostname = new URL(initialValues.url).hostname.replace(/^www\./, "");
+            setLinkDomain(hostname);
+          } catch {
+            setLinkDomain(null);
           }
-        } catch {
-          // ignore
         }
       }
-    }
-    if (!open) {
+      if (mode === "create") {
+        const raw = localStorage.getItem("wish-draft");
+        if (raw) {
+          try {
+            form.setFieldsValue(JSON.parse(raw));
+          } catch {
+            /* ignore */
+          }
+        }
+      }
+    } else {
       setShowPasteTip(false);
     }
-  }, [open, form]);
+  }, [open, initialValues, form, mode]);
 
+  // iOS anti-zoom
   useEffect(() => {
     const metaViewport = document.querySelector(
       'meta[name="viewport"]'
@@ -78,13 +92,20 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
     }
   }, [open]);
 
+  // apply metadata
   useEffect(() => {
-    if (metadata && !form.getFieldValue("name")) {
-      form.setFieldsValue({ name: metadata.title } as any);
+    if (!metadata) return;
+    const updates: Partial<WishUI> = {};
+    if (metadata.image && !form.getFieldValue("image_url")) {
+      updates.image_url = metadata.image;
     }
+    if ((metadata.site_name || metadata.title) && !form.getFieldValue("brand")) {
+      updates.brand = metadata.site_name || metadata.title;
+    }
+    if (Object.keys(updates).length > 0) form.setFieldsValue(updates as any);
   }, [metadata, form]);
 
-  // Lock background scroll and lower header z-index when the sheet is open
+  // lock background scroll
   useEffect(() => {
     const body = document.body;
     const header = document.querySelector(
@@ -111,18 +132,22 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
     }
   }, [open]);
 
-  // Save as draft on each change
   const handleValuesChange = (_: any, values: WishUI) => {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(values));
+    if (mode === "create") {
+      localStorage.setItem("wish-draft", JSON.stringify(values));
+    }
   };
 
   const handleLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     try {
       const url = new URL(value);
-      setLinkDomain(url.hostname);
+      const domain = url.hostname.replace(/^www\./, "");
+      setLinkDomain(domain);
+      form.setFieldsValue({ merchant_domain: domain } as any);
     } catch {
       setLinkDomain(null);
+      form.setFieldsValue({ merchant_domain: undefined } as any);
     }
   };
 
@@ -142,17 +167,27 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
   };
 
   const handleFinish = (values: WishUI) => {
-    const url = values.url as string | undefined;
-    if (url) {
-      try {
-        new URL(url);
-      } catch {
-        message.warning("Lien invalide, il sera ignoré");
-      }
-    }
-    onSubmit({ ...values, price: values.price ?? undefined } as WishUI);
-    localStorage.removeItem(DRAFT_KEY);
+    const priceNumber = values.price ? parseFloat(String(values.price)) : undefined;
+    const price_cents = priceNumber != null ? Math.round(priceNumber * 100) : null;
+    const submitValues: WishUI = {
+      ...initialValues,
+      ...values,
+      price_cents,
+    } as WishUI;
+    onSubmit(submitValues);
+    if (mode === "create") localStorage.removeItem("wish-draft");
   };
+
+  const tagOptions = [
+    "Maison",
+    "Cuisine",
+    "Sport",
+    "Lecture",
+    "Tech",
+    "Mode",
+    "Beauté",
+    "Jeux",
+  ].map((t) => ({ value: t }));
 
   return (
     <Drawer
@@ -191,11 +226,11 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
-                WebkitLineClamp: 2,
+                WebkitLineClamp: 1,
                 WebkitBoxOrient: "vertical",
               }}
             >
-              Ajouter un souhait
+              {mode === "create" ? "Ajouter un souhait" : "Modifier le souhait"}
             </Typography.Title>
             <Typography.Text
               style={{
@@ -229,7 +264,7 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
       }}
       maskStyle={{ backgroundColor: "rgba(0,0,0,0.5)" }}
       zIndex={1001}
-      rootClassName="add-wish-sheet"
+      rootClassName="wish-sheet"
       getContainer={document.body}
       contentWrapperStyle={{
         maxHeight: isMobile ? "90vh" : undefined,
@@ -252,57 +287,58 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
           extra="Un nom clair aide tes proches à choisir."
         >
           <Input
-            placeholder="Bouilloire inox silencieuse"
+            placeholder="Arrosoir inox Haws 1 L"
             style={{ fontSize: 16 }}
           />
         </Form.Item>
 
         <Form.Item
-          name="description"
-          label="Description"
-          extra="Un message perso motive l’offreur 💌."
-        >
-          <Input.TextArea
-            placeholder="Pourquoi ça me ferait plaisir ? Une petite note pour guider (couleur, taille, usage…)."
-            autoSize={{ minRows: 3, maxRows: 4 }}
-            style={{ fontSize: 16 }}
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="price"
           label="Prix"
           extra="Indique un budget pour faciliter le choix."
         >
-          <Input
-            type="text"
-            inputMode="decimal"
-            placeholder="0"
-            style={{ fontSize: 16 }}
-            addonAfter={
-              <Form.Item name="currency" initialValue="EUR" noStyle>
-                <Select
-                  style={{ width: 80, fontSize: 16 }}
-                  getPopupContainer={(trigger) =>
-                    (trigger.closest(".add-wish-sheet") as HTMLElement) ||
-                    document.body
-                  }
-                  dropdownStyle={{ zIndex: 1002 }}
-                >
-                  <Select.Option value="EUR">EUR</Select.Option>
-                  <Select.Option value="GBP">GBP</Select.Option>
-                  <Select.Option value="USD">USD</Select.Option>
-                </Select>
-              </Form.Item>
-            }
-          />
+          <Space.Compact block>
+            <Form.Item name="price" noStyle>
+              <Input
+                type="text"
+                inputMode="decimal"
+                placeholder="0"
+                style={{ fontSize: 16 }}
+              />
+            </Form.Item>
+            <Form.Item name="currency" initialValue="EUR" noStyle>
+              <Select
+                style={{ width: 80, fontSize: 16 }}
+                getPopupContainer={(trigger) =>
+                  (trigger.closest(".wish-sheet") as HTMLElement) ||
+                  document.body
+                }
+                dropdownStyle={{ zIndex: 1002 }}
+              >
+                <Select.Option value="EUR">EUR</Select.Option>
+                <Select.Option value="GBP">GBP</Select.Option>
+                <Select.Option value="USD">USD</Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="price_is_approx"
+              valuePropName="checked"
+              noStyle
+            >
+              <Checkbox
+                aria-label="Prix approximatif"
+                style={{ padding: "0 8px", fontSize: 16 }}
+              >
+                ≈
+              </Checkbox>
+            </Form.Item>
+          </Space.Compact>
         </Form.Item>
 
-        <Form.Item name="url" label="Lien" extra="Ajoute un lien pour aider à trouver le bon produit.">
+        <Form.Item name="url" label="Lien marchand">
           <Space>
             <Input
               ref={linkInputRef}
-              placeholder="https://amazon.fr/… (ou autre site)"
+              placeholder="https://… (Amazon, Etsy, marque…)"
               inputMode="url"
               onChange={handleLinkChange}
               style={{ flex: 1, fontSize: 16 }}
@@ -313,18 +349,41 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
           </Space>
           {showPasteTip && (
             <Typography.Text type="secondary">
-              Maintiens dans le champ puis Coller
+              Maintiens puis Coller
             </Typography.Text>
           )}
         </Form.Item>
         {linkDomain && (
-          <Tag style={{ marginBottom: 16 }}>
-            {linkDomain} {" "}
-            <a href={form.getFieldValue("url")} target="_blank" rel="noopener noreferrer">
-              Ouvrir
-            </a>
-          </Tag>
+          <Tag style={{ marginBottom: 16 }}>{linkDomain}</Tag>
         )}
+
+        <Form.Item name="description" label="Commentaire perso">
+          <Input.TextArea
+            placeholder="Pourquoi ça me ferait plaisir ? Couleur, taille, usage… 💌"
+            autoSize={{ minRows: 3, maxRows: 4 }}
+            style={{ fontSize: 16 }}
+          />
+        </Form.Item>
+
+        <Form.Item name="priority" label="Priorité" initialValue={2}>
+          <Segmented
+            options={[
+              { label: "⭐ Essentiel", value: 1 },
+              { label: "💡 Envie", value: 2 },
+              { label: "🎲 Surprise", value: 3 },
+            ]}
+            style={{ width: "100%" }}
+          />
+        </Form.Item>
+
+        <Form.Item name="tag" label="Tag">
+          <AutoComplete
+            options={tagOptions}
+            style={{ fontSize: 16 }}
+            placeholder=""
+          />
+        </Form.Item>
+
         <div
           style={{
             position: "sticky",
@@ -338,8 +397,12 @@ export const AddWishSheet: React.FC<AddWishSheetProps> = ({ open, onCancel, onSu
           }}
         >
           <Button onClick={onCancel}>Annuler</Button>
-          <Button type="primary" htmlType="submit">
-            Ajouter
+          <Button
+            type="primary"
+            htmlType="submit"
+            aria-label={mode === "create" ? "Ajouter" : "Enregistrer"}
+          >
+            {mode === "create" ? "Ajouter" : "Enregistrer"}
           </Button>
         </div>
       </Form>
