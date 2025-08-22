@@ -35,6 +35,19 @@ Refine's hooks and components simplifies the development process and eliminates 
     yarn start
 ```
 
+## Supabase CLI
+
+The Supabase CLI relies on two environment variables:
+
+- `SUPABASE_PROJECT_ID` – your project identifier
+- `SUPABASE_KEY` – the service role key for the project
+
+Before starting any task, regenerate the database types to keep them in sync:
+
+```bash
+npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > database.types.ts
+```
+
 ## Learn More
 
 To learn more about **Refine**, please check out the [Documentation](https://refine.dev/docs)

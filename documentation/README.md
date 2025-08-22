@@ -37,7 +37,16 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 - Scroll containers inside sheets use `overscroll-behavior: contain` to prevent accidental pull-to-refresh.
 
 ## Database
-Supabase Postgres powers persistence. Types are generated with `npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > database.types.ts` and imported across the codebase to ensure queries match the schema.
+Supabase Postgres powers persistence. The Supabase CLI requires two environment variables:
+
+- `SUPABASE_PROJECT_ID` – your project identifier
+- `SUPABASE_KEY` – the service role key used by the CLI
+
+Before starting any task, regenerate the database types to keep them in sync:
+
+`npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > database.types.ts`
+
+The resulting `database.types.ts` file is imported across the codebase to ensure queries match the schema.
 
 ## Build
 - The project builds via `tsc && vite build` to ensure compatibility with Yarn PnP.
