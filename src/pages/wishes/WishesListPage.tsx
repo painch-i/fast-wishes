@@ -319,11 +319,10 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
           }}
         >
           {domain && (
-            <Tag
+            <span
               style={{
-                background: colors.accentMint,
-                border: "none",
-                color: colors.textPrimary,
+                fontSize: 14,
+                color: colors.textSecondary,
                 flexShrink: 0,
                 cursor: "pointer",
               }}
@@ -333,7 +332,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
               }}
             >
               {domain}
-            </Tag>
+            </span>
           )}
           <span
             style={{
