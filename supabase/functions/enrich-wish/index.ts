@@ -29,26 +29,26 @@ serve(async (req) => {
   }
   
   if (req.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
+    return new Response("Method not allowed", { headers: corsHeaders, status: 405 });
   }
   try {
     const { url } = (await req.json()) as Payload;
     if (!url) {
       return new Response(JSON.stringify({ error: "Missing url" }), {
         status: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
     const response = await fetch(url);
     const html = await response.text();
     const metadata = parseMeta(html);
     return new Response(JSON.stringify(metadata), {
-      headers: { "Content-Type": "application/json" },
+      headers: { headers: corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { headers: corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
