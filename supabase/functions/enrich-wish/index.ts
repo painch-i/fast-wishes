@@ -43,12 +43,12 @@ serve(async (req) => {
     const html = await response.text();
     const metadata = parseMeta(html);
     return new Response(JSON.stringify(metadata), {
-      headers: { headers: corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
-      headers: { headers: corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
