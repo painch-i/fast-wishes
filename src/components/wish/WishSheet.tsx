@@ -9,7 +9,6 @@ import {
   Typography,
   Checkbox,
   Segmented,
-  AutoComplete,
   message,
 } from "antd";
 import type { InputRef } from "antd";
@@ -20,6 +19,7 @@ import { useLinkMetadata } from "../../hooks/useLinkMetadata";
 import { colors } from "../../theme";
 import { guessUserCurrency } from "../../utility";
 import { useGetIdentity } from "@refinedev/core";
+import { CategorySelector } from "../CategorySelector";
 
 export interface WishSheetProps {
   open: boolean;
@@ -216,16 +216,6 @@ export const WishSheet: React.FC<WishSheetProps> = ({
     if (mode === "create") localStorage.removeItem("wish-draft");
   };
 
-  const tagOptions = [
-    "Maison",
-    "Cuisine",
-    "Sport",
-    "Lecture",
-    "Tech",
-    "Mode",
-    "Beauté",
-    "Jeux",
-  ].map((t) => ({ value: t }));
 
   return (
     <Drawer
@@ -484,12 +474,12 @@ export const WishSheet: React.FC<WishSheetProps> = ({
           />
         </Form.Item>
 
-        <Form.Item name="tag" label="Tag">
-          <AutoComplete
-            options={tagOptions}
-            style={{ fontSize: 16 }}
-            placeholder=""
-          />
+        <Form.Item
+          name="tags"
+          label="Catégories"
+          extra="Optionnel — ajoute 1 à 3 catégories"
+        >
+          <CategorySelector />
         </Form.Item>
 
         <div

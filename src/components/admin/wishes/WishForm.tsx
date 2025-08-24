@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Input, InputNumber, Select, Switch, Segmented, Form, Typography } from "antd";
+import { CategorySelector } from "../../CategorySelector";
 import type { FormInstance } from "antd";
 import { WishUI } from "../../../types/wish";
 import { useWishMetadata } from "../../../hooks/useWishMetadata";
@@ -118,8 +119,8 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="tags"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Tags">
-            <Select mode="tags" tokenSeparators={[","]} {...field} />
+          <Form.Item label="Catégories" extra="Optionnel — ajoute 1 à 3 catégories">
+            <CategorySelector {...field} value={field.value ?? []} />
           </Form.Item>
         )}
       />

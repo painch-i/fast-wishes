@@ -16,6 +16,7 @@ import {
 import { WishUI } from "../../../types/wish";
 import { useLinkMetadata } from "../../../hooks/useLinkMetadata";
 import { PreviewPublic } from "./PreviewPublic";
+import { CategorySelector } from "../../CategorySelector";
 
 export type CreateWishWizardProps = {
   open: boolean;
@@ -242,8 +243,12 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
           <Form.Item name="description" label="Description">
             <Input.TextArea rows={3} onBlur={validateStep} />
           </Form.Item>
-          <Form.Item name="tags" label="Tags">
-            <Select mode="tags" tokenSeparators={[","]} onChange={validateStep} />
+          <Form.Item
+            name="tags"
+            label="Catégories"
+            extra="Optionnel — ajoute 1 à 3 catégories"
+          >
+            <CategorySelector />
           </Form.Item>
           <Form.Item name="quantity" label="Quantité">
             <InputNumber

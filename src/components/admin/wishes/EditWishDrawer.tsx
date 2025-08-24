@@ -14,6 +14,7 @@ import {
   Segmented,
 } from "antd";
 import { WishUI } from "../../../types/wish";
+import { CategorySelector } from "../../CategorySelector";
 
 export type EditWishDrawerProps = {
   open: boolean;
@@ -135,8 +136,12 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
                 <Form.Item name="quantity" label="Quantité">
                   <InputNumber min={1} style={{ width: "100%" }} />
                 </Form.Item>
-                <Form.Item name="tags" label="Tags">
-                  <Select mode="tags" tokenSeparators={[","]} />
+                <Form.Item
+                  name="tags"
+                  label="Catégories"
+                  extra="Optionnel — ajoute 1 à 3 catégories"
+                >
+                  <CategorySelector />
                 </Form.Item>
                 <Form.Item name="note_private" label="Note privée"> 
                   <Input.TextArea rows={3} />
