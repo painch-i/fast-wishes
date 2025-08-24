@@ -1,0 +1,38 @@
+.sheet-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sheet-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sheet-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sheet-price {
+  font-weight: 600;
+}
+
+.sheet-domain {
+  color: #ff6b6b;
+}
+
+.sheet-caption {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 8px;
+}

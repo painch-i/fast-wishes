@@ -1,0 +1,83 @@
+.gift-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #eef0f3;
+  border-radius: 12px;
+  background-color: #fff;
+  cursor: pointer;
+  position: relative;
+}
+
+.gift-tile.reserved {
+  filter: saturate(0.6);
+  pointer-events: none;
+}
+
+.thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #f3f4f6;
+  flex-shrink: 0;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffe7e1, #fff);
+  color: #ff6b6b;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.domain-pill {
+  background: #eef0f3;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.price {
+  margin-left: auto;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.reserved-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
