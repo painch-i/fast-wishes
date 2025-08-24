@@ -36,11 +36,16 @@ locked and `overscroll-behavior: contain` prevents pull-to-refresh.
    ferait plaisir ? Couleur, taille, usage… 💌”.
 5. **Priorité** – three chips with one always selected: ⭐ Essentiel,
    💡 Envie (default) and 🎲 Surprise.
-6. **Tag** – autocomplete allowing free text with suggestions
-   (Maison, Cuisine, Sport, Lecture, Tech, Mode, Beauté, Jeux).
+6. **Catégories** – 1 à 3 chips via une puce fantôme « + Ajouter une catégorie ».
+   Un tap la transforme en champ inline (placeholder “Ex. Maison, Cuisine, Sport…”)
+   avec une rangée de suggestions défilable : Maison, Cuisine, Sport, Lecture, Tech,
+   Mode, Beauté, Jeux, Bébé, Voyage. “Créer « {texte} »” apparaît si aucune
+   suggestion ne correspond. Entrée/OK ou tap sur une suggestion valide la
+   catégorie. Chaque chip est supprimable (×), l’ajout se masque à trois entrées et
+   les valeurs sont normalisées (trim + capitalisation) sans doublons.
 
 Only the title is mandatory. On submit the sheet returns a `WishUI`
 object including `price_cents`, `price_is_approx`, `merchant_domain`,
-`brand`, `tag` and any metadata. The parent performs an optimistic
+`brand`, `tags` and any metadata. The parent performs an optimistic
 creation or update then closes the sheet and shows a single success
 toast.
