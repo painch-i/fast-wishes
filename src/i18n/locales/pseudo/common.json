@@ -1,0 +1,45 @@
+{
+  "public": {
+    "header": {
+      "title": "Åññîṽèřśářý dê {name} 🎂~~~",
+      "subtitle": "Çhøøśîś çè qùî fârâ pläîśîr 💝~~~",
+      "remaining": "{count, plural, one {# çädèäû rèstāñţ} other {# çädèäûx rèstāñţš}}~~~",
+      "gift": "çädèäû"
+    }
+  },
+  "wish": {
+    "toast": {
+      "created": "Šøùħäît äĵøùţé ✨~~~",
+      "saveError": "Òûps, òñ ñ’ä pû èñrègîšţřèr. Tès îñføs sôñţ gärdèés èñ brøûîlløñ.~~~",
+      "reserved": "Déjà réseŕvē — ìmpøssîblē dè supprimēr.~~~",
+      "deleted": "Šøùħäît supprimé.~~~",
+      "deleteError": "Òûps, ìmpøssîblē dè supprimēr. Réessäyèŕ.~~~",
+      "unknownUser": "Împøssîblē dè créer lè šøùħäît : ûtilîsäţèûŕ încõññû~~~",
+      "updated": "Møđîfîçäţîøñš èñřèģîšţřèéš ✨~~~",
+      "updateError": "Òûps, òñ ń'ä pà pû èñrègîštřèr. Tès mōđîfš sōñţ gärdèés løçälèmèñţ~~~",
+      "copied": "Lîèñ çøpîé ✨~~~",
+      "copyError": "Împøssîblè dè çøpîèr lè lîèñ~~~"
+    },
+    "actions": {
+      "reserve": {
+        "success": "Řésèrvē ! Mèrçî 💝~~~"
+      }
+    },
+    "form": {
+      "title": {
+        "label": "Tîţřè dû šøùħäît~~~"
+      }
+    },
+    "list": {
+      "title": "Ţès šøùħäîţš 🎁~~~",
+      "viewPublic": "Vøîŕ lā bëùţîqüē (päĝè pûblîqüē)~~~",
+      "sharePublic": "Päŕţägèr lè līèñ pûblîqüē~~~",
+      "instructions": "Äppûîè sûr ûñ šøùħäît pøùŕ lè módîfîèr.~~~",
+      "count": "{count, plural, one {# šøùħäît} other {# šøùħäîţš}}~~~",
+      "banner": "Ţä lîšté pûblîqüē n’affîçħè èñçørē ríēñ. Rèñđs ûñ šøùħäît pûblîqûē pøùŕ lè mõñţŕèr.~~~"
+    }
+  },
+  "common": {
+    "cancel": "Äññûľèŕ~~~"
+  }
+}

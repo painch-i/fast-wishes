@@ -1,0 +1,45 @@
+{
+  "public": {
+    "header": {
+      "title": "Anniversaire de {name} 🎂",
+      "subtitle": "Choisis ce qui fera plaisir 💝",
+      "remaining": "{count, plural, one {# cadeau restant} other {# cadeaux restants}}",
+      "gift": "cadeau"
+    }
+  },
+  "wish": {
+    "toast": {
+      "created": "Souhait ajouté ✨",
+      "saveError": "Oups, on n’a pas pu enregistrer. Tes infos sont gardées en brouillon.",
+      "reserved": "Déjà réservé — impossible de supprimer.",
+      "deleted": "Souhait supprimé.",
+      "deleteError": "Oups, impossible de supprimer. Réessayer.",
+      "unknownUser": "Impossible de créer le souhait : utilisateur inconnu",
+      "updated": "Modifications enregistrées ✨",
+      "updateError": "Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement.",
+      "copied": "Lien copié ✨",
+      "copyError": "Impossible de copier le lien"
+    },
+    "actions": {
+      "reserve": {
+        "success": "Réservé ! Merci 💝"
+      }
+    },
+    "form": {
+      "title": {
+        "label": "Titre du souhait"
+      }
+    },
+    "list": {
+      "title": "Tes souhaits 🎁",
+      "viewPublic": "Voir la boutique (page publique)",
+      "sharePublic": "Partager le lien public",
+      "instructions": "Appuie sur un souhait pour le modifier.",
+      "count": "{count, plural, one {# souhait} other {# souhaits}}",
+      "banner": "Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
+    }
+  },
+  "common": {
+    "cancel": "Annuler"
+  }
+}

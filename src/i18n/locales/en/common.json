@@ -1,0 +1,45 @@
+{
+  "public": {
+    "header": {
+      "title": "{name}'s birthday 🎂",
+      "subtitle": "Pick something they'll love 💝",
+      "remaining": "{count, plural, one {# gift left} other {# gifts left}}",
+      "gift": "gift"
+    }
+  },
+  "wish": {
+    "toast": {
+      "created": "Wish added ✨",
+      "saveError": "Oops, couldn't save. Your info is kept as a draft.",
+      "reserved": "Already reserved—can't delete.",
+      "deleted": "Wish deleted.",
+      "deleteError": "Oops, couldn't delete. Try again.",
+      "unknownUser": "Unable to create wish: unknown user",
+      "updated": "Changes saved ✨",
+      "updateError": "Oops, couldn't save. Your edits are kept locally.",
+      "copied": "Link copied ✨",
+      "copyError": "Unable to copy link"
+    },
+    "actions": {
+      "reserve": {
+        "success": "Reserved! Thanks 💝"
+      }
+    },
+    "form": {
+      "title": {
+        "label": "Wish title"
+      }
+    },
+    "list": {
+      "title": "Your wishes 🎁",
+      "viewPublic": "View public page",
+      "sharePublic": "Share public link",
+      "instructions": "Tap a wish to edit it.",
+      "count": "{count, plural, one {# wish} other {# wishes}}",
+      "banner": "Your public list is empty. Make a wish public to show it."
+    }
+  },
+  "common": {
+    "cancel": "Cancel"
+  }
+}

@@ -56,6 +56,15 @@ The resulting `database.types.ts` file is imported across the codebase to ensure
 - The project builds via `tsc && vite build` to ensure compatibility with Yarn PnP.
 - Extra runtime helpers rely on `@mui/system` for MUI Data Grid and `tslib` for TypeScript transpiled helpers.
 
+## Internationalization
+- Translations are handled with **i18next** and **react-i18next** with an ICU plugin for plurals.
+- Supported locales: `fr`, `en`, and a stretching `pseudo` locale. Invalid locales redirect to French.
+- Language is detected from the URL path, then cookie, local storage, and browser settings. Preference persists in both cookie and `localStorage`.
+- Translation namespaces (`common.json`) load on demand via dynamic imports.
+- The top-level router uses paths like `/:locale/*` and updates `<html lang>` accordingly.
+- The `useFormat` helper exposes `formatPrice`, `formatNumber`, and `formatDate` using the active locale via `Intl`.
+- Run `yarn check:i18n` in CI to ensure French and English keys remain in sync.
+
 ## Branding
 - Refine-specific banners and metadata were removed.
 - A custom star-themed favicon (`public/favicon.svg`) now represents the Fast Wishes brand.
