@@ -5,6 +5,29 @@
       "subtitle": "Choisis ce qui fera plaisir 💝",
       "remaining": "{count, plural, one {# cadeau restant} other {# cadeaux restants}}",
       "gift": "cadeau"
+    },
+    "card": {
+      "reserved": "✅ Réservé",
+      "reserve": "Réserver",
+      "propose": "Proposer un autre lien"
+    },
+    "reserve": {
+      "switchPropose": "Je veux plutôt proposer un autre lien",
+      "surprise": "On garde la surprise 🤫",
+      "labels": {
+        "name": "Prénom",
+        "email": "Email",
+        "url": "Lien",
+        "note": "Note"
+      },
+      "buttons": {
+        "confirm": "Confirmer la réservation",
+        "send": "Envoyer"
+      },
+      "toast": {
+        "reserved": "Réservé ! Merci 🤍 On garde la surprise.",
+        "proposed": "Lien envoyé, merci !"
+      }
     }
   },
   "wish": {
@@ -26,8 +49,46 @@
       }
     },
     "form": {
-      "title": {
-        "label": "Titre du souhait"
+      "title": { "label": "Titre du souhait" },
+      "url": { "label": "URL" },
+      "image": { "label": "Image" },
+      "price": { "label": "Prix" },
+      "currency": { "label": "Devise" },
+      "description": { "label": "Description" },
+      "quantity": { "label": "Quantité" },
+      "tags": { "label": "Tags" },
+      "notePrivate": { "label": "Note privée" },
+      "status": { "label": "Statut" },
+      "isPublic": { "label": "Public ?" }
+    },
+    "status": {
+      "draft": "Brouillon",
+      "available": "Disponible",
+      "reserved": "Réservé",
+      "received": "Reçu",
+      "archived": "Archivé"
+    },
+    "row": {
+      "edit": "Modifier {name}",
+      "delete": "Supprimer {name}",
+      "addNote": "Ajoute un petit mot pour guider 💌",
+      "addLink": "+ Lien pour aider à trouver",
+      "confirm": "Confirmer",
+      "remove": "Supprimer",
+      "addPrice": "Ajouter un prix"
+    },
+    "quickAdd": {
+      "placeholder": "Colle un lien…",
+      "add": "+ Ajouter"
+    },
+    "drawer": {
+      "title": "Éditer le souhait",
+      "unsaved": "Des modifications non sauvegardées",
+      "help": "Peaufine ton souhait, on s'occupe du reste 💡",
+      "tabs": {
+        "general": "Général",
+        "details": "Détails",
+        "visibility": "Visibilité"
       }
     },
     "list": {
@@ -36,10 +97,41 @@
       "sharePublic": "Partager le lien public",
       "instructions": "Appuie sur un souhait pour le modifier.",
       "count": "{count, plural, one {# souhait} other {# souhaits}}",
-      "banner": "Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
+      "banner": "Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer.",
+      "loadError": "Oups, impossible d’afficher la liste.",
+      "retry": "Réessayer",
+      "empty": "Aucun souhait pour l’instant. Ajoute ton premier ✨",
+      "ghost1": "Ajouter un souhait (ex : 'Bouilloire inox')",
+      "ghost2": "Ajouter un souhait (ex : 'Pull M – couleur beige')",
+      "publicLinkInfo": "Ce lien ne montre que tes souhaits publics.",
+      "shareTitle": "Ma liste de souhaits"
+    },
+    "new": {
+      "success": "Soumis avec succès !"
+    }
+  },
+  "lists": {
+    "public": {
+      "columns": {
+        "name": "Nom",
+        "description": "Description",
+        "isPublic": "Public ?",
+        "actions": "Actions"
+      }
     }
   },
   "common": {
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "add": "Ajouter",
+    "share": "Partager",
+    "retry": "Réessayer",
+    "name": "Nom",
+    "description": "Description",
+    "email": "Email",
+    "link": "Lien",
+    "note": "Note",
+    "firstName": "Prénom",
+    "submit": "Envoyer"
   }
 }

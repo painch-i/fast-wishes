@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Input, Button, Space } from "antd";
+import { useTranslation } from "react-i18next";
 
 export type QuickAddBarProps = {
   onAdd: (url?: string) => void;
@@ -7,6 +8,7 @@ export type QuickAddBarProps = {
 
 export const QuickAddBar: React.FC<QuickAddBarProps> = ({ onAdd }) => {
   const [link, setLink] = useState("");
+  const { t } = useTranslation();
 
   const handleSubmit = () => {
     onAdd(link);
@@ -27,14 +29,14 @@ export const QuickAddBar: React.FC<QuickAddBarProps> = ({ onAdd }) => {
     >
       <Space>
         <Input
-          placeholder="Colle un lien…"
+          placeholder={t("wish.quickAdd.placeholder")}
           value={link}
           onChange={(e) => setLink(e.target.value)}
           size="large"
           style={{ width: 260 }}
         />
         <Button type="primary" size="large" onClick={handleSubmit}>
-          + Ajouter
+          {t("wish.quickAdd.add")}
         </Button>
       </Space>
     </div>

@@ -27,6 +27,7 @@ type RowProps = {
 
 const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
   const { formatPrice } = useFormat();
+  const { t } = useTranslation();
   const priceCents =
     item.price_cents != null
       ? item.price_cents
@@ -176,7 +177,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
       longPressed.current = true;
       setPressed(false);
       if (item.status === "reserved") {
-        message.warning("Déjà réservé — impossible de supprimer.");
+        message.warning(t("wish.toast.reserved"));
         return;
       }
       setDanger(true);
@@ -235,7 +236,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
       className="wish-row"
       role="button"
       tabIndex={0}
-      aria-label={`Modifier ${item.name}`}
+      aria-label={t("wish.row.edit", { name: item.name })}
       onClick={handleClick}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClick()}
       onPointerDown={startPress}
@@ -260,7 +261,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
     >
       <button
         className="visually-hidden"
-        aria-label={`Supprimer ${item.name}`}
+        aria-label={t("wish.row.delete", { name: item.name })}
         onClick={(e) => {
           e.stopPropagation();
           setDanger(true);
@@ -318,7 +319,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
               onOpen(item, "description");
             }}
           >
-            {item.description || "Ajoute un petit mot pour guider 💌"}
+            {item.description || t("wish.row.addNote")}
           </span>
         </div>
         {!domain && (
@@ -333,14 +334,14 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
               onOpen(item, "url");
             }}
           >
-            + Lien pour aider à trouver
+            {t("wish.row.addLink")}
           </div>
         )}
       </div>
       {danger ? (
         <button
           ref={chipRef}
-          aria-label={confirm ? "Confirmer" : `Supprimer ${item.name}`}
+          aria-label={confirm ? t("wish.row.confirm") : t("wish.row.delete", { name: item.name })}
           onClick={(e) => {
             e.stopPropagation();
             handleDelete();
@@ -357,7 +358,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
             transition: "all 150ms",
           }}
         >
-          {confirm ? "Confirmer" : "Supprimer"}
+          {confirm ? t("wish.row.confirm") : t("wish.row.remove")}
         </button>
       ) : (
         <div
@@ -397,7 +398,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
                 onOpen(item, "price");
               }}
             >
-              Ajouter un prix
+              {t("wish.row.addPrice")}
             </Tag>
           )}
           <span style={{ color: "#9CA3AF", fontSize: 16 }}>›</span>
@@ -454,7 +455,7 @@ export const WishesListPage: React.FC = () => {
     navigator.vibrate?.(10);
     if (navigator.share) {
       navigator
-        .share({ title: "Ma liste de souhaits", url: publicUrl })
+        .share({ title: t("wish.list.shareTitle"), url: publicUrl })
         .catch(() => {});
     } else {
       navigator.clipboard
@@ -704,10 +705,10 @@ export const WishesListPage: React.FC = () => {
       {!isLoading && isError && (
         <div style={{ textAlign: "center", padding: "40px 0" }}>
           <Typography.Text>
-            Oups, impossible d’afficher la liste.
+            {t("wish.list.loadError")}
           </Typography.Text>
           <div style={{ marginTop: 16 }}>
-            <Button onClick={() => refetch()}>Réessayer</Button>
+            <Button onClick={() => refetch()}>{t("wish.list.retry")}</Button>
           </div>
         </div>
       )}
@@ -716,7 +717,7 @@ export const WishesListPage: React.FC = () => {
         <div style={{ textAlign: "center", padding: "40px 0" }}>
           <div style={{ fontSize: 48 }}>🎁</div>
           <Typography.Paragraph>
-            Aucun souhait pour l’instant. Ajoute ton premier ✨
+            {t("wish.list.empty")}
           </Typography.Paragraph>
         </div>
       )}
@@ -728,10 +729,7 @@ export const WishesListPage: React.FC = () => {
           ))}
           {wishes.length <= 2 && (
             <>
-              {[
-                "Ajouter un souhait (ex : 'Bouilloire inox')",
-                "Ajouter un souhait (ex : 'Pull M – couleur beige')",
-              ].map((placeholder, i) => (
+              {[t("wish.list.ghost1"), t("wish.list.ghost2")].map((placeholder, i) => (
                 <div
                   key={`ghost-${i}`}
                   role="button"

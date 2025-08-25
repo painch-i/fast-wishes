@@ -4,6 +4,7 @@ import { useGetIdentity, useOne, useUpdate } from "@refinedev/core";
 import { Alert, Button, Space, Switch, Table, Typography, message } from "antd";
 import { UserIdentity, UserSlug } from "../../types";
 import type { Tables } from "../../../database.types";
+import { useTranslation } from "react-i18next";
 
 export type IWish = Tables<"wishes">;
 
@@ -17,6 +18,7 @@ export const EditWishListPage: React.FC = () => {
     resource: "user_slugs",
     id: identity?.id,
   });
+  const { t } = useTranslation();
 
   const { tableProps } = useTable<IWish>({
     queryOptions: { enabled: !!identity },
@@ -45,13 +47,13 @@ export const EditWishListPage: React.FC = () => {
     if (!publicUrl) return;
     if (navigator.share) {
       navigator
-        .share({ title: "Ma liste de souhaits", url: publicUrl })
+        .share({ title: t("wish.list.shareTitle"), url: publicUrl })
         .catch(() => {});
     } else {
       navigator.clipboard
         .writeText(publicUrl)
-        .then(() => message.success("Lien copié ✨"))
-        .catch(() => message.error("Impossible de copier le lien"));
+        .then(() => message.success(t("wish.toast.copied")))
+        .catch(() => message.error(t("wish.toast.copyError")));
     }
   };
 
@@ -61,13 +63,13 @@ export const EditWishListPage: React.FC = () => {
         <div style={{ marginBottom: 16 }}>
           <Space>
             <Button href={publicUrl} target="_blank">
-              Voir la liste publique
+              {t("wish.list.viewPublic")}
             </Button>
-            <Button onClick={handleShare}>Partager</Button>
+            <Button onClick={handleShare}>{t("wish.list.sharePublic")}</Button>
           </Space>
           <div>
             <Typography.Text type="secondary">
-              Ce lien ne montre que tes souhaits publics.
+              {t("wish.list.publicLinkInfo")}
             </Typography.Text>
           </div>
         </div>
@@ -75,23 +77,23 @@ export const EditWishListPage: React.FC = () => {
       {!hasPublic && (
         <Alert
           style={{ marginBottom: 16 }}
-          message="Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
+          message={t("wish.list.banner")}
           type="info"
           showIcon
         />
       )}
       <Table {...tableProps} rowKey="id">
-        <Table.Column key="name" dataIndex="name" title="Name" sorter />
+        <Table.Column key="name" dataIndex="name" title={t("lists.public.columns.name")} sorter />
         <Table.Column
           key="description"
           dataIndex="description"
-          title="Description"
+          title={t("lists.public.columns.description")}
           sorter
         />
         <Table.Column
           key="is_public"
           dataIndex="is_public"
-          title="Is Public ?"
+          title={t("lists.public.columns.isPublic")}
           sorter
           render={(value: boolean, record: IWish) => (
             <Switch
@@ -104,7 +106,7 @@ export const EditWishListPage: React.FC = () => {
         />
 
         <Table.Column<IWish>
-          title="Actions"
+          title={t("lists.public.columns.actions")}
           dataIndex="actions"
           render={(_, record) => (
             <Space>

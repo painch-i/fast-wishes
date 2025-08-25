@@ -14,6 +14,7 @@ import {
   Segmented,
 } from "antd";
 import { WishUI } from "../../../types/wish";
+import { useTranslation } from "react-i18next";
 
 export type EditWishDrawerProps = {
   open: boolean;
@@ -32,6 +33,7 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
 }) => {
   const [form] = Form.useForm<WishUI>();
   const [saving, setSaving] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (open) {
@@ -50,7 +52,7 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
   const handleClose = () => {
     if (form.isFieldsTouched()) {
       Modal.confirm({
-        title: "Des modifications non sauvegardées",
+        title: t("wish.drawer.unsaved"),
         onOk: onClose,
       });
     } else {
@@ -78,18 +80,18 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
       title={
         <Space direction="vertical" size={0} style={{ width: "100%" }}>
           <Typography.Title level={4} style={{ margin: 0 }}>
-            Éditer le souhait
+            {t("wish.drawer.title")}
           </Typography.Title>
           <Typography.Text type="secondary">
-            Peaufine ton souhait, on s'occupe du reste 💡
+            {t("wish.drawer.help")}
           </Typography.Text>
         </Space>
       }
       extra={
         <Space>
-          <Button onClick={handleClose}>Annuler</Button>
+          <Button onClick={handleClose}>{t("common.cancel")}</Button>
           <Button type="primary" loading={saving} onClick={submit}>
-            Enregistrer
+            {t("common.save")}
           </Button>
         </Space>
       }
@@ -98,16 +100,16 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
         items={[
           {
             key: "general",
-            label: "Général",
+            label: t("wish.drawer.tabs.general"),
             children: (
               <Form layout="vertical" form={form}>
-                <Form.Item name="name" label="Titre" rules={[{ required: true }]}> 
+                <Form.Item name="name" label={t("wish.form.title.label")} rules={[{ required: true }]}> 
                   <Input size="large" />
                 </Form.Item>
-                <Form.Item name="url" label="URL"> 
+                <Form.Item name="url" label={t("wish.form.url.label")}>
                   <Input size="large" />
                 </Form.Item>
-                <Form.Item name="image_url" label="Image"> 
+                <Form.Item name="image_url" label={t("wish.form.image.label")}>
                   <Input size="large" />
                 </Form.Item>
               </Form>
@@ -115,13 +117,13 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
           },
           {
             key: "details",
-            label: "Détails",
+            label: t("wish.drawer.tabs.details"),
             children: (
               <Form layout="vertical" form={form}>
-                <Form.Item name="price" label="Prix">
+                <Form.Item name="price" label={t("wish.form.price.label")}>
                   <InputNumber min={0} style={{ width: "100%" }} />
                 </Form.Item>
-                <Form.Item name="currency" label="Devise">
+                <Form.Item name="currency" label={t("wish.form.currency.label")}>
                   <Select
                     options={[form.getFieldValue("currency"), "EUR", "USD", "GBP"]
                       .filter((v): v is string => !!v)
@@ -129,19 +131,19 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
                       .map((v) => ({ value: v }))}
                   />
                 </Form.Item>
-                <Form.Item name="description" label="Description">
+                <Form.Item name="description" label={t("wish.form.description.label")}>
                   <Input.TextArea rows={3} />
                 </Form.Item>
-                <Form.Item name="quantity" label="Quantité">
+                <Form.Item name="quantity" label={t("wish.form.quantity.label")}>
                   <InputNumber min={1} style={{ width: "100%" }} />
                 </Form.Item>
-                <Form.Item name="tags" label="Tags">
+                <Form.Item name="tags" label={t("wish.form.tags.label")}>
                   <Select mode="tags" tokenSeparators={[","]} />
                 </Form.Item>
-                <Form.Item name="note_private" label="Note privée"> 
+                <Form.Item name="note_private" label={t("wish.form.notePrivate.label")}>
                   <Input.TextArea rows={3} />
                 </Form.Item>
-                <Form.Item name="priority" label="Priorité">
+                <Form.Item name="priority" label={t("wish.form.priority.label")}>
                   <Segmented options={[1, 2, 3]} />
                 </Form.Item>
               </Form>
@@ -149,13 +151,13 @@ export const EditWishDrawer: React.FC<EditWishDrawerProps> = ({
           },
           {
             key: "visibility",
-            label: "Visibilité",
+            label: t("wish.drawer.tabs.visibility"),
             children: (
               <Form layout="vertical" form={form}>
-                <Form.Item name="status" label="Statut">
-                  <Select options={["draft", "available", "reserved", "received", "archived"].map((v) => ({ value: v }))} />
+                <Form.Item name="status" label={t("wish.form.status.label")}>
+                  <Select options={["draft", "available", "reserved", "received", "archived"].map((v) => ({ value: v, label: t(`wish.status.${v}`) }))} />
                 </Form.Item>
-                <Form.Item name="is_public" label="Public ?" valuePropName="checked">
+                <Form.Item name="is_public" label={t("wish.form.isPublic.label")} valuePropName="checked">
                   <Switch />
                 </Form.Item>
               </Form>

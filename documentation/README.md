@@ -64,6 +64,7 @@ The resulting `database.types.ts` file is imported across the codebase to ensure
 - The top-level router uses paths like `/:locale/*` and updates `<html lang>` accordingly.
 - The `useFormat` helper exposes `formatPrice`, `formatNumber`, and `formatDate` using the active locale via `Intl`.
 - Run `yarn check:i18n` in CI to ensure French and English keys remain in sync.
+- All user-facing components rely on semantic translation keys stored in `common.json` for French, English and pseudo locales.
 
 ## Branding
 - Refine-specific banners and metadata were removed.
