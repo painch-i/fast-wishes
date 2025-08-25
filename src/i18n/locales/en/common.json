@@ -57,6 +57,7 @@
       "description": { "label": "Description" },
       "quantity": { "label": "Quantity" },
       "tags": { "label": "Tags" },
+      "priority": { "label": "Priority" },
       "notePrivate": { "label": "Private note" },
       "status": { "label": "Status" },
       "isPublic": { "label": "Public?" }
@@ -89,6 +90,87 @@
         "general": "General",
         "details": "Details",
         "visibility": "Visibility"
+      }
+    },
+    "wizard": {
+      "title": "Create a wish",
+      "steps": {
+        "link": "Link",
+        "details": "Details",
+        "visibility": "Visibility"
+      },
+      "actions": {
+        "previous": "Previous",
+        "next": "Next",
+        "create": "Create",
+        "import": "Import details"
+      },
+      "link": {
+        "intro": "Paste a link (Amazon, Etsy…) and we'll prefill ✨",
+        "url": {
+          "invalid": "Invalid URL",
+          "placeholder": "https://example.com/product/123"
+        }
+      },
+      "details": {
+        "essential": {
+          "title": "Essentials",
+          "intro": "Add what matters: a nice photo, a short note…"
+        },
+        "optional": { "title": "Optional" }
+      },
+      "visibility": {
+        "title": "Status & sharing",
+        "intro": "You can keep this wish private while tweaking."
+      },
+      "messages": {
+        "nameRequired": "Title required",
+        "priceMin": "Price ≥ 0"
+      }
+    },
+    "sheet": {
+      "title": { "create": "Add a wish", "edit": "Edit wish" },
+      "subtitle": "Capture the basics now, refine later.",
+      "name": {
+        "required": "A title is required",
+        "extra": "A clear name helps your friends choose.",
+        "placeholder": "Haws stainless watering can 1 L"
+      },
+      "price": {
+        "extra": "Give a budget to guide choices.",
+        "approxAria": "Approximate price"
+      },
+      "url": {
+        "label": "Merchant link",
+        "invalid": "Invalid link",
+        "pasteTip": "Long-press then \"Paste\"",
+        "placeholder": "https://… (Amazon, Etsy, brand site)",
+        "button": "Paste",
+        "toast": "Link added ✨"
+      },
+      "description": {
+        "label": "Personal note",
+        "placeholder": "Why would I love it? Color, size, use… 💌"
+      },
+      "priority": {
+        "options": {
+          "1": "⭐ Must-have",
+          "2": "💡 Nice to have",
+          "3": "🎲 Surprise me"
+        }
+      },
+      "tag": {
+        "label": "Tag",
+        "options": [
+          "Home",
+          "Kitchen",
+          "Sports",
+          "Reading",
+          "Tech",
+          "Fashion",
+          "Beauty",
+          "Games"
+        ]
       }
     },
     "list": {

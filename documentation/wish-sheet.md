@@ -8,6 +8,8 @@ remains visible with safe-area padding, exposing **Annuler** and a
 primary **Ajouter/Enregistrer** button. While open, body scrolling is
 locked and `overscroll-behavior: contain` prevents pull-to-refresh.
 
+All labels, placeholders and helper text are sourced from the `i18n` bundles, allowing the sheet to adapt to any supported locale.
+
 ## Fields
 1. **Titre** – required. Placeholder “Arrosoir inox Haws 1 L” with the
    help text “Un nom clair aide tes proches à choisir.”
