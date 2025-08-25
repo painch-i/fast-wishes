@@ -11,7 +11,7 @@ import routerBindings, {
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
   import { liveProvider } from "@refinedev/supabase";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router";
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router";
 import { ConfigProvider } from "antd";
 import authProvider from "./authProvider";
 import { AnonymousLogin } from "./components/auth/anonymous-login";
@@ -26,6 +26,12 @@ import i18n from "./i18n";
 import { LocaleGate } from "./i18n/LocaleGate";
 import { fallbackLng } from "./i18n/config";
 
+function RootRedirect() {
+  const { pathname, search, hash } = useLocation();
+  const target = i18n.resolvedLanguage || fallbackLng;
+  return <Navigate to={`/${target}${pathname}${search}${hash}`} replace />;
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -37,7 +43,7 @@ function App() {
               <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto", colorScheme: "light" } }} />
               <Routes>
                 <Route path=":locale/*" element={<LocaleGate />} />
-                <Route path="*" element={<Navigate to={`/${fallbackLng}`} replace />} />
+                <Route path="*" element={<RootRedirect />} />
               </Routes>
             </ThemeProvider>
           </RefineKbarProvider>
