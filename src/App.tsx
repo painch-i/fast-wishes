@@ -11,7 +11,7 @@ import routerBindings, {
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
   import { liveProvider } from "@refinedev/supabase";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router";
 import { ConfigProvider } from "antd";
 import authProvider from "./authProvider";
 import { AnonymousLogin } from "./components/auth/anonymous-login";
@@ -21,52 +21,34 @@ import { theme } from "./theme";
 import { supabaseClient } from "./utility";
 import { smartDataProvider } from "./providers/smartDataProvider";
 import { WishesListPage } from "./pages/wishes/WishesListPage";
+import { I18nextProvider } from "react-i18next";
+import i18n from "./i18n";
+import { LocaleGate } from "./i18n/LocaleGate";
+import { fallbackLng } from "./i18n/config";
+
+function RootRedirect() {
+  const { pathname, search, hash } = useLocation();
+  const target = i18n.resolvedLanguage || fallbackLng;
+  return <Navigate to={`/${target}${pathname}${search}${hash}`} replace />;
+}
 
 function App() {
   return (
     <BrowserRouter>
-      <ConfigProvider theme={theme}>
-      <RefineKbarProvider>
-        <ThemeProvider theme={RefineThemes.Blue}>
-          <CssBaseline />
-          <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto", colorScheme: "light" } }} />
-              <Refine
-                  dataProvider={smartDataProvider}
-                  liveProvider={liveProvider(supabaseClient)}
-                authProvider={authProvider}
-                routerProvider={routerBindings}
-                options={{
-                  warnWhenUnsavedChanges: true,
-                  useNewQueryKeys: true,
-                  liveMode: 'auto',
-                  projectId: "wPUVlS-YutdNT-PBBtUI",
-                }}
-                resources={[
-                  {
-                    name: "wishes",
-                    list: "/wishes",
-                    create: "/new-wish",
-                  },
-                ]}
-              >
-                    <Authenticated key="protected" fallback={<AnonymousLogin/>}>
-                      <Routes>
-                            <Route path="/wishes" element={<WishesListPage />} />
-                          <Route path="/new-wish" element={<NewWishPage />} />
-                          {/* <Route path="/:slug/:id" element={<WishShow />} /> */}
-                          {/* <Route path="/wishes/:id/edit" element={<WishEdit />} /> */}
-                      </Routes>
-                    </Authenticated>
-                    <Routes>
-                      <Route path="/l/:slug" element={<PublicWishlistPage />} />
-                    </Routes>
-                <RefineKbar />
-                <UnsavedChangesNotifier />
-                <DocumentTitleHandler />
-              </Refine>
-        </ThemeProvider>
-      </RefineKbarProvider>
-      </ConfigProvider>
+      <I18nextProvider i18n={i18n}>
+        <ConfigProvider theme={theme}>
+          <RefineKbarProvider>
+            <ThemeProvider theme={RefineThemes.Blue}>
+              <CssBaseline />
+              <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto", colorScheme: "light" } }} />
+              <Routes>
+                <Route path=":locale/*" element={<LocaleGate />} />
+                <Route path="*" element={<RootRedirect />} />
+              </Routes>
+            </ThemeProvider>
+          </RefineKbarProvider>
+        </ConfigProvider>
+      </I18nextProvider>
     </BrowserRouter>
   );
 }

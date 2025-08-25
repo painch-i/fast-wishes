@@ -9,6 +9,7 @@ import {
 import { Space, Switch, Table } from "antd";
 import { useParams } from "react-router";
 import type { Tables } from "../../../database.types";
+import { useTranslation } from "react-i18next";
 
 export type IWish = Tables<"wishes">;
 
@@ -22,6 +23,7 @@ export type IUser = {
 export const UserPublicList: React.FC = () => {
   const params = useParams();
   const slug = params.slug;
+  const { t } = useTranslation();
 
   const { tableProps } = useTable<IWish>({
     resource: 'wishes',
@@ -47,14 +49,14 @@ export const UserPublicList: React.FC = () => {
   return (
     <List>
       <Table {...tableProps} rowKey="id">
-        <Table.Column key="name" dataIndex="name" title="Name" sorter />
-        <Table.Column key="description" dataIndex="description" title="Description" sorter/>
-        <Table.Column key="is_public" dataIndex="is_public" title="Is Public ?" sorter
+        <Table.Column key="name" dataIndex="name" title={t("lists.public.columns.name")} sorter />
+        <Table.Column key="description" dataIndex="description" title={t("lists.public.columns.description")} sorter/>
+        <Table.Column key="is_public" dataIndex="is_public" title={t("lists.public.columns.isPublic")} sorter
           render={(value: boolean) => <Switch checked={value} disabled />}
         />
 
         <Table.Column<IWish>
-          title="Actions"
+          title={t("lists.public.columns.actions")}
           dataIndex="actions"
           render={(_, record) => (
             <Space>
