@@ -1,5 +1,6 @@
 import { useForm, useGetIdentity } from "@refinedev/core";
 import { UserIdentity } from "../../types";
+import { useTranslation } from "react-i18next";
 
 export const NewWishPage = () => {
   const { onFinish, mutation } = useForm({
@@ -8,6 +9,7 @@ export const NewWishPage = () => {
   });
 
   const { data: identity } = useGetIdentity<UserIdentity>();
+  const { t } = useTranslation();
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     if (!identity) {
@@ -28,14 +30,14 @@ export const NewWishPage = () => {
 
   return (
     <form onSubmit={onSubmit}>
-      <label htmlFor="name">Name</label>
+      <label htmlFor="name">{t("common.name")}</label>
       <input type="text" id="name" name="name" />
 
-      <label htmlFor="description">Description</label>
+      <label htmlFor="description">{t("common.description")}</label>
       <textarea id="description" name="description" />
 
-      {mutation.isSuccess && <span>successfully submitted!</span>}
-      <button type="submit">Submit</button>
+      {mutation.isSuccess && <span>{t("wish.new.success")}</span>}
+      <button type="submit">{t("common.submit")}</button>
     </form>
   );
 };

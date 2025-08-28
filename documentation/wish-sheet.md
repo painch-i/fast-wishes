@@ -8,6 +8,8 @@ remains visible with safe-area padding, exposing **Annuler** and a
 primary **Ajouter/Enregistrer** button. While open, body scrolling is
 locked and `overscroll-behavior: contain` prevents pull-to-refresh.
 
+All labels, placeholders and helper text are sourced from the `i18n` bundles, allowing the sheet to adapt to any supported locale.
+
 ## Fields
 1. **Titre** – required. Placeholder “Arrosoir inox Haws 1 L” with the
    help text “Un nom clair aide tes proches à choisir.”
@@ -36,8 +38,10 @@ locked and `overscroll-behavior: contain` prevents pull-to-refresh.
    ferait plaisir ? Couleur, taille, usage… 💌”.
 5. **Priorité** – three chips with one always selected: ⭐ Essentiel,
    💡 Envie (default) and 🎲 Surprise.
-6. **Tag** – autocomplete allowing free text with suggestions
-   (Maison, Cuisine, Sport, Lecture, Tech, Mode, Beauté, Jeux).
+6. **Tag** – autocomplete allowing free text with suggestions.
+   The suggestion list is sourced from the translation bundle and
+   gracefully falls back to an empty list while the locale file loads
+   (prevents runtime errors).
 
 Only the title is mandatory. On submit the sheet returns a `WishUI`
 object including `price_cents`, `price_is_approx`, `merchant_domain`,

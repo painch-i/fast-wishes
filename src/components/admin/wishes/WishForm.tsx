@@ -4,6 +4,7 @@ import { Input, InputNumber, Select, Switch, Segmented, Form, Typography } from 
 import type { FormInstance } from "antd";
 import { WishUI } from "../../../types/wish";
 import { useWishMetadata } from "../../../hooks/useWishMetadata";
+import { useTranslation } from "react-i18next";
 
 const { TextArea } = Input;
 
@@ -17,6 +18,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
   const { control, handleSubmit, watch, setValue } = useForm<WishUI>({
     defaultValues: { quantity: 1, priority: 2, ...initialValues },
   });
+  const { t } = useTranslation();
 
   const url = watch("url");
   const { metadata } = useWishMetadata(url ?? undefined);
@@ -37,7 +39,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <Form.Item label="Titre" required>
+          <Form.Item label={t("wish.form.title.label")} required>
               <Input size="large" {...field} value={field.value ?? ""} />
           </Form.Item>
         )}
@@ -46,7 +48,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="url"
         control={control}
         render={({ field }) => (
-          <Form.Item label="URL">
+          <Form.Item label={t("wish.form.url.label")}>
               <Input size="large" {...field} value={field.value ?? ""} />
           </Form.Item>
         )}
@@ -58,7 +60,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="image_url"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Image URL">
+          <Form.Item label={t("wish.form.image.label")}>
               <Input size="large" {...field} value={field.value ?? ""} />
           </Form.Item>
         )}
@@ -67,7 +69,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="price"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Prix">
+          <Form.Item label={t("wish.form.price.label")}>
             <InputNumber min={0} style={{ width: "100%" }} {...field} />
           </Form.Item>
         )}
@@ -76,7 +78,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="currency"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Devise">
+          <Form.Item label={t("wish.form.currency.label")}>
             <Select
               {...field}
               options={[field.value, "EUR", "USD", "GBP"]
@@ -91,7 +93,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="description"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Description">
+          <Form.Item label={t("wish.form.description.label")}>
               <TextArea rows={3} {...field} value={field.value ?? ""} />
           </Form.Item>
         )}
@@ -100,7 +102,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="quantity"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Quantité">
+          <Form.Item label={t("wish.form.quantity.label")}>
             <InputNumber min={1} style={{ width: "100%" }} {...field} />
           </Form.Item>
         )}
@@ -109,7 +111,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="priority"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Priorité">
+          <Form.Item label={t("wish.form.priority.label")}>
             <Segmented {...field} options={[1, 2, 3]} />
           </Form.Item>
         )}
@@ -118,7 +120,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="tags"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Tags">
+          <Form.Item label={t("wish.form.tags.label")}>
             <Select mode="tags" tokenSeparators={[","]} {...field} />
           </Form.Item>
         )}
@@ -127,7 +129,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="note_private"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Note privée">
+          <Form.Item label={t("wish.form.notePrivate.label")}>
             <TextArea rows={3} {...field} />
           </Form.Item>
         )}
@@ -136,8 +138,8 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="status"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Statut">
-            <Select {...field} options={["draft", "available", "reserved", "received", "archived"].map(v => ({ value: v }))} />
+          <Form.Item label={t("wish.form.status.label")}>
+            <Select {...field} options={["draft", "available", "reserved", "received", "archived"].map(v => ({ value: v, label: t(`wish.status.${v}`) }))} />
           </Form.Item>
         )}
       />
@@ -145,7 +147,7 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         name="is_public"
         control={control}
         render={({ field }) => (
-          <Form.Item label="Public ?" valuePropName="checked">
+          <Form.Item label={t("wish.form.isPublic.label")} valuePropName="checked">
             <Switch {...field} />
           </Form.Item>
         )}

@@ -20,6 +20,7 @@ import { useLinkMetadata } from "../../hooks/useLinkMetadata";
 import { colors } from "../../theme";
 import { guessUserCurrency } from "../../utility";
 import { useGetIdentity } from "@refinedev/core";
+import { useTranslation } from "react-i18next";
 
 export interface WishSheetProps {
   open: boolean;
@@ -38,6 +39,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
   onCancel,
   onSubmit,
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm<WishUI>();
   const isMobile = useMediaQuery("(max-width:600px)");
   const [linkDomain, setLinkDomain] = useState<string | null>(null);
@@ -195,7 +197,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
       if (text) {
         form.setFieldsValue({ url: text } as any);
         linkInputRef.current?.focus({ cursor: "end" });
-        message.success("Lien ajouté ✨");
+        message.success(t("wish.sheet.url.toast"));
         setShowPasteTip(false);
       }
     } catch {
@@ -216,16 +218,10 @@ export const WishSheet: React.FC<WishSheetProps> = ({
     if (mode === "create") localStorage.removeItem("wish-draft");
   };
 
-  const tagOptions = [
-    "Maison",
-    "Cuisine",
-    "Sport",
-    "Lecture",
-    "Tech",
-    "Mode",
-    "Beauté",
-    "Jeux",
-  ].map((t) => ({ value: t }));
+  const rawTags = t("wish.sheet.tag.options", { returnObjects: true }) as unknown;
+  const tagOptions = Array.isArray(rawTags)
+    ? rawTags.map((v) => ({ value: v }))
+    : [];
 
   return (
     <Drawer
@@ -268,7 +264,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
                 WebkitBoxOrient: "vertical",
               }}
             >
-              {mode === "create" ? "Ajouter un souhait" : "Modifier le souhait"}
+              {mode === "create" ? t("wish.sheet.title.create") : t("wish.sheet.title.edit")}
             </Typography.Title>
             <Typography.Text
               style={{
@@ -282,7 +278,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
                 overflowWrap: "anywhere",
               }}
             >
-              Note l’essentiel, tu pourras peaufiner après.
+              {t("wish.sheet.subtitle")}
             </Typography.Text>
           </div>
         </div>
@@ -320,19 +316,19 @@ export const WishSheet: React.FC<WishSheetProps> = ({
       >
         <Form.Item
           name="name"
-          label="Titre"
-          rules={[{ required: true, min: 2, message: "Un titre est requis" }]}
-          extra="Un nom clair aide tes proches à choisir."
+          label={t("wish.form.title.label")}
+          rules={[{ required: true, min: 2, message: t("wish.sheet.name.required") }]}
+          extra={t("wish.sheet.name.extra")}
         >
           <Input
-            placeholder="Arrosoir inox Haws 1 L"
+            placeholder={t("wish.sheet.name.placeholder")}
             style={{ fontSize: 16 }}
           />
         </Form.Item>
 
         <Form.Item
-          label="Prix"
-          extra="Indique un budget pour faciliter le choix."
+          label={t("wish.form.price.label")}
+          extra={t("wish.sheet.price.extra")}
         >
           <Space.Compact block>
             <Form.Item name="price" noStyle>
@@ -372,7 +368,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
               noStyle
             >
               <Checkbox
-                aria-label="Prix approximatif"
+                aria-label={t("wish.sheet.price.approxAria")}
                 style={{ padding: "0 8px", fontSize: 16 }}
               >
                 ≈
@@ -383,20 +379,20 @@ export const WishSheet: React.FC<WishSheetProps> = ({
 
         <Form.Item
           name="url"
-          label="Lien marchand"
+          label={t("wish.sheet.url.label")}
           validateStatus={!isUrlValid ? "error" : undefined}
           help={
             !isUrlValid
-              ? "Lien invalide"
+              ? t("wish.sheet.url.invalid")
               : showPasteTip
-              ? "Maintiens dans le champ puis \"Coller\""
+              ? t("wish.sheet.url.pasteTip")
               : undefined
           }
         >
           <Space.Compact style={{ width: "100%" }}>
             <Input
               ref={linkInputRef}
-              placeholder="https://… (Amazon, Etsy, site de la marque)"
+              placeholder={t("wish.sheet.url.placeholder")}
               inputMode="url"
               onChange={() => setShowPasteTip(false)}
               style={{ fontSize: 16 }}
@@ -428,7 +424,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
               }
             />
             <Button onClick={handlePaste} style={{ fontSize: 16 }}>
-              Coller
+              {t("wish.sheet.url.button")}
             </Button>
           </Space.Compact>
         </Form.Item>
@@ -465,26 +461,26 @@ export const WishSheet: React.FC<WishSheetProps> = ({
           </Typography.Text>
         )}
 
-        <Form.Item name="description" label="Commentaire perso">
+        <Form.Item name="description" label={t("wish.sheet.description.label")}>
           <Input.TextArea
-            placeholder="Pourquoi ça me ferait plaisir ? Couleur, taille, usage… 💌"
+            placeholder={t("wish.sheet.description.placeholder")}
             autoSize={{ minRows: 3, maxRows: 4 }}
             style={{ fontSize: 16 }}
           />
         </Form.Item>
 
-        <Form.Item name="priority" label="Priorité" initialValue={2}>
+        <Form.Item name="priority" label={t("wish.form.priority.label")} initialValue={2}>
           <Segmented
             options={[
-              { label: "⭐ Essentiel", value: 1 },
-              { label: "💡 Envie", value: 2 },
-              { label: "🎲 Surprise", value: 3 },
+              { label: t("wish.sheet.priority.options.1"), value: 1 },
+              { label: t("wish.sheet.priority.options.2"), value: 2 },
+              { label: t("wish.sheet.priority.options.3"), value: 3 },
             ]}
             style={{ width: "100%" }}
           />
         </Form.Item>
 
-        <Form.Item name="tag" label="Tag">
+        <Form.Item name="tag" label={t("wish.sheet.tag.label")}>
           <AutoComplete
             options={tagOptions}
             style={{ fontSize: 16 }}
@@ -504,13 +500,13 @@ export const WishSheet: React.FC<WishSheetProps> = ({
             paddingBottom: "calc(8px + env(safe-area-inset-bottom))",
           }}
         >
-          <Button onClick={onCancel}>Annuler</Button>
+          <Button onClick={onCancel}>{t("common.cancel")}</Button>
           <Button
             type="primary"
             htmlType="submit"
-            aria-label={mode === "create" ? "Ajouter" : "Enregistrer"}
+            aria-label={mode === "create" ? t("common.add") : t("common.save")}
           >
-            {mode === "create" ? "Ajouter" : "Enregistrer"}
+            {mode === "create" ? t("common.add") : t("common.save")}
           </Button>
         </div>
       </Form>

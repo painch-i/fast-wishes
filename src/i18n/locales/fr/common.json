@@ -1,0 +1,219 @@
+{
+  "public": {
+    "header": {
+      "title": "Anniversaire de {name} 🎂",
+      "subtitle": "Choisis ce qui fera plaisir 💝",
+      "remaining": "{count, plural, one {# cadeau restant} other {# cadeaux restants}}",
+      "gift": "cadeau"
+    },
+    "card": {
+      "reserved": "✅ Réservé",
+      "reserve": "Réserver",
+      "propose": "Proposer un autre lien"
+    },
+    "reserve": {
+      "switchPropose": "Je veux plutôt proposer un autre lien",
+      "surprise": "On garde la surprise 🤫",
+      "labels": {
+        "name": "Prénom",
+        "email": "Email",
+        "url": "Lien",
+        "note": "Note"
+      },
+      "buttons": {
+        "confirm": "Confirmer la réservation",
+        "send": "Envoyer"
+      },
+      "toast": {
+        "reserved": "Réservé ! Merci 🤍 On garde la surprise.",
+        "proposed": "Lien envoyé, merci !"
+      }
+    }
+  },
+  "wish": {
+    "toast": {
+      "created": "Souhait ajouté ✨",
+      "saveError": "Oups, on n’a pas pu enregistrer. Tes infos sont gardées en brouillon.",
+      "reserved": "Déjà réservé — impossible de supprimer.",
+      "deleted": "Souhait supprimé.",
+      "deleteError": "Oups, impossible de supprimer. Réessayer.",
+      "unknownUser": "Impossible de créer le souhait : utilisateur inconnu",
+      "updated": "Modifications enregistrées ✨",
+      "updateError": "Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement.",
+      "copied": "Lien copié ✨",
+      "copyError": "Impossible de copier le lien"
+    },
+    "actions": {
+      "reserve": {
+        "success": "Réservé ! Merci 💝"
+      }
+    },
+    "form": {
+      "title": { "label": "Titre du souhait" },
+      "url": { "label": "URL" },
+      "image": { "label": "Image" },
+      "price": { "label": "Prix" },
+      "currency": { "label": "Devise" },
+      "description": { "label": "Description" },
+      "quantity": { "label": "Quantité" },
+      "tags": { "label": "Tags" },
+      "priority": { "label": "Priorité" },
+      "notePrivate": { "label": "Note privée" },
+      "status": { "label": "Statut" },
+      "isPublic": { "label": "Public ?" }
+    },
+    "status": {
+      "draft": "Brouillon",
+      "available": "Disponible",
+      "reserved": "Réservé",
+      "received": "Reçu",
+      "archived": "Archivé"
+    },
+    "row": {
+      "edit": "Modifier {name}",
+      "delete": "Supprimer {name}",
+      "addNote": "Ajoute un petit mot pour guider 💌",
+      "addLink": "+ Lien pour aider à trouver",
+      "confirm": "Confirmer",
+      "remove": "Supprimer",
+      "addPrice": "Ajouter un prix"
+    },
+    "quickAdd": {
+      "placeholder": "Colle un lien…",
+      "add": "+ Ajouter"
+    },
+    "drawer": {
+      "title": "Éditer le souhait",
+      "unsaved": "Des modifications non sauvegardées",
+      "help": "Peaufine ton souhait, on s'occupe du reste 💡",
+      "tabs": {
+        "general": "Général",
+        "details": "Détails",
+        "visibility": "Visibilité"
+      }
+    },
+    "wizard": {
+      "title": "Créer un souhait",
+      "steps": {
+        "link": "Lien",
+        "details": "Détails",
+        "visibility": "Visibilité"
+      },
+      "actions": {
+        "previous": "Précédent",
+        "next": "Suivant",
+        "create": "Créer",
+        "import": "Importer les infos"
+      },
+      "link": {
+        "intro": "Colle un lien (Amazon, Etsy…). On pré-remplit pour toi ✨",
+        "url": {
+          "invalid": "URL invalide",
+          "placeholder": "https://exemple.com/produit/123"
+        }
+      },
+      "details": {
+        "essential": {
+          "title": "Essentiel",
+          "intro": "Ajoute ce qui compte : une jolie photo, un petit mot…"
+        },
+        "optional": { "title": "Optionnel" }
+      },
+      "visibility": {
+        "title": "Statut & partage",
+        "intro": "Tu peux garder ce souhait privé le temps d’ajuster."
+      },
+      "messages": {
+        "nameRequired": "Titre requis",
+        "priceMin": "Prix ≥ 0"
+      }
+    },
+    "sheet": {
+      "title": { "create": "Ajouter un souhait", "edit": "Modifier le souhait" },
+      "subtitle": "Note l’essentiel, tu pourras peaufiner après.",
+      "name": {
+        "required": "Un titre est requis",
+        "extra": "Un nom clair aide tes proches à choisir.",
+        "placeholder": "Arrosoir inox Haws 1 L"
+      },
+      "price": {
+        "extra": "Indique un budget pour faciliter le choix.",
+        "approxAria": "Prix approximatif"
+      },
+      "url": {
+        "label": "Lien marchand",
+        "invalid": "Lien invalide",
+        "pasteTip": "Maintiens dans le champ puis \"Coller\"",
+        "placeholder": "https://… (Amazon, Etsy, site de la marque)",
+        "button": "Coller",
+        "toast": "Lien ajouté ✨"
+      },
+      "description": {
+        "label": "Commentaire perso",
+        "placeholder": "Pourquoi ça me ferait plaisir ? Couleur, taille, usage… 💌"
+      },
+      "priority": {
+        "options": {
+          "1": "⭐ Essentiel",
+          "2": "💡 Envie",
+          "3": "🎲 Surprise"
+        }
+      },
+      "tag": {
+        "label": "Tag",
+        "options": [
+          "Maison",
+          "Cuisine",
+          "Sport",
+          "Lecture",
+          "Tech",
+          "Mode",
+          "Beauté",
+          "Jeux"
+        ]
+      }
+    },
+    "list": {
+      "title": "Tes souhaits 🎁",
+      "viewPublic": "Voir la boutique (page publique)",
+      "sharePublic": "Partager le lien public",
+      "instructions": "Appuie sur un souhait pour le modifier.",
+      "count": "{count, plural, one {# souhait} other {# souhaits}}",
+      "banner": "Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer.",
+      "loadError": "Oups, impossible d’afficher la liste.",
+      "retry": "Réessayer",
+      "empty": "Aucun souhait pour l’instant. Ajoute ton premier ✨",
+      "ghost1": "Ajouter un souhait (ex : 'Bouilloire inox')",
+      "ghost2": "Ajouter un souhait (ex : 'Pull M – couleur beige')",
+      "publicLinkInfo": "Ce lien ne montre que tes souhaits publics.",
+      "shareTitle": "Ma liste de souhaits"
+    },
+    "new": {
+      "success": "Soumis avec succès !"
+    }
+  },
+  "lists": {
+    "public": {
+      "columns": {
+        "name": "Nom",
+        "description": "Description",
+        "isPublic": "Public ?",
+        "actions": "Actions"
+      }
+    }
+  },
+  "common": {
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "add": "Ajouter",
+    "share": "Partager",
+    "retry": "Réessayer",
+    "name": "Nom",
+    "description": "Description",
+    "email": "Email",
+    "link": "Lien",
+    "note": "Note",
+    "firstName": "Prénom",
+    "submit": "Envoyer"
+  }
+}

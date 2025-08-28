@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Card, Tag } from "antd";
 import type { Wish } from "./types";
 import "./WishCard.css";
+import { useTranslation } from "react-i18next";
 
 export interface WishCardProps {
   wish: Wish;
@@ -11,6 +12,7 @@ export interface WishCardProps {
 
 export const WishCard: React.FC<WishCardProps> = ({ wish, onReserve, onProposeLink }) => {
   const reserved = wish.isReserved;
+  const { t } = useTranslation();
   return (
     <Card
       className={`wish-card${reserved ? " reserved" : ""}`}
@@ -28,7 +30,7 @@ export const WishCard: React.FC<WishCardProps> = ({ wish, onReserve, onProposeLi
           )}
           {reserved && (
             <Tag color="success" className="reserved-badge">
-              ✅ Réservé
+              {t("public.card.reserved")}
             </Tag>
           )}
         </div>
@@ -45,7 +47,7 @@ export const WishCard: React.FC<WishCardProps> = ({ wish, onReserve, onProposeLi
         aria-disabled={reserved}
         onClick={() => onReserve?.(wish)}
       >
-        Réserver
+        {t("public.card.reserve")}
       </Button>
       <Button
         type="link"
@@ -53,7 +55,7 @@ export const WishCard: React.FC<WishCardProps> = ({ wish, onReserve, onProposeLi
         className="secondary-link"
         onClick={() => onProposeLink?.(wish)}
       >
-        Proposer un autre lien
+        {t("public.card.propose")}
       </Button>
     </Card>
   );

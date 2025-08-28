@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Modal,
   Steps,
@@ -24,18 +25,13 @@ export type CreateWishWizardProps = {
   onSubmit: (values: WishUI, asDraft?: boolean) => void;
 };
 
-const stepItems = [
-  { title: "Lien" },
-  { title: "Détails" },
-  { title: "Visibilité" },
-];
-
 export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
   open,
   initialValues,
   onCancel,
   onSubmit,
 }) => {
+  const { t } = useTranslation();
   const [current, setCurrent] = useState(0);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<WishUI>();
@@ -46,6 +42,15 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
 
   const [preview, setPreview] = useState<Partial<WishUI>>({});
   const [stepValid, setStepValid] = useState(true);
+
+  const stepItems = useMemo(
+    () => [
+      { title: t("wish.wizard.steps.link") },
+      { title: t("wish.wizard.steps.details") },
+      { title: t("wish.wizard.steps.visibility") },
+    ],
+    [t]
+  );
 
   useEffect(() => {
     if (open) {
@@ -114,7 +119,7 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
       }}
     >
       <Typography.Title level={4} style={{ margin: 0 }}>
-        Créer un souhait
+        {t("wish.wizard.title")}
       </Typography.Title>
       <Steps
         current={current}
@@ -141,7 +146,7 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
       <Space>
         {current > 0 && (
           <Button onClick={prev} size="large">
-            Précédent
+            {t("wish.wizard.actions.previous")}
           </Button>
         )}
         {current < 2 && (
@@ -151,7 +156,7 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
             size="large"
             disabled={current === 1 && !stepValid}
           >
-            Suivant
+            {t("wish.wizard.actions.next")}
           </Button>
         )}
         {current === 2 && (
@@ -162,30 +167,32 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
             loading={loading}
             disabled={!stepValid}
           >
-            Créer
+            {t("wish.wizard.actions.create")}
           </Button>
         )}
         <Button type="text" onClick={onCancel} size="large">
-          Annuler
+          {t("common.cancel")}
         </Button>
       </Space>
     </div>
   );
 
   const linkStep = (
-    <Card title="Lien" bordered={false} style={{ marginBottom: 16 }}>
-      <Typography.Paragraph>
-        Colle un lien (Amazon, Etsy…). On pré-remplit pour toi ✨
-      </Typography.Paragraph>
-      <Form.Item name="url" label="URL" rules={[{ type: "url", message: "URL invalide" }]}>
+    <Card title={t("wish.wizard.steps.link")} bordered={false} style={{ marginBottom: 16 }}>
+      <Typography.Paragraph>{t("wish.wizard.link.intro")}</Typography.Paragraph>
+      <Form.Item
+        name="url"
+        label={t("wish.form.url.label")}
+        rules={[{ type: "url", message: t("wish.wizard.link.url.invalid") }]}
+      >
         <Input
           size="large"
-          placeholder="https://exemple.com/produit/123"
+          placeholder={t("wish.wizard.link.url.placeholder")}
           onBlur={validateStep}
         />
       </Form.Item>
       <Button type="primary" onClick={next} size="large">
-        Importer les infos
+        {t("wish.wizard.actions.import")}
       </Button>
       {metadata && (
         <div style={{ marginTop: 16 }}>
@@ -203,24 +210,28 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
   const detailsStep = (
     <div style={{ display: isMobile ? "block" : "flex", gap: 16 }}>
       <div style={{ flex: 1 }}>
-        <Card title="Essentiel" bordered={false} style={{ marginBottom: 16 }}>
+        <Card
+          title={t("wish.wizard.details.essential.title")}
+          bordered={false}
+          style={{ marginBottom: 16 }}
+        >
           <Typography.Paragraph>
-            Ajoute ce qui compte : une jolie photo, un petit mot…
+            {t("wish.wizard.details.essential.intro")}
           </Typography.Paragraph>
           <Form.Item
             name="name"
-            label="Titre"
-            rules={[{ required: true, message: "Titre requis" }]}
+            label={t("wish.form.title.label")}
+            rules={[{ required: true, message: t("wish.wizard.messages.nameRequired") }]}
           >
             <Input size="large" onBlur={validateStep} />
           </Form.Item>
-          <Form.Item name="image_url" label="Image">
+          <Form.Item name="image_url" label={t("wish.form.image.label")}>
             <Input size="large" onBlur={validateStep} />
           </Form.Item>
           <Form.Item
             name="price"
-            label="Prix"
-            rules={[{ type: "number", min: 0, message: "Prix ≥ 0" }]}
+            label={t("wish.form.price.label")}
+            rules={[{ type: "number", min: 0, message: t("wish.wizard.messages.priceMin") }]}
           >
             <InputNumber
               min={0}
@@ -228,7 +239,7 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
               onBlur={validateStep}
             />
           </Form.Item>
-          <Form.Item name="currency" label="Devise">
+          <Form.Item name="currency" label={t("wish.form.currency.label")}>
             <Select
               options={[form.getFieldValue("currency"), "EUR", "USD", "GBP"]
                 .filter((v): v is string => !!v)
@@ -238,27 +249,31 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
             />
           </Form.Item>
         </Card>
-        <Card title="Optionnel" bordered={false} style={{ marginBottom: 16 }}>
-          <Form.Item name="description" label="Description">
+        <Card
+          title={t("wish.wizard.details.optional.title")}
+          bordered={false}
+          style={{ marginBottom: 16 }}
+        >
+          <Form.Item name="description" label={t("wish.form.description.label")}>
             <Input.TextArea rows={3} onBlur={validateStep} />
           </Form.Item>
-          <Form.Item name="tags" label="Tags">
+          <Form.Item name="tags" label={t("wish.form.tags.label")}>
             <Select mode="tags" tokenSeparators={[","]} onChange={validateStep} />
           </Form.Item>
-          <Form.Item name="quantity" label="Quantité">
+          <Form.Item name="quantity" label={t("wish.form.quantity.label")}>
             <InputNumber
               min={1}
               style={{ width: "100%" }}
               onBlur={validateStep}
             />
           </Form.Item>
-          <Form.Item name="priority" label="Priorité">
+          <Form.Item name="priority" label={t("wish.form.priority.label")}> 
             <Select
               options={[1, 2, 3].map((v) => ({ value: v }))}
               onChange={validateStep}
             />
           </Form.Item>
-          <Form.Item name="note_private" label="Note privée">
+          <Form.Item name="note_private" label={t("wish.form.notePrivate.label")}>
             <Input.TextArea rows={2} onBlur={validateStep} />
           </Form.Item>
         </Card>
@@ -270,17 +285,28 @@ export const CreateWishWizard: React.FC<CreateWishWizardProps> = ({
   );
 
   const visibilityStep = (
-    <Card title="Statut & partage" bordered={false} style={{ marginBottom: 16 }}>
+    <Card
+      title={t("wish.wizard.visibility.title")}
+      bordered={false}
+      style={{ marginBottom: 16 }}
+    >
       <Typography.Paragraph>
-        Tu peux garder ce souhait privé le temps d’ajuster.
+        {t("wish.wizard.visibility.intro")}
       </Typography.Paragraph>
-      <Form.Item name="status" label="Statut" initialValue="draft">
+      <Form.Item name="status" label={t("wish.form.status.label")} initialValue="draft">
         <Select
-          options={["draft", "available", "reserved", "received", "archived"].map((v) => ({ value: v }))}
+          options={["draft", "available", "reserved", "received", "archived"].map((v) => ({
+            value: v,
+            label: t(`wish.status.${v}`),
+          }))}
           onChange={validateStep}
         />
       </Form.Item>
-      <Form.Item name="is_public" label="Public ?" valuePropName="checked">
+      <Form.Item
+        name="is_public"
+        label={t("wish.form.isPublic.label")}
+        valuePropName="checked"
+      >
         <Switch onChange={validateStep} />
       </Form.Item>
     </Card>

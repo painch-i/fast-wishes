@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Drawer, Tabs, Button, Space, Form } from "antd";
 import { WishUI } from "../../../types/wish";
 import { WishForm } from "./WishForm";
+import { useTranslation } from "react-i18next";
 
 export type WishDrawerProps = {
   open: boolean;
@@ -13,6 +14,7 @@ export type WishDrawerProps = {
 export const WishDrawer: React.FC<WishDrawerProps> = ({ open, initialValues, onClose, onSave }) => {
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
+  const { t } = useTranslation();
 
   const handleSubmit = async (values: WishUI) => {
     setSaving(true);
@@ -25,13 +27,13 @@ export const WishDrawer: React.FC<WishDrawerProps> = ({ open, initialValues, onC
       width={520}
       open={open}
       destroyOnClose
-      title="Éditer le souhait"
+      title={t("wish.drawer.title")}
       onClose={onClose}
       extra={
         <Space>
-          <Button onClick={onClose}>Annuler</Button>
+          <Button onClick={onClose}>{t("common.cancel")}</Button>
           <Button type="primary" loading={saving} onClick={() => form.submit()}>
-            Enregistrer
+            {t("common.save")}
           </Button>
         </Space>
       }
@@ -40,7 +42,7 @@ export const WishDrawer: React.FC<WishDrawerProps> = ({ open, initialValues, onC
         items={[
           {
             key: "general",
-            label: "Général",
+            label: t("wish.drawer.tabs.general"),
             children: (
               <WishForm
                 form={form}
