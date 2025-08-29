@@ -1,0 +1,220 @@
+{
+  "public": {
+    "header": {
+      "title": "{name}'s birthday 🎂",
+      "subtitle": "Pick something they'll love 💝",
+      "remaining": "{count, plural, one {# gift left} other {# gifts left}}",
+      "gift": "gift"
+    },
+    "card": {
+      "reserved": "✅ Reserved",
+      "reserve": "Reserve",
+      "propose": "Suggest another link"
+    },
+    "reserve": {
+      "switchPropose": "I'd rather suggest another link",
+      "surprise": "We'll keep it a surprise 🤫",
+      "labels": {
+        "name": "First name",
+        "email": "Email",
+        "url": "Link",
+        "note": "Note"
+      },
+      "buttons": {
+        "confirm": "Confirm reservation",
+        "send": "Send"
+      },
+      "toast": {
+        "reserved": "Reserved! Thanks 🤍 We'll keep it a surprise.",
+        "proposed": "Link sent, thanks!"
+      }
+    }
+  },
+  "wish": {
+    "toast": {
+      "created": "Wish added ✨",
+      "saveError": "Oops, couldn't save. Your info is kept as a draft.",
+      "reserved": "Already reserved—can't delete.",
+      "deleted": "Wish deleted.",
+      "deleteError": "Oops, couldn't delete. Try again.",
+      "unknownUser": "Unable to create wish: unknown user",
+      "updated": "Changes saved ✨",
+      "updateError": "Oops, couldn't save. Your edits are kept locally.",
+      "copied": "Link copied ✨",
+      "copyError": "Unable to copy link"
+    },
+    "actions": {
+      "reserve": {
+        "success": "Reserved! Thanks 💝"
+      }
+    },
+    "form": {
+      "title": { "label": "Wish title" },
+      "url": { "label": "URL" },
+      "image": { "label": "Image" },
+      "price": { "label": "Price" },
+      "currency": { "label": "Currency" },
+      "description": { "label": "Description" },
+      "quantity": { "label": "Quantity" },
+      "tags": { "label": "Tags" },
+      "priority": { "label": "Priority" },
+      "notePrivate": { "label": "Private note" },
+      "status": { "label": "Status" },
+      "isPublic": { "label": "Public?" }
+    },
+    "status": {
+      "draft": "Draft",
+      "available": "Available",
+      "reserved": "Reserved",
+      "received": "Received",
+      "archived": "Archived"
+    },
+    "row": {
+      "edit": "Edit {name}",
+      "delete": "Delete {name}",
+      "addNote": "Add a note to help 💌",
+      "addLink": "+ Link to help find it",
+      "confirm": "Confirm",
+      "remove": "Delete",
+      "addPrice": "Add a price"
+    },
+    "quickAdd": {
+      "placeholder": "Paste a link…",
+      "add": "+ Add"
+    },
+    "drawer": {
+      "title": "Edit wish",
+      "unsaved": "Unsaved changes",
+      "help": "Polish your wish, we'll handle the rest 💡",
+      "tabs": {
+        "general": "General",
+        "details": "Details",
+        "visibility": "Visibility"
+      }
+    },
+    "wizard": {
+      "title": "Create a wish",
+      "steps": {
+        "link": "Link",
+        "details": "Details",
+        "visibility": "Visibility"
+      },
+      "actions": {
+        "previous": "Previous",
+        "next": "Next",
+        "create": "Create",
+        "import": "Import details"
+      },
+      "link": {
+        "intro": "Paste a link (Amazon, Etsy…) and we'll prefill ✨",
+        "url": {
+          "invalid": "Invalid URL",
+          "placeholder": "https://example.com/product/123"
+        }
+      },
+      "details": {
+        "essential": {
+          "title": "Essentials",
+          "intro": "Add what matters: a nice photo, a short note…"
+        },
+        "optional": { "title": "Optional" }
+      },
+      "visibility": {
+        "title": "Status & sharing",
+        "intro": "You can keep this wish private while tweaking."
+      },
+      "messages": {
+        "nameRequired": "Title required",
+        "priceMin": "Price ≥ 0"
+      }
+    },
+    "sheet": {
+      "title": { "create": "Add a wish", "edit": "Edit wish" },
+      "subtitle": "Capture the basics now, refine later.",
+      "name": {
+        "required": "A title is required",
+        "extra": "A clear name helps your friends choose.",
+        "placeholder": "Haws stainless watering can 1 L"
+      },
+      "price": {
+        "extra": "Give a budget to guide choices.",
+        "approxAria": "Approximate price"
+      },
+      "url": {
+        "label": "Merchant link",
+        "invalid": "Invalid link",
+        "pasteTip": "Long-press then \"Paste\"",
+        "placeholder": "https://… (Amazon, Etsy, brand site)",
+        "button": "Paste",
+        "toast": "Link added ✨"
+      },
+      "description": {
+        "label": "Personal note",
+        "placeholder": "Why would I love it? Color, size, use… 💌"
+      },
+      "priority": {
+        "options": {
+          "1": "⭐ Must-have",
+          "2": "💡 Nice to have",
+          "3": "🎲 Surprise me"
+        }
+      },
+      "tag": {
+        "label": "Tag",
+        "options": [
+          "Home",
+          "Kitchen",
+          "Sports",
+          "Reading",
+          "Tech",
+          "Fashion",
+          "Beauty",
+          "Games"
+        ]
+      }
+    },
+    "list": {
+      "title": "Your wishes 🎁",
+      "viewPublic": "View public page",
+      "sharePublic": "Share public link",
+      "instructions": "Tap a wish to edit it.",
+      "count": "{count, plural, one {# wish} other {# wishes}}",
+      "banner": "Your public list is empty. Make a wish public to show it.",
+      "loadError": "Oops, couldn't display the list.",
+      "retry": "Try again",
+      "empty": "No wishes yet. Add your first ✨",
+      "ghost1": "Add a wish (e.g. 'Stainless kettle')",
+      "ghost2": "Add a wish (e.g. 'Sweater M – beige')",
+      "publicLinkInfo": "This link only shows your public wishes.",
+      "shareTitle": "My wishlist"
+    },
+    "new": {
+      "success": "Submitted successfully!"
+    }
+  },
+  "lists": {
+    "public": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "isPublic": "Public?",
+        "actions": "Actions"
+      }
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "add": "Add",
+    "share": "Share",
+    "retry": "Retry",
+    "name": "Name",
+    "description": "Description",
+    "email": "Email",
+    "link": "Link",
+    "note": "Note",
+    "firstName": "First name",
+    "submit": "Submit"
+  }
+}
+

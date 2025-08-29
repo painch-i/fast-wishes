@@ -5,6 +5,7 @@ import { Tag, Skeleton } from "antd";
 import { WishCard, ReserveBottomSheet } from "../../components";
 import type { Wish } from "../../components";
 import "./public-wishlist.page.css";
+import { useTranslation } from "react-i18next";
 
 export const PublicWishlistPage: React.FC = () => {
   const { slug } = useParams();
@@ -26,18 +27,19 @@ export const PublicWishlistPage: React.FC = () => {
   const wishes = data?.data ?? [];
   const remaining = wishes.filter((w) => !w.isReserved).length;
   const [selected, setSelected] = useState<Wish | null>(null);
+  const { t } = useTranslation();
 
   return (
     <div className="public-wishlist">
       <header className="wishlist-header">
-        <h1>Anniversaire de Ismael 🎂</h1>
-        <p className="subtitle">Choisis ce qui fera plaisir 💝</p>
+        <h1>{t("public.header.title", { name: "Ismael" })}</h1>
+        <p className="subtitle">{t("public.header.subtitle")}</p>
         <Tag className="counter">
-          <span role="img" aria-label="cadeau">
+          <span role="img" aria-label={t("public.header.gift")}>
             🎁
           </span>
           {" "}
-          {remaining} cadeaux restants
+          {t("public.header.remaining", { count: remaining })}
         </Tag>
       </header>
       <div className="wish-grid">

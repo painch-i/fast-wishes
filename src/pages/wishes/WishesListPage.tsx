@@ -16,26 +16,8 @@ import { WishSheet } from "../../components/wish/WishSheet";
 import { WishUI } from "../../types/wish";
 import { UserIdentity, UserSlug } from "../../types";
 import { mapDbToWishUI, getExtras, setExtras } from "../../utility";
-
-const browserLocale = () =>
-  typeof navigator !== "undefined" && navigator.language
-    ? navigator.language
-    : undefined;
-
-const formatPrice = (
-  price?: number | string | null,
-  currency?: string | null
-) => {
-  if (price == null) return null;
-  const numeric = typeof price === "string" ? parseFloat(price) : price;
-  if (isNaN(Number(numeric))) return null;
-  const locale = browserLocale();
-  const cur = currency || "USD";
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: cur,
-  }).format(numeric);
-};
+import { useTranslation } from "react-i18next";
+import { useFormat } from "../../i18n";
 
 type RowProps = {
   item: WishUI;
@@ -44,7 +26,15 @@ type RowProps = {
 };
 
 const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
-  const price = formatPrice(item.price, item.currency);
+  const { formatPrice } = useFormat();
+  const { t } = useTranslation();
+  const priceCents =
+    item.price_cents != null
+      ? item.price_cents
+      : item.price
+      ? Math.round(parseFloat(String(item.price)) * 100)
+      : null;
+  const price = formatPrice(priceCents, item.currency || undefined);
   const domain = (() => {
     try {
       return item.url ? new URL(item.url).hostname : null;
@@ -187,7 +177,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
       longPressed.current = true;
       setPressed(false);
       if (item.status === "reserved") {
-        message.warning("Déjà réservé — impossible de supprimer.");
+        message.warning(t("wish.toast.reserved"));
         return;
       }
       setDanger(true);
@@ -246,7 +236,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
       className="wish-row"
       role="button"
       tabIndex={0}
-      aria-label={`Modifier ${item.name}`}
+      aria-label={t("wish.row.edit", { name: item.name })}
       onClick={handleClick}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleClick()}
       onPointerDown={startPress}
@@ -271,7 +261,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
     >
       <button
         className="visually-hidden"
-        aria-label={`Supprimer ${item.name}`}
+        aria-label={t("wish.row.delete", { name: item.name })}
         onClick={(e) => {
           e.stopPropagation();
           setDanger(true);
@@ -329,7 +319,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
               onOpen(item, "description");
             }}
           >
-            {item.description || "Ajoute un petit mot pour guider 💌"}
+            {item.description || t("wish.row.addNote")}
           </span>
         </div>
         {!domain && (
@@ -344,14 +334,14 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
               onOpen(item, "url");
             }}
           >
-            + Lien pour aider à trouver
+            {t("wish.row.addLink")}
           </div>
         )}
       </div>
       {danger ? (
         <button
           ref={chipRef}
-          aria-label={confirm ? "Confirmer" : `Supprimer ${item.name}`}
+          aria-label={confirm ? t("wish.row.confirm") : t("wish.row.delete", { name: item.name })}
           onClick={(e) => {
             e.stopPropagation();
             handleDelete();
@@ -368,7 +358,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
             transition: "all 150ms",
           }}
         >
-          {confirm ? "Confirmer" : "Supprimer"}
+          {confirm ? t("wish.row.confirm") : t("wish.row.remove")}
         </button>
       ) : (
         <div
@@ -408,7 +398,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
                 onOpen(item, "price");
               }}
             >
-              Ajouter un prix
+              {t("wish.row.addPrice")}
             </Tag>
           )}
           <span style={{ color: "#9CA3AF", fontSize: 16 }}>›</span>
@@ -419,6 +409,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
 };
 
 export const WishesListPage: React.FC = () => {
+  const { t } = useTranslation();
   const { data: identity } = useGetIdentity<UserIdentity>();
 
   const { data, isLoading, isError, refetch } = useList<WishUI>({
@@ -464,13 +455,13 @@ export const WishesListPage: React.FC = () => {
     navigator.vibrate?.(10);
     if (navigator.share) {
       navigator
-        .share({ title: "Ma liste de souhaits", url: publicUrl })
+        .share({ title: t("wish.list.shareTitle"), url: publicUrl })
         .catch(() => {});
     } else {
       navigator.clipboard
         ?.writeText(publicUrl)
-        .then(() => message.success("Lien copié ✨"))
-        .catch(() => message.error("Impossible de copier le lien"));
+        .then(() => message.success(t("wish.toast.copied")))
+        .catch(() => message.error(t("wish.toast.copyError")));
     }
   };
 
@@ -510,19 +501,17 @@ export const WishesListPage: React.FC = () => {
         {
           onSuccess: () => {
             setExtras(String(values.id), { note_private, tags, metadata });
-            message.success("Modifications enregistrées ✨");
+            message.success(t("wish.toast.updated"));
             setSheetOpen(false);
             refetch();
           },
           onError: () =>
-            message.error(
-              "Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement."
-            ),
+            message.error(t("wish.toast.updateError")),
         }
       );
     } else {
       if (!identity?.id) {
-        message.error("Impossible de créer le souhait : utilisateur inconnu");
+        message.error(t("wish.toast.unknownUser"));
         return;
       }
       create(
@@ -541,14 +530,12 @@ export const WishesListPage: React.FC = () => {
             if (data?.data?.id) {
               setExtras(String(data.data.id), { note_private, tags, metadata });
             }
-            message.success("Souhait ajouté ✨");
+            message.success(t("wish.toast.created"));
             setSheetOpen(false);
             refetch();
           },
           onError: () =>
-            message.error(
-              "Oups, on n’a pas pu enregistrer. Tes infos sont gardées en brouillon."
-            ),
+            message.error(t("wish.toast.saveError")),
         }
       );
     }
@@ -556,7 +543,7 @@ export const WishesListPage: React.FC = () => {
 
   const handleDelete = (wish: WishUI) => {
     if (wish.status === "reserved") {
-      message.warning("Déjà réservé — impossible de supprimer.");
+      message.warning(t("wish.toast.reserved"));
       return;
     }
     const index = wishes.findIndex((w) => w.id === wish.id);
@@ -579,9 +566,9 @@ export const WishesListPage: React.FC = () => {
       duration: 5,
       content: (
         <span aria-live="polite">
-          Souhait supprimé. {" "}
+          {t("wish.toast.deleted")} {" "}
           <Button type="link" onClick={undo} style={{ padding: 0 }}>
-            Annuler
+            {t("common.cancel")}
           </Button>
         </span>
       ),
@@ -597,7 +584,7 @@ export const WishesListPage: React.FC = () => {
         {
           onError: () => {
             undo();
-            message.error("Oups, impossible de supprimer. Réessayer.");
+            message.error(t("wish.toast.deleteError"));
           },
         }
       );
@@ -619,13 +606,13 @@ export const WishesListPage: React.FC = () => {
           }}
         >
           <Typography.Title level={2} style={{ margin: 0, fontWeight: 600 }}>
-            Tes souhaits 🎁
+            {t("wish.list.title")}
           </Typography.Title>
           {hasPublic && (
             <div className="header-icons">
               <button
                 className="icon-btn"
-                aria-label="Voir la boutique (page publique)"
+                aria-label={t("wish.list.viewPublic")}
                 onClick={handleOpenPublic}
                 disabled={!publicUrl}
               >
@@ -635,7 +622,7 @@ export const WishesListPage: React.FC = () => {
               </button>
               <button
                 className="icon-btn"
-                aria-label="Partager le lien public"
+                aria-label={t("wish.list.sharePublic")}
                 onClick={handleShare}
                 disabled={!publicUrl}
               >
@@ -648,7 +635,7 @@ export const WishesListPage: React.FC = () => {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Typography.Text type="secondary">
-            Appuie sur un souhait pour le modifier.
+            {t("wish.list.instructions")}
           </Typography.Text>
           {wishes.length > 0 && (
             <Tag
@@ -658,7 +645,7 @@ export const WishesListPage: React.FC = () => {
                 color: "#111827",
               }}
             >
-              {wishes.length} souhait{wishes.length > 1 ? "s" : ""}
+              {t("wish.list.count", { count: wishes.length })}
             </Tag>
           )}
         </div>
@@ -667,7 +654,7 @@ export const WishesListPage: React.FC = () => {
       {!bannerDismissed && wishes.length > 0 && !hasPublic && (
         <Alert
           style={{ marginBottom: 16 }}
-          message="Ta liste publique n’affiche encore rien. Rends un souhait public pour le montrer."
+          message={t("wish.list.banner")}
           type="info"
           showIcon
           closable
@@ -718,10 +705,10 @@ export const WishesListPage: React.FC = () => {
       {!isLoading && isError && (
         <div style={{ textAlign: "center", padding: "40px 0" }}>
           <Typography.Text>
-            Oups, impossible d’afficher la liste.
+            {t("wish.list.loadError")}
           </Typography.Text>
           <div style={{ marginTop: 16 }}>
-            <Button onClick={() => refetch()}>Réessayer</Button>
+            <Button onClick={() => refetch()}>{t("wish.list.retry")}</Button>
           </div>
         </div>
       )}
@@ -730,7 +717,7 @@ export const WishesListPage: React.FC = () => {
         <div style={{ textAlign: "center", padding: "40px 0" }}>
           <div style={{ fontSize: 48 }}>🎁</div>
           <Typography.Paragraph>
-            Aucun souhait pour l’instant. Ajoute ton premier ✨
+            {t("wish.list.empty")}
           </Typography.Paragraph>
         </div>
       )}
@@ -742,10 +729,7 @@ export const WishesListPage: React.FC = () => {
           ))}
           {wishes.length <= 2 && (
             <>
-              {[
-                "Ajouter un souhait (ex : 'Bouilloire inox')",
-                "Ajouter un souhait (ex : 'Pull M – couleur beige')",
-              ].map((placeholder, i) => (
+              {[t("wish.list.ghost1"), t("wish.list.ghost2")].map((placeholder, i) => (
                 <div
                   key={`ghost-${i}`}
                   role="button"
