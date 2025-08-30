@@ -857,7 +857,11 @@ export const WishesListPage: React.FC = () => {
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         placement={window.matchMedia && window.matchMedia("(max-width:600px)").matches ? "bottom" : "right"}
-        height={window.matchMedia && window.matchMedia("(max-width:600px)").matches ? "60vh" : undefined}
+        height={
+          window.matchMedia && window.matchMedia("(max-width:600px)").matches
+            ? "100vh"
+            : undefined
+        }
         width={360}
         title={t("wish.list.settingsTitle")}
         extra={

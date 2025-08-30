@@ -47,5 +47,7 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 - Hidden whenever an edit or add modal is active.
 
 ## Settings Drawer
-- Accessible from the header and switches between list and user tabs.
-- The primary **Enregistrer** action sits in the drawer header; closing via the built-in close icon cancels changes.
+- The header settings icon opens a drawer to manage list and account details.
+- On mobile it slides up as a bottom sheet covering the full viewport height.
+- On desktop it appears as a 360px side drawer anchored to the right.
+
