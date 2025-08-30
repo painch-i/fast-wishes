@@ -1,24 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
+import { CloseCircleFilled, ExportOutlined } from "@ant-design/icons";
+import { useMediaQuery } from "@mui/material";
+import { useGetIdentity } from "@refinedev/core";
+import type { InputRef } from "antd";
 import {
+  Button,
   Drawer,
   Form,
   Input,
-  Button,
+  Segmented,
   Select,
   Space,
   Typography,
-  Segmented,
   message,
 } from "antd";
-import type { InputRef } from "antd";
-import { CloseCircleFilled, ExportOutlined } from "@ant-design/icons";
-import { useMediaQuery } from "@mui/material";
-import type { WishUI } from "../../types/wish";
+import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLinkMetadata } from "../../hooks/useLinkMetadata";
 import { colors } from "../../theme";
+import type { WishUI } from "../../types/wish";
 import { guessUserCurrency } from "../../utility";
-import { useGetIdentity } from "@refinedev/core";
-import { useTranslation } from "react-i18next";
+import { EmojiPickerPopover } from "../admin/wishes/EmojiPickerPopover";
 
 export interface WishSheetProps {
   open: boolean;
@@ -55,6 +56,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
 
   const url = Form.useWatch("url", form);
   const { metadata } = useLinkMetadata(debouncedUrl);
+  const emoji = Form.useWatch("emoji", form);
 
   useEffect(() => {
     if (open) {
@@ -308,16 +310,27 @@ export const WishSheet: React.FC<WishSheetProps> = ({
         onValuesChange={handleValuesChange}
         style={{ flex: 1, overflowY: "auto", padding: "0 0 16px" }}
       >
-        <Form.Item
-          name="name"
-          label={t("wish.form.title.label")}
-          rules={[{ required: true, min: 2, message: t("wish.sheet.name.required") }]}
-          extra={t("wish.sheet.name.extra")}
-        >
-          <Input
-            placeholder={t("wish.sheet.name.placeholder")}
-            style={{ fontSize: 16 }}
-          />
+        <Form.Item label={t("wish.form.title.label")} extra={t("wish.sheet.name.extra")}>
+          <Space.Compact style={{ width: "100%" }}>
+            <EmojiPickerPopover
+              value={emoji ?? undefined}
+              onChange={(em) => form.setFieldsValue({ emoji: (em as any) ?? null } as any)}
+            />
+            <Form.Item
+              name="name"
+              noStyle
+              rules={[{ required: true, min: 2, message: t("wish.sheet.name.required") }]}
+            >
+              <Input
+                placeholder={t("wish.sheet.name.placeholder")}
+                style={{ fontSize: 16 }}
+              />
+            </Form.Item>
+          </Space.Compact>
+        </Form.Item>
+        {/* Hidden field to carry emoji value */}
+        <Form.Item name="emoji" hidden>
+          <Input />
         </Form.Item>
 
         <Form.Item

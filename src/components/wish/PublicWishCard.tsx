@@ -54,7 +54,7 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({ wish }) => {
           <img src={wish.image} alt="" aria-hidden className="pw-hero-img" />
         ) : (
           <div className="pw-emoji" aria-hidden>
-            {pickEmoji(wish.name)}
+            {wish.emoji || pickEmoji(wish.name)}
           </div>
         )}
         {priceLabel && <div className="pw-price-tag">{priceLabel}</div>}

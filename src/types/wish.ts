@@ -10,6 +10,7 @@ export type WishUI = Tables<"wishes"> & {
   status?: WishStatus;
   note_private?: string;
   tags?: string[];
+  emoji?: string | null;
   metadata?: {
     site_name?: string;
     favicon?: string;

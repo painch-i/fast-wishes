@@ -4,4 +4,5 @@ export type Wish = Tables<"wishes"> & {
   image?: string;
   meta?: string;
   isReserved?: boolean;
+  emoji?: string | null;
 };

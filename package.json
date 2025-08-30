@@ -23,6 +23,7 @@
     "@refinedev/supabase": "^5.7.4",
     "antd": "^5.26.7",
     "country-to-currency": "^2.0.2",
+    "emoji-picker-react": "^4.13.2",
     "i18next": "^25.4.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "i18next-icu": "^2.4.0",
