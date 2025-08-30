@@ -1,23 +1,23 @@
-import { useEffect, useRef, useState } from "react";
-import { Typography, Skeleton, Button, Tag, message, Alert } from "antd";
-import { OpenInNew } from "@mui/icons-material";
-import "./WishesListPage.css";
-import { colors } from "../../theme";
+import { OpenInNew, Settings } from "@mui/icons-material";
 import {
+  useCreate,
+  useDelete,
   useGetIdentity,
   useList,
-  useCreate,
-  useUpdate,
   useOne,
-  useDelete,
+  useUpdate,
 } from "@refinedev/core";
+import { Alert, Button, Drawer, Form, Input, Skeleton, Tag, Typography, message } from "antd";
+import { useEffect, useRef, useState } from "react";
+import { colors } from "../../theme";
+import "./WishesListPage.css";
 
-import { WishSheet } from "../../components/wish/WishSheet";
-import { WishUI } from "../../types/wish";
-import { UserIdentity, UserSlug } from "../../types";
-import { mapDbToWishUI, getExtras, setExtras } from "../../utility";
 import { useTranslation } from "react-i18next";
+import { WishSheet } from "../../components/wish/WishSheet";
 import { useFormat } from "../../i18n";
+import { UserIdentity, UserSlug } from "../../types";
+import { WishUI } from "../../types/wish";
+import { getExtras, mapDbToWishUI, setExtras } from "../../utility";
 
 type RowProps = {
   item: WishUI;
@@ -436,12 +436,16 @@ export const WishesListPage: React.FC = () => {
   const hasPublic = wishes.some((w) => w.is_public);
 
   const { mutate: update } = useUpdate();
+  const { mutate: updateUser } = useUpdate();
   const { mutate: create } = useCreate();
   const { mutate: deleteOne } = useDelete();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<WishUI | undefined>();
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsForm] = Form.useForm<{ slug: string; name?: string | null }>();
+  const watchedSlug = Form.useWatch("slug", settingsForm);
   const pendingDelete = useRef<{ item: WishUI; index: number; timeout: number } | null>(null);
 
   useEffect(() => {
@@ -589,8 +593,24 @@ export const WishesListPage: React.FC = () => {
           <Typography.Title level={2} style={{ margin: 0, fontWeight: 600 }}>
             {t("wish.list.title")}
           </Typography.Title>
-          {hasPublic && publicUrl && (
-            <div className="header-icons">
+          <div className="header-icons">
+            <button
+              className="icon-btn"
+              aria-label={t("wish.list.settings", "Settings")}
+              onClick={() => {
+                // Prefill form with current values
+                settingsForm.setFieldsValue({
+                  slug: slugData?.data.slug || "",
+                  name: slugData?.data.name || undefined,
+                });
+                setSettingsOpen(true);
+              }}
+            >
+              <span className="icon-btn-inner">
+                <Settings style={{ width: 20, height: 20 }} />
+              </span>
+            </button>
+            {hasPublic && publicUrl && (
               <a
                 className="icon-btn"
                 aria-label={t("wish.list.viewPublic")}
@@ -602,8 +622,8 @@ export const WishesListPage: React.FC = () => {
                   <OpenInNew style={{ width: 20, height: 20 }} />
                 </span>
               </a>
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Typography.Text type="secondary">
@@ -751,6 +771,83 @@ export const WishesListPage: React.FC = () => {
         onCancel={() => setSheetOpen(false)}
         onSubmit={handleSave}
       />
+
+      <Drawer
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        placement={window.matchMedia && window.matchMedia("(max-width:600px)").matches ? "bottom" : "right"}
+        height={window.matchMedia && window.matchMedia("(max-width:600px)").matches ? "60vh" : undefined}
+        width={360}
+        title={t("wish.list.settingsTitle")}
+      >
+        <Form
+          form={settingsForm}
+          layout="vertical"
+          initialValues={{ slug: slugData?.data.slug, name: slugData?.data.name || undefined }}
+          onFinish={(values) => {
+            if (!identity?.id) return;
+            const sanitized = (values.slug || "")
+              .toLowerCase()
+              .replace(/\s+/g, "-")
+              .replace(/[^a-z0-9-]/g, "")
+              .replace(/--+/g, "-")
+              .replace(/^-+|-+$/g, "");
+            if (sanitized !== values.slug) settingsForm.setFieldsValue({ slug: sanitized });
+            updateUser(
+              {
+                resource: "users",
+                id: identity.id,
+                values: { slug: sanitized, name: values.name ?? null },
+                successNotification: false,
+                errorNotification: false,
+              },
+              {
+                onSuccess: () => {
+                  message.success(t("wish.toast.updated"));
+                  setSettingsOpen(false);
+                },
+                onError: () => {
+                  message.error(t("wish.toast.updateError"));
+                },
+              }
+            );
+          }}
+        >
+          <Form.Item
+            name="slug"
+            label={t("common.slug")}
+            rules={[{ required: true, message: t("wish.sheet.name.required") }]}
+          >
+            <Input
+              placeholder="mon-slug"
+              onChange={(e) => {
+                const v = e.target.value
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, "")
+                  .replace(/--+/g, "-")
+                  .replace(/^-+|-+$/g, "");
+                if (v !== e.target.value) settingsForm.setFieldsValue({ slug: v });
+              }}
+            />
+          </Form.Item>
+          <Form.Item name="name" label={t("common.name")}> 
+            <Input placeholder={t("common.name")} />
+          </Form.Item>
+          {watchedSlug && (
+            <Typography.Text type="secondary">
+              {t("wish.list.publicLinkInfo")} {" "}
+              <code>{`${window.location.origin}/l/${watchedSlug}`}</code>
+            </Typography.Text>
+          )}
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
+            <Button onClick={() => setSettingsOpen(false)}>{t("common.cancel")}</Button>
+            <Button type="primary" onClick={() => settingsForm.submit()}>
+              {t("common.save")}
+            </Button>
+          </div>
+        </Form>
+      </Drawer>
       {!sheetOpen && (
         <Button
           type="primary"

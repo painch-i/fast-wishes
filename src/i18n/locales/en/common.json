@@ -177,6 +177,8 @@
     },
     "list": {
       "title": "Your wishes 🎁",
+      "settings": "Settings",
+      "settingsTitle": "Store settings",
       "viewPublic": "View public page",
       "sharePublic": "Share public link",
       "instructions": "Tap a wish to edit it.",
@@ -209,6 +211,7 @@
   "common": {
     "cancel": "Cancel",
     "save": "Save",
+    "slug": "Slug",
     "add": "Add",
     "share": "Share",
     "retry": "Retry",

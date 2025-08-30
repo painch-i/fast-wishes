@@ -177,6 +177,8 @@
     },
     "list": {
       "title": "Tes souhaits 🎁",
+      "settings": "Paramètres",
+      "settingsTitle": "Paramètres de la boutique",
       "viewPublic": "Ouvrir",
       "sharePublic": "Partager le lien public",
       "instructions": "Appuie sur un souhait pour le modifier.",
@@ -209,6 +211,7 @@
   "common": {
     "cancel": "Annuler",
     "save": "Enregistrer",
+    "slug": "Slug",
     "add": "Ajouter",
     "share": "Partager",
     "retry": "Réessayer",
