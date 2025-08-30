@@ -60,7 +60,7 @@ The resulting `database.types.ts` file is imported across the codebase to ensure
 - Translations are handled with **i18next** and **react-i18next** with an ICU plugin for plurals.
 - Supported locales: `fr`, `en`, and a stretching `pseudo` locale. Invalid locales redirect to English.
 - Language is detected from the URL path, cookie, local storage, then browser settings (`navigator.language`). Preference persists in both cookie and `localStorage`. English is the fallback when no preference can be determined.
-- Translation namespaces (`common.json`) load on demand via dynamic imports.
+- Translation namespaces (`common.json`) load on demand using `import.meta.glob`, ensuring the locale files are bundled in production.
 - The top-level router uses paths like `/:locale/*` and updates `<html lang>` accordingly.
 - The root path `/` and other unprefixed URLs redirect to the detected locale's wishes page (e.g. `/fr/wishes`).
 - The `useFormat` helper exposes `formatPrice`, `formatNumber`, and `formatDate` using the active locale via `Intl`.
