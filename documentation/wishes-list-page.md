@@ -8,11 +8,9 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 - When at least one wish exists, a count badge shows `{n} souhait(s)`.
 
 ## Public List Access
-- If at least one wish is public, two icon buttons appear in the header:
-  - External link opens `/l/{slug}` in a new tab.
-  - Share button uses the Web Share API with clipboard fallback.
-- Icons are 20–22 px inside 36 px circles, spaced by 8 px and aligned right.
-- Icons stay hidden when no wish is public.
+- If at least one wish is public, a single external‑link icon appears in the header linking to `/l/{slug}` in a new tab.
+- No Share/Copy action is shown anymore.
+- The icon stays hidden when no wish is public.
 - When there are wishes but none are public, a dismissable info banner reminds the user to make at least one wish public.
 
 ## Rows

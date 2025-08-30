@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Typography, Skeleton, Button, Tag, message, Alert } from "antd";
-import { OpenInNew, Share } from "@mui/icons-material";
+import { OpenInNew } from "@mui/icons-material";
 import "./WishesListPage.css";
 import { colors } from "../../theme";
 import {
@@ -450,29 +450,7 @@ export const WishesListPage: React.FC = () => {
     }
   }, []);
 
-  const handleShare = () => {
-    if (!publicUrl) return;
-    navigator.vibrate?.(10);
-    const shareTitle = slugData?.data?.name
-      ? t("wish.list.shareTitleNamed", { name: slugData.data.name })
-      : t("wish.list.shareTitleMine");
-    if (navigator.share) {
-      navigator
-        .share({ title: shareTitle, url: publicUrl })
-        .catch(() => {});
-    } else {
-      navigator.clipboard
-        ?.writeText(publicUrl)
-        .then(() => message.success(t("wish.toast.copied")))
-        .catch(() => message.error(t("wish.toast.copyError")));
-    }
-  };
-
-  const handleOpenPublic = () => {
-    if (!publicUrl) return;
-    navigator.vibrate?.(10);
-    window.open(publicUrl, "_blank");
-  };
+  // Share and external open actions removed; keep a simple anchor link.
 
   const dismissBanner = () => {
     localStorage.setItem("public-banner-dismissed", "1");
@@ -611,28 +589,19 @@ export const WishesListPage: React.FC = () => {
           <Typography.Title level={2} style={{ margin: 0, fontWeight: 600 }}>
             {t("wish.list.title")}
           </Typography.Title>
-          {hasPublic && (
+          {hasPublic && publicUrl && (
             <div className="header-icons">
-              <button
+              <a
                 className="icon-btn"
                 aria-label={t("wish.list.viewPublic")}
-                onClick={handleOpenPublic}
-                disabled={!publicUrl}
+                href={publicUrl}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <span className="icon-btn-inner">
                   <OpenInNew style={{ width: 20, height: 20 }} />
                 </span>
-              </button>
-              <button
-                className="icon-btn"
-                aria-label={t("wish.list.sharePublic")}
-                onClick={handleShare}
-                disabled={!publicUrl}
-              >
-                <span className="icon-btn-inner">
-                  <Share style={{ width: 20, height: 20 }} />
-                </span>
-              </button>
+              </a>
             </div>
           )}
         </div>

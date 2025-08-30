@@ -177,7 +177,7 @@
     },
     "list": {
       "title": "Tes souhaits 🎁",
-      "viewPublic": "Voir la boutique (page publique)",
+      "viewPublic": "Ouvrir",
       "sharePublic": "Partager le lien public",
       "instructions": "Appuie sur un souhait pour le modifier.",
       "count": "{count, plural, one {# souhait} other {# souhaits}}",
