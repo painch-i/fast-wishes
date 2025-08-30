@@ -50,3 +50,4 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 - The header settings icon opens a drawer to manage list and account details.
 - On mobile it slides up as a bottom sheet covering the full viewport height.
 - On desktop it appears as a 360px side drawer anchored to the right.
+

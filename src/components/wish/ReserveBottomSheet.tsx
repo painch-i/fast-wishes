@@ -93,6 +93,16 @@ export const ReserveBottomSheet: React.FC<ReserveBottomSheetProps> = ({
       height="auto"
       destroyOnClose
       title={wish?.name}
+      extra={
+        <Button
+          type="primary"
+          onClick={() => form.submit()}
+          loading={submitting}
+          disabled={submitting}
+        >
+          {t("public.reserve.buttons.confirm")}
+        </Button>
+      }
     >
       <p>{t("public.reserve.surprise")}</p>
       <Form
@@ -113,11 +123,6 @@ export const ReserveBottomSheet: React.FC<ReserveBottomSheetProps> = ({
           rules={[{ type: "email", message: t("public.reserve.errors.emailInvalid") }]}
         >
           <Input type="email" autoComplete="email" />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" block loading={submitting} disabled={submitting}>
-            {t("public.reserve.buttons.confirm")}
-          </Button>
         </Form.Item>
       </Form>
     </Drawer>
