@@ -50,9 +50,10 @@ Before starting any task, regenerate the database types to keep them in sync:
 `npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID --schema public > database.types.ts`
 
 The resulting `database.types.ts` file is imported across the codebase to ensure queries match the schema.
-
 ## Edge Functions
+
 - **enrich-wish** fetches basic metadata for a supplied URL to prefill wish details. See `wish-enrichment-edge-function.md` for implementation notes.
+- **search-amazon** uses Amazon's Product Advertising API to return a list of products matching a query. See `amazon-product-search-edge-function.md` for implementation notes.
 - Edge functions deploy automatically to Supabase when commits land on `main` via the `deploy-edge-functions.yml` GitHub workflow.
 
 ## Build
