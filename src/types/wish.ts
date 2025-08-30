@@ -18,7 +18,6 @@ export type WishUI = Tables<"wishes"> & {
   price_is_approx?: boolean;
   merchant_domain?: string;
   brand?: string;
-  tag?: string;
   price_cents?: number | null;
 };
 

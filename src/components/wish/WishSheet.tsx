@@ -9,7 +9,6 @@ import {
   Typography,
   Checkbox,
   Segmented,
-  AutoComplete,
   message,
 } from "antd";
 import type { InputRef } from "antd";
@@ -217,11 +216,6 @@ export const WishSheet: React.FC<WishSheetProps> = ({
     onSubmit(submitValues);
     if (mode === "create") localStorage.removeItem("wish-draft");
   };
-
-  const rawTags = t("wish.sheet.tag.options", { returnObjects: true }) as unknown;
-  const tagOptions = Array.isArray(rawTags)
-    ? rawTags.map((v) => ({ value: v }))
-    : [];
 
   return (
     <Drawer
@@ -478,14 +472,6 @@ export const WishSheet: React.FC<WishSheetProps> = ({
               { label: t("wish.sheet.priority.options.3"), value: 3 },
             ]}
             style={{ width: "100%" }}
-          />
-        </Form.Item>
-
-        <Form.Item name="tag" label={t("wish.sheet.tag.label")}>
-          <AutoComplete
-            options={tagOptions}
-            style={{ fontSize: 16 }}
-            placeholder=""
           />
         </Form.Item>
 

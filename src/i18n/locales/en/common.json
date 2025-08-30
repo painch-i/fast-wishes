@@ -160,19 +160,6 @@
           "2": "💡 Nice to have",
           "3": "🎲 Surprise me"
         }
-      },
-      "tag": {
-        "label": "Tag",
-        "options": [
-          "Home",
-          "Kitchen",
-          "Sports",
-          "Reading",
-          "Tech",
-          "Fashion",
-          "Beauty",
-          "Games"
-        ]
       }
     },
     "list": {
