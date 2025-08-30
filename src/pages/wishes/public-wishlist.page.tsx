@@ -13,14 +13,14 @@ export const PublicWishlistPage: React.FC = () => {
     resource: "wishes",
     filters: [
       {
-        field: "user_slugs.slug",
+        field: "users.slug",
         operator: "eq",
         value: slug,
       },
       { field: "is_public", operator: "eq", value: true },
     ],
     meta: {
-      select: "*, user_slugs!inner(slug)",
+      select: "*, users!inner(slug)",
     },
   });
 

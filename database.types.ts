@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      user_slugs: {
+      users: {
         Row: {
           created_at: string
           id: string
@@ -71,7 +71,7 @@ export type Database = {
             foreignKeyName: "wishes_user_id_fkey1"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user_slugs"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]

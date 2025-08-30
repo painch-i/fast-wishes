@@ -425,7 +425,7 @@ export const WishesListPage: React.FC = () => {
   }, [data]);
 
   const { data: slugData } = useOne<UserSlug>({
-    resource: "user_slugs",
+    resource: "users",
     id: identity?.id,
     queryOptions: { enabled: !!identity },
   });
@@ -798,4 +798,3 @@ export const WishesListPage: React.FC = () => {
     </div>
   );
 };
-

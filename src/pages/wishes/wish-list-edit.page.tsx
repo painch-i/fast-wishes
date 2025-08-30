@@ -15,7 +15,7 @@ export const EditWishListPage: React.FC = () => {
 
   const { data: slugData } = useOne<UserSlug>({
     queryOptions: { enabled: !!identity },
-    resource: "user_slugs",
+    resource: "users",
     id: identity?.id,
   });
   const { t } = useTranslation();
@@ -119,4 +119,3 @@ export const EditWishListPage: React.FC = () => {
     </List>
   );
 };
-

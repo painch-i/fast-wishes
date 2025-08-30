@@ -30,7 +30,7 @@ export const UserPublicList: React.FC = () => {
     filters: {
       permanent: [
         {
-        field: "user_slugs.slug",
+        field: "users.slug",
         operator: "eq",
         value: slug,
       },
@@ -42,7 +42,7 @@ export const UserPublicList: React.FC = () => {
     ]
     },
     meta: {
-      select: "*, user_slugs!inner(slug)",
+      select: "*, users!inner(slug)",
     },
   });
 

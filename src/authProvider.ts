@@ -25,8 +25,8 @@ const authProvider: AuthProvider = {
 
     if (data.user?.id) {
       await supabaseClient
-        .from("user_slugs")
-        .insert<TablesInsert<"user_slugs">>({
+        .from("users")
+        .insert<TablesInsert<"users">>({
           id: data.user.id,
           slug: nanoid(),
         });
