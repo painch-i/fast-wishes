@@ -13,65 +13,38 @@
   padding: 0;
 }
 
-/* Hero */
-.pw-hero {
+/* Avatar */
+.pw-avatar {
   position: relative;
-  height: 88px;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 12px;
   background: linear-gradient(135deg, #fff0f0, #ffffff);
+  overflow: hidden;
 }
 
-.pw-hero-img {
-  position: absolute;
-  inset: 0;
+.pw-avatar-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 .pw-emoji {
-  position: absolute;
-  inset: 0;
+  width: 100%;
+  height: 100%;
   display: grid;
   place-items: center;
   font-size: 28px;
 }
 
-/* Cute price tag */
-.pw-price-tag {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 2;
-  background: #ffffff;
-  color: #111827;
-  border: 1px solid rgba(17, 24, 39, 0.08);
-  border-radius: 999px;
-  padding: 4px 10px 4px 26px;
-  font-weight: 800;
+/* Inline price */
+.pw-price {
+  margin-top: 4px;
+  font-weight: 700;
   font-size: 13px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  box-shadow: none;
+  color: #111827;
 }
-
-/* punch hole + subtle halo */
-.pw-price-tag::after {
-  content: "";
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 120, 120, 0.35) 0 2px, transparent 3px);
-  box-shadow:
-    inset 0 0 0 1.5px rgba(17, 24, 39, 0.06),
-    0 0 0 1px rgba(255, 255, 255, 0.9);
-}
-
-/* no ambient glow to keep it flat */
 
 .pw-link {
   position: absolute;
@@ -98,7 +71,6 @@
 .pw-body {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   padding: 12px;
 }
@@ -126,8 +98,6 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
-/* (old .pw-price-pill removed) */
 
 /* Inline CTA aligned with text */
 .pw-cta-inline {
