@@ -2,6 +2,8 @@
 
 These components provide the public wishlist UI.
 
+- **PublicWishCard** renders each wish as a compact row with a 56px image or emoji avatar on the left, text details to the right and an inline reserve button.
+
 ## Theme tokens
 
 - Radius: `12px`

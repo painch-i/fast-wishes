@@ -54,23 +54,23 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({ wish, reserved =
 
   return (
     <Card className={`public-wish-card${reserved ? " is-reserved" : ""}`} hoverable>
-      <div className="pw-hero">
-        {wish.image ? (
-          <img src={wish.image} alt="" aria-hidden className="pw-hero-img" />
-        ) : (
-          <div className="pw-emoji" aria-hidden>
-            {wish.emoji || pickEmoji(wish.name)}
-          </div>
-        )}
-        {priceLabel && <div className="pw-price-tag">{priceLabel}</div>}
-        {hasUrl && (
-          <button type="button" className="pw-link" aria-label="Ouvrir le lien" onClick={openLink}>
-            🔗
-          </button>
-        )}
-      </div>
-
       <div className="pw-body">
+        <div className="pw-avatar">
+          {wish.image ? (
+            <img src={wish.image} alt="" aria-hidden className="pw-avatar-img" />
+          ) : (
+            <div className="pw-emoji" aria-hidden>
+              {wish.emoji || pickEmoji(wish.name)}
+            </div>
+          )}
+          {priceLabel && <div className="pw-price-tag">{priceLabel}</div>}
+          {hasUrl && (
+            <button type="button" className="pw-link" aria-label="Ouvrir le lien" onClick={openLink}>
+              🔗
+            </button>
+          )}
+        </div>
+
         <div className="pw-text">
           <h3 className="pw-title" title={wish.name}>
             {wish.name}
