@@ -192,12 +192,13 @@ export const PublicWishlistPage: React.FC = () => {
         height="auto"
         destroyOnClose
         title={cancelTarget?.name || t("public.card.cancelReservation")}
+        extra={
+          <Button type="primary" onClick={confirmCancelReservation}>
+            {t("wish.row.confirm")}
+          </Button>
+        }
       >
         <Typography.Paragraph>{t("public.card.cancelReservation")}</Typography.Paragraph>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-          <Button onClick={() => setCancelOpen(false)}>{t("common.cancel")}</Button>
-          <Button type="primary" onClick={confirmCancelReservation}>{t("wish.row.confirm")}</Button>
-        </div>
       </Drawer>
     </div>
   );
