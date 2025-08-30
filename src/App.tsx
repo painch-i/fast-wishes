@@ -28,8 +28,9 @@ import { fallbackLng } from "./i18n/config";
 
 function RootRedirect() {
   const { pathname, search, hash } = useLocation();
-  const target = i18n.resolvedLanguage || fallbackLng;
-  return <Navigate to={`/${target}${pathname}${search}${hash}`} replace />;
+  const target = i18n.language || fallbackLng;
+  const suffix = pathname === "/" ? "/wishes" : pathname;
+  return <Navigate to={`/${target}${suffix}${search}${hash}`} replace />;
 }
 
 function App() {

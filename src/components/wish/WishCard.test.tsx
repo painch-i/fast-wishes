@@ -1,11 +1,15 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { WishCard } from "./WishCard";
 import type { Wish } from "./types";
+import { changeLocale } from "../../i18n";
 
 const baseWish: Wish = { id: 1, name: "Vélo" };
 
 describe("WishCard", () => {
+  beforeAll(async () => {
+    await changeLocale("fr");
+  });
   it("renders title", () => {
     render(<WishCard wish={baseWish} />);
     expect(screen.getByText("Vélo")).toBeInTheDocument();
