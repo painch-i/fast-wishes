@@ -453,9 +453,12 @@ export const WishesListPage: React.FC = () => {
   const handleShare = () => {
     if (!publicUrl) return;
     navigator.vibrate?.(10);
+    const shareTitle = slugData?.data?.name
+      ? t("wish.list.shareTitleNamed", { name: slugData.data.name })
+      : t("wish.list.shareTitleMine");
     if (navigator.share) {
       navigator
-        .share({ title: t("wish.list.shareTitle"), url: publicUrl })
+        .share({ title: shareTitle, url: publicUrl })
         .catch(() => {});
     } else {
       navigator.clipboard

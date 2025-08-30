@@ -2,6 +2,8 @@
   "public": {
     "header": {
       "title": "{name}'s birthday 🎂",
+      "wishlistNamed": "{name}'s wishlist",
+      "wishlistMine": "My wishlist",
       "subtitle": "Pick something they'll love 💝",
       "remaining": "{count, plural, one {# gift left} other {# gifts left}}",
       "gift": "gift"
@@ -186,7 +188,9 @@
       "ghost1": "Add a wish (e.g. 'Stainless kettle')",
       "ghost2": "Add a wish (e.g. 'Sweater M – beige')",
       "publicLinkInfo": "This link only shows your public wishes.",
-      "shareTitle": "My wishlist"
+      "shareTitle": "My wishlist",
+      "shareTitleNamed": "{name}'s wishlist",
+      "shareTitleMine": "My wishlist"
     },
     "new": {
       "success": "Submitted successfully!"
@@ -217,4 +221,3 @@
     "submit": "Submit"
   }
 }
-

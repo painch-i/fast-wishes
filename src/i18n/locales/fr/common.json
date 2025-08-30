@@ -2,6 +2,8 @@
   "public": {
     "header": {
       "title": "Anniversaire de {name} 🎂",
+      "wishlistNamed": "Liste de souhaits de {name}",
+      "wishlistMine": "Ma liste de souhaits",
       "subtitle": "Choisis ce qui fera plaisir 💝",
       "remaining": "{count, plural, one {# cadeau restant} other {# cadeaux restants}}",
       "gift": "cadeau"
@@ -186,7 +188,9 @@
       "ghost1": "Ajouter un souhait (ex : 'Bouilloire inox')",
       "ghost2": "Ajouter un souhait (ex : 'Pull M – couleur beige')",
       "publicLinkInfo": "Ce lien ne montre que tes souhaits publics.",
-      "shareTitle": "Ma liste de souhaits"
+      "shareTitle": "Ma liste de souhaits",
+      "shareTitleNamed": "Liste de souhaits de {name}",
+      "shareTitleMine": "Ma liste de souhaits"
     },
     "new": {
       "success": "Soumis avec succès !"

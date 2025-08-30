@@ -46,8 +46,11 @@ export const EditWishListPage: React.FC = () => {
   const handleShare = () => {
     if (!publicUrl) return;
     if (navigator.share) {
+      const shareTitle = slugData?.data?.name
+        ? t("wish.list.shareTitleNamed", { name: slugData.data.name })
+        : t("wish.list.shareTitleMine");
       navigator
-        .share({ title: t("wish.list.shareTitle"), url: publicUrl })
+        .share({ title: shareTitle, url: publicUrl })
         .catch(() => {});
     } else {
       navigator.clipboard

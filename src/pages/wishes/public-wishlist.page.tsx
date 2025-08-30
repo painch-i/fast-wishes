@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useParams } from "react-router";
 import { useList } from "@refinedev/core";
 import { Tag, Skeleton } from "antd";
@@ -6,6 +6,7 @@ import { WishCard, ReserveBottomSheet } from "../../components";
 import type { Wish } from "../../components";
 import "./public-wishlist.page.css";
 import { useTranslation } from "react-i18next";
+import type { Tables } from "../../../database.types";
 
 export const PublicWishlistPage: React.FC = () => {
   const { slug } = useParams();
@@ -24,15 +25,27 @@ export const PublicWishlistPage: React.FC = () => {
     },
   });
 
+  // Fetch the user by slug to get the optional name, even if no public wishes
+  const { data: userData } = useList<Tables<"users">>({
+    resource: "users",
+    filters: [{ field: "slug", operator: "eq", value: slug }],
+    meta: { select: "*" },
+  });
+
   const wishes = data?.data ?? [];
   const remaining = wishes.filter((w) => !w.isReserved).length;
   const [selected, setSelected] = useState<Wish | null>(null);
   const { t } = useTranslation();
 
+  const ownerName = useMemo(() => userData?.data?.[0]?.name ?? undefined, [userData]);
+  const title = ownerName
+    ? t("public.header.wishlistNamed", { name: ownerName })
+    : t("public.header.wishlistMine");
+
   return (
     <div className="public-wishlist">
       <header className="wishlist-header">
-        <h1>{t("public.header.title", { name: "Ismael" })}</h1>
+        <h1>{title}</h1>
         <p className="subtitle">{t("public.header.subtitle")}</p>
         <Tag className="counter">
           <span role="img" aria-label={t("public.header.gift")}>
