@@ -1,14 +1,14 @@
-import { Navigate, Outlet, useParams } from "react-router";
-import { useEffect } from "react";
 import { Authenticated, Refine } from "@refinedev/core";
 import { RefineKbar } from "@refinedev/kbar";
 import routerBindings, { DocumentTitleHandler, UnsavedChangesNotifier } from "@refinedev/react-router";
 import { liveProvider } from "@refinedev/supabase";
+import { useEffect } from "react";
+import { Navigate, Outlet, useParams } from "react-router";
 import authProvider from "../authProvider";
-import { supabaseClient } from "../utility";
-import { smartDataProvider } from "../providers/smartDataProvider";
 import { AnonymousLogin } from "../components/auth/anonymous-login";
-import { fallbackLng, supportedLngs, Locale } from "./config";
+import { smartDataProvider } from "../providers/smartDataProvider";
+import { supabaseClient } from "../utility";
+import { fallbackLng, Locale, supportedLngs } from "./config";
 import { changeLocale } from "./index";
 
 export const LocaleGate: React.FC = () => {

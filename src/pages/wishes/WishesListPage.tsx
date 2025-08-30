@@ -449,12 +449,29 @@ export const WishesListPage: React.FC = () => {
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const pendingDelete = useRef<{ item: WishUI; index: number; timeout: number } | null>(null);
+  const openedOnEmpty = useRef(false);
 
   useEffect(() => {
     if (localStorage.getItem("public-banner-dismissed")) {
       setBannerDismissed(true);
     }
   }, []);
+
+  // Auto-open add drawer on first load if there are no wishes
+  useEffect(() => {
+    const count = data?.data?.length ?? null;
+    if (
+      !openedOnEmpty.current &&
+      !isLoading &&
+      !isError &&
+      sheetOpen === false &&
+      identity?.id &&
+      count === 0
+    ) {
+      openedOnEmpty.current = true;
+      openAdd();
+    }
+  }, [isLoading, isError, data?.data?.length, sheetOpen, identity?.id]);
 
   // Debounced slug availability check
   useEffect(() => {
