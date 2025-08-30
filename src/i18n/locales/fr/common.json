@@ -199,7 +199,10 @@
       "slugChecking": "Vérification de la disponibilité…",
       "slugTaken": "Déjà pris, essaie un autre",
       "listNameLabel": "Nom de la liste",
-      "listNamePlaceholder": "Anniversaire de Ismaël 🎂"
+      "listNamePlaceholder": "Anniversaire de Ismaël 🎂",
+      "contactEmailLabel": "Email de contact",
+      "contactEmailPlaceholder": "ex : prenom@example.com",
+      "contactEmailInvalid": "Email invalide"
     },
     "new": {
       "success": "Soumis avec succès !"

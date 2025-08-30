@@ -199,7 +199,10 @@
       "slugChecking": "Checking availability…",
       "slugTaken": "Already taken, try another",
       "listNameLabel": "List name",
-      "listNamePlaceholder": "Ismaël's birthday 🎂"
+      "listNamePlaceholder": "Ismaël's birthday 🎂",
+      "contactEmailLabel": "Contact email",
+      "contactEmailPlaceholder": "e.g. firstname@example.com",
+      "contactEmailInvalid": "Invalid email"
     },
     "new": {
       "success": "Submitted successfully!"

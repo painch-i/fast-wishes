@@ -444,7 +444,7 @@ export const WishesListPage: React.FC = () => {
   const [editing, setEditing] = useState<WishUI | undefined>();
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settingsForm] = Form.useForm<{ slug: string; name?: string | null }>();
+  const [settingsForm] = Form.useForm<{ slug: string; name?: string | null; contact_email?: string }>();
   const watchedSlug = Form.useWatch("slug", settingsForm);
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
@@ -627,12 +627,17 @@ export const WishesListPage: React.FC = () => {
             <button
               className="icon-btn"
               aria-label={t("wish.list.settings", "Settings")}
-              onClick={() => {
+              onClick={async () => {
                 // Prefill form with current values
                 settingsForm.setFieldsValue({
                   slug: slugData?.data.slug || "",
                   name: slugData?.data.user_list_name || undefined,
                 });
+                try {
+                  const { data } = await supabaseClient.auth.getUser();
+                  const authEmail = data.user?.email as string | undefined;
+                  if (authEmail) settingsForm.setFieldsValue({ contact_email: authEmail });
+                } catch {}
                 setSettingsOpen(true);
               }}
             >
@@ -830,6 +835,17 @@ export const WishesListPage: React.FC = () => {
               message.error(t("wish.list.slugTaken"));
               return;
             }
+            // Update primary auth email via Supabase auth client
+            if (values.contact_email) {
+              supabaseClient.auth
+                .updateUser({ email: values.contact_email }, { emailRedirectTo: `${window.location.origin}/` })
+                .then(({ error }) => {
+                  if (error) message.error(t("wish.toast.updateError"));
+                })
+                .catch(() => {
+                  message.error(t("wish.toast.updateError"));
+                });
+            }
             updateUser(
               {
                 resource: "users",
@@ -879,6 +895,13 @@ export const WishesListPage: React.FC = () => {
           </Form.Item>
           <Form.Item name="name" label={t("wish.list.listNameLabel")}>
             <Input placeholder={t("wish.list.listNamePlaceholder")} />
+          </Form.Item>
+          <Form.Item
+            name="contact_email"
+            label={t("wish.list.contactEmailLabel")}
+            rules={[{ type: "email", message: t("wish.list.contactEmailInvalid") }]}
+          >
+            <Input placeholder={t("wish.list.contactEmailPlaceholder")} />
           </Form.Item>
           {watchedSlug && (
             <Typography.Text type="secondary">
