@@ -1,30 +1,19 @@
-import { Authenticated, Refine } from "@refinedev/core";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import { RefineKbarProvider } from "@refinedev/kbar";
 
 import { RefineThemes } from "@refinedev/mui";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { ThemeProvider } from "@mui/material/styles";
-import routerBindings, {
-  DocumentTitleHandler,
-  UnsavedChangesNotifier,
-} from "@refinedev/react-router";
-  import { liveProvider } from "@refinedev/supabase";
-import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router";
 import { ConfigProvider } from "antd";
-import authProvider from "./authProvider";
-import { AnonymousLogin } from "./components/auth/anonymous-login";
-import { PublicWishlistPage } from "./pages/wishes/public-wishlist.page";
-import { NewWishPage } from "./pages/wishes/new-wish.page";
-import { theme } from "./theme";
-import { supabaseClient } from "./utility";
-import { smartDataProvider } from "./providers/smartDataProvider";
-import { WishesListPage } from "./pages/wishes/WishesListPage";
 import { I18nextProvider } from "react-i18next";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
 import i18n from "./i18n";
 import { LocaleGate, ProtectedOutlet } from "./i18n/LocaleGate";
 import { fallbackLng } from "./i18n/config";
+import { WishesListPage } from "./pages/wishes/WishesListPage";
+import { PublicWishlistPage } from "./pages/wishes/public-wishlist.page";
+import { theme } from "./theme";
 
 function RootRedirect() {
   const { pathname, search, hash } = useLocation();
@@ -46,9 +35,8 @@ function App() {
                 <Route path=":locale" element={<LocaleGate />}>
                   <Route element={<ProtectedOutlet />}>
                     <Route path="wishes" element={<WishesListPage />} />
-                    <Route path="new-wish" element={<NewWishPage />} />
+                    <Route path="l/:slug" element={<PublicWishlistPage />} />
                   </Route>
-                  <Route path="l/:slug" element={<PublicWishlistPage />} />
                 </Route>
                 <Route path="*" element={<RootRedirect />} />
               </Routes>

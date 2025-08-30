@@ -162,10 +162,14 @@
         }
       }
     },
-    "list": {
+  "list": {
       "title": "Tes souhaits 🎁",
       "settings": "Paramètres",
-      "settingsTitle": "Paramètres de la liste",
+      "settingsTitle": "Paramètres",
+      "tabs": {
+        "list": "Liste",
+        "user": "Vous"
+      },
       "viewPublic": "Ouvrir",
       "sharePublic": "Partager le lien public",
       "instructions": "Appuie sur un souhait pour le modifier.",
@@ -181,15 +185,16 @@
       "shareTitleNamed": "Liste de souhaits de {name}",
       "shareTitleMine": "Ma liste de souhaits",
       "publicLinkLabel": "Lien public",
-      "publicLinkPlaceholder": "ex : anniversaire-ismael",
+      "publicLinkPlaceholder": "ex : ma-liste-anniversaire",
       "publicLinkRequired": "Merci de choisir un lien",
       "slugChecking": "Vérification de la disponibilité…",
       "slugTaken": "Déjà pris, essaie un autre",
       "listNameLabel": "Nom de la liste",
-      "listNamePlaceholder": "Anniversaire de Ismaël 🎂",
+      "listNamePlaceholder": "Anniversaire 🎂",
       "contactEmailLabel": "Email de contact",
       "contactEmailPlaceholder": "ex : prenom@example.com",
-      "contactEmailInvalid": "Email invalide"
+      "contactEmailInvalid": "Email invalide",
+      "userNamePlaceholder": "Votre nom"
     },
     "new": {
       "success": "Soumis avec succès !"
@@ -205,6 +210,7 @@
       }
     }
   },
+  
   "common": {
     "cancel": "Annuler",
     "save": "Enregistrer",

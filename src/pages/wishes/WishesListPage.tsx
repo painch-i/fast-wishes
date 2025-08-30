@@ -7,7 +7,7 @@ import {
   useOne,
   useUpdate,
 } from "@refinedev/core";
-import { Alert, Button, Drawer, Form, Input, Skeleton, Tag, Typography, message } from "antd";
+import { Alert, Button, Drawer, Form, Input, Skeleton, Tag, Tabs, Typography, message } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { colors } from "../../theme";
 import "./WishesListPage.css";
@@ -444,8 +444,9 @@ export const WishesListPage: React.FC = () => {
   const [editing, setEditing] = useState<WishUI | undefined>();
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settingsForm] = Form.useForm<{ slug: string; name?: string | null; contact_email?: string }>();
-  const watchedSlug = Form.useWatch("slug", settingsForm);
+  const [settingsFormList] = Form.useForm<{ slug: string; name?: string | null }>();
+  const [settingsFormUser] = Form.useForm<{ contact_email?: string; user_name?: string | null }>();
+  const watchedSlug = Form.useWatch("slug", settingsFormList);
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const pendingDelete = useRef<{ item: WishUI; index: number; timeout: number } | null>(null);
@@ -645,15 +646,19 @@ export const WishesListPage: React.FC = () => {
               className="icon-btn"
               aria-label={t("wish.list.settings", "Settings")}
               onClick={async () => {
-                // Prefill form with current values
-                settingsForm.setFieldsValue({
+                // Prefill forms with current values
+                settingsFormList.setFieldsValue({
                   slug: slugData?.data.slug || "",
                   name: slugData?.data.user_list_name || undefined,
                 });
                 try {
                   const { data } = await supabaseClient.auth.getUser();
                   const authEmail = data.user?.email as string | undefined;
-                  if (authEmail) settingsForm.setFieldsValue({ contact_email: authEmail });
+                  const meta = (data.user?.user_metadata as any) || {};
+                  settingsFormUser.setFieldsValue({
+                    contact_email: authEmail,
+                    user_name: (slugData?.data as any)?.name || meta.name || undefined,
+                  });
                 } catch {}
                 setSettingsOpen(true);
               }}
@@ -832,107 +837,163 @@ export const WishesListPage: React.FC = () => {
         width={360}
         title={t("wish.list.settingsTitle")}
       >
-        <Form
-          form={settingsForm}
-          layout="vertical"
-          initialValues={{ slug: slugData?.data.slug, name: slugData?.data.user_list_name || undefined }}
-          onFinish={(values) => {
-            if (!identity?.id) return;
-            const sanitized = (values.slug || "")
-              .toLowerCase()
-              .replace(/\s+/g, "-")
-              .replace(/[^a-z0-9-]/g, "")
-              .replace(/--+/g, "-")
-              .replace(/^-+|-+$/g, "");
-            if (sanitized !== values.slug) settingsForm.setFieldsValue({ slug: sanitized });
-            if (
-              slugAvailable === false &&
-              sanitized !== (slugData?.data.slug || "")
-            ) {
-              message.error(t("wish.list.slugTaken"));
-              return;
-            }
-            // Update primary auth email via Supabase auth client
-            if (values.contact_email) {
-              supabaseClient.auth
-                .updateUser({ email: values.contact_email }, { emailRedirectTo: `${window.location.origin}/` })
-                .then(({ error }) => {
-                  if (error) message.error(t("wish.toast.updateError"));
-                })
-                .catch(() => {
-                  message.error(t("wish.toast.updateError"));
-                });
-            }
-            updateUser(
-              {
-                resource: "users",
-                id: identity.id,
-                values: { slug: sanitized, user_list_name: values.name ?? null },
-                successNotification: false,
-                errorNotification: false,
-              },
-              {
-                onSuccess: () => {
-                  message.success(t("wish.toast.updated"));
-                  setSettingsOpen(false);
-                },
-                onError: () => {
-                  message.error(t("wish.toast.updateError"));
-                },
-              }
-            );
-          }}
-        >
-          <Form.Item
-            name="slug"
-            label={t("wish.list.publicLinkLabel")}
-            rules={[{ required: true, message: t("wish.list.publicLinkRequired") }]}
-            validateStatus={slugChecking ? "validating" : slugAvailable == null ? undefined : slugAvailable ? "success" : "error"}
-            help={
-              slugChecking
-                ? t("wish.list.slugChecking")
-                : slugAvailable === false
-                ? t("wish.list.slugTaken")
-                : undefined
-            }
-          >
-            <Input
-              placeholder={t("wish.list.publicLinkPlaceholder")}
-              addonBefore={`${window.location.origin}/l/`}
-              onChange={(e) => {
-                const v = e.target.value
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, "")
-                  .replace(/--+/g, "-")
-                  .replace(/^-+|-+$/g, "");
-                if (v !== e.target.value) settingsForm.setFieldsValue({ slug: v });
-              }}
-            />
-          </Form.Item>
-          <Form.Item name="name" label={t("wish.list.listNameLabel")}>
-            <Input placeholder={t("wish.list.listNamePlaceholder")} />
-          </Form.Item>
-          <Form.Item
-            name="contact_email"
-            label={t("wish.list.contactEmailLabel")}
-            rules={[{ type: "email", message: t("wish.list.contactEmailInvalid") }]}
-          >
-            <Input placeholder={t("wish.list.contactEmailPlaceholder")} />
-          </Form.Item>
-          {watchedSlug && (
-            <Typography.Text type="secondary">
-              {t("wish.list.publicLinkInfo")} {" "}
-              <code>{`${window.location.origin}/l/${watchedSlug}`}</code>
-            </Typography.Text>
-          )}
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-            <Button onClick={() => setSettingsOpen(false)}>{t("common.cancel")}</Button>
-            <Button type="primary" onClick={() => settingsForm.submit()}>
-              {t("common.save")}
-            </Button>
-          </div>
-        </Form>
+        <Tabs
+          items={[
+            {
+              key: "list",
+              label: t("wish.list.tabs.list"),
+              children: (
+                <Form
+                  form={settingsFormList}
+                  layout="vertical"
+                  initialValues={{ slug: slugData?.data.slug, name: slugData?.data.user_list_name || undefined }}
+                  onFinish={(values) => {
+                    if (!identity?.id) return;
+                    const sanitized = (values.slug || "")
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")
+                      .replace(/[^a-z0-9-]/g, "")
+                      .replace(/--+/g, "-")
+                      .replace(/^-+|-+$/g, "");
+                    if (sanitized !== values.slug) settingsFormList.setFieldsValue({ slug: sanitized });
+                    if (
+                      slugAvailable === false &&
+                      sanitized !== (slugData?.data.slug || "")
+                    ) {
+                      message.error(t("wish.list.slugTaken"));
+                      return;
+                    }
+                    updateUser(
+                      {
+                        resource: "users",
+                        id: identity.id,
+                        values: { slug: sanitized, user_list_name: values.name ?? null },
+                        successNotification: false,
+                        errorNotification: false,
+                      },
+                      {
+                        onSuccess: () => {
+                          message.success(t("wish.toast.updated"));
+                          setSettingsOpen(false);
+                        },
+                        onError: () => {
+                          message.error(t("wish.toast.updateError"));
+                        },
+                      }
+                    );
+                  }}
+                >
+                  <Form.Item
+                    name="slug"
+                    label={t("wish.list.publicLinkLabel")}
+                    rules={[{ required: true, message: t("wish.list.publicLinkRequired") }]}
+                    validateStatus={slugChecking ? "validating" : slugAvailable == null ? undefined : slugAvailable ? "success" : "error"}
+                    help={
+                      slugChecking
+                        ? t("wish.list.slugChecking")
+                        : slugAvailable === false
+                        ? t("wish.list.slugTaken")
+                        : undefined
+                    }
+                  >
+                    <Input
+                      placeholder={t("wish.list.publicLinkPlaceholder")}
+                      addonBefore={`${window.location.origin}/l/`}
+                      onChange={(e) => {
+                        const v = e.target.value
+                          .toLowerCase()
+                          .replace(/\s+/g, "-")
+                          .replace(/[^a-z0-9-]/g, "")
+                          .replace(/--+/g, "-")
+                          .replace(/^-+|-+$/g, "");
+                        if (v !== e.target.value) settingsFormList.setFieldsValue({ slug: v });
+                      }}
+                    />
+                  </Form.Item>
+                  <Form.Item name="name" label={t("wish.list.listNameLabel")}>
+                    <Input placeholder={t("wish.list.listNamePlaceholder")} />
+                  </Form.Item>
+                  {watchedSlug && (
+                    <Typography.Text type="secondary">
+                      {t("wish.list.publicLinkInfo")} {" "}
+                      <code>{`${window.location.origin}/l/${watchedSlug}`}</code>
+                    </Typography.Text>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
+                    <Button onClick={() => setSettingsOpen(false)}>{t("common.cancel")}</Button>
+                    <Button type="primary" onClick={() => settingsFormList.submit()}>
+                      {t("common.save")}
+                    </Button>
+                  </div>
+                </Form>
+              ),
+            },
+            {
+              key: "user",
+              label: t("wish.list.tabs.user"),
+              children: (
+                <Form
+                  form={settingsFormUser}
+                  layout="vertical"
+                  onFinish={async (values) => {
+                    try {
+                      // Update primary auth email via Supabase auth client
+                      if (values.contact_email) {
+                        const { error } = await supabaseClient.auth.updateUser(
+                          { email: values.contact_email },
+                          { emailRedirectTo: `${window.location.origin}/` }
+                        );
+                        if (error) throw error;
+                      }
+                      // Update name in users table (if provided)
+                      if (identity?.id && (values.user_name != null)) {
+                        await new Promise<void>((resolve, reject) =>
+                          updateUser(
+                            {
+                              resource: "users",
+                              id: identity.id,
+                              values: { name: values.user_name ?? null },
+                              successNotification: false,
+                              errorNotification: false,
+                            },
+                            {
+                              onSuccess: () => resolve(),
+                              onError: () => reject(new Error("db-update")),
+                            }
+                          )
+                        );
+                      }
+                      // Store name in auth user metadata for convenience
+                      await supabaseClient.auth.updateUser({ data: { name: values.user_name || null } });
+                      message.success(t("wish.toast.updated"));
+                      setSettingsOpen(false);
+                    } catch {
+                      message.error(t("wish.toast.updateError"));
+                    }
+                  }}
+                >
+                  <Form.Item
+                    name="contact_email"
+                    label={t("wish.list.contactEmailLabel")}
+                    rules={[{ type: "email", message: t("wish.list.contactEmailInvalid") }]}
+                  >
+                    <Input placeholder={t("wish.list.contactEmailPlaceholder")} />
+                  </Form.Item>
+                  <Form.Item name="user_name" label={t("common.name")}> 
+                    <Input placeholder={t("wish.list.userNamePlaceholder")} />
+                  </Form.Item>
+
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
+                    <Button onClick={() => setSettingsOpen(false)}>{t("common.cancel")}</Button>
+                    <Button type="primary" onClick={() => settingsFormUser.submit()}>
+                      {t("common.save")}
+                    </Button>
+                  </div>
+                </Form>
+              ),
+            },
+          ]}
+        />
       </Drawer>
       {!sheetOpen && (
         <Button
