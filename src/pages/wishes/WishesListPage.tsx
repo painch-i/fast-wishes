@@ -409,7 +409,7 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
 };
 
 export const WishesListPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data: identity } = useGetIdentity<UserIdentity>();
 
   const { data, isLoading, isError, refetch } = useList<WishUI>({
@@ -445,8 +445,9 @@ export const WishesListPage: React.FC = () => {
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsFormList] = Form.useForm<{ slug: string; name?: string | null }>();
-  const [settingsFormUser] = Form.useForm<{ contact_email?: string; user_name?: string | null }>();
+  const [settingsFormUser] = Form.useForm<{ contact_email?: string; user_name?: string | null; recover_email?: string }>();
   const watchedSlug = Form.useWatch("slug", settingsFormList);
+  const [sendingRecovery, setSendingRecovery] = useState(false);
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const pendingDelete = useRef<{ item: WishUI; index: number; timeout: number } | null>(null);
@@ -624,6 +625,28 @@ export const WishesListPage: React.FC = () => {
       pendingDelete.current = null;
     }, 5000);
     pendingDelete.current = { item: wish, index, timeout };
+  };
+
+  const handleSendRecoveryLink = async () => {
+    try {
+      const email: string | undefined = settingsFormUser.getFieldValue("recover_email");
+      if (!email) {
+        message.warning(t("wish.list.recoveryEmailRequired"));
+        return;
+      }
+      setSendingRecovery(true);
+      const redirectTo = `${window.location.origin}/${i18n.language || "fr"}/wishes`;
+      const { error } = await supabaseClient.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: redirectTo },
+      });
+      if (error) throw error;
+      message.success(t("wish.list.recoveryEmailSent"));
+    } catch {
+      message.error(t("wish.list.recoveryEmailError"));
+    } finally {
+      setSendingRecovery(false);
+    }
   };
 
   return (
@@ -843,11 +866,12 @@ export const WishesListPage: React.FC = () => {
               key: "list",
               label: t("wish.list.tabs.list"),
               children: (
-                <Form
-                  form={settingsFormList}
-                  layout="vertical"
-                  initialValues={{ slug: slugData?.data.slug, name: slugData?.data.user_list_name || undefined }}
-                  onFinish={(values) => {
+                <>
+                  <Form
+                    form={settingsFormList}
+                    layout="vertical"
+                    initialValues={{ slug: slugData?.data.slug, name: slugData?.data.user_list_name || undefined }}
+                    onFinish={(values) => {
                     if (!identity?.id) return;
                     const sanitized = (values.slug || "")
                       .toLowerCase()
@@ -919,13 +943,31 @@ export const WishesListPage: React.FC = () => {
                       <code>{`${window.location.origin}/l/${watchedSlug}`}</code>
                     </Typography.Text>
                   )}
-                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-                    <Button onClick={() => setSettingsOpen(false)}>{t("common.cancel")}</Button>
-                    <Button type="primary" onClick={() => settingsFormList.submit()}>
-                      {t("common.save")}
-                    </Button>
-                  </div>
-                </Form>
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
+                      <Button onClick={() => setSettingsOpen(false)}>{t("common.cancel")}</Button>
+                      <Button type="primary" onClick={() => settingsFormList.submit()}>
+                        {t("common.save")}
+                      </Button>
+                    </div>
+                  </Form>
+
+                  <div style={{ borderTop: "1px solid #EEF0F3", margin: "16px 0" }} />
+                  <Typography.Text type="secondary">{t("wish.list.recoverIntro")}</Typography.Text>
+                  <Form form={settingsFormUser} layout="vertical">
+                    <Form.Item
+                      name="recover_email"
+                      label={t("wish.list.recoveryEmailLabel")}
+                      rules={[{ type: "email", message: t("wish.list.recoveryEmailInvalid") }]}
+                    >
+                      <Input placeholder={t("wish.list.recoveryEmailPlaceholder")} />
+                    </Form.Item>
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: -8 }}>
+                      <Button onClick={handleSendRecoveryLink} loading={sendingRecovery}>
+                        {t("wish.list.recoverAction")}
+                      </Button>
+                    </div>
+                  </Form>
+                </>
               ),
             },
             {
@@ -974,14 +1016,16 @@ export const WishesListPage: React.FC = () => {
                 >
                   <Form.Item
                     name="contact_email"
-                    label={t("wish.list.contactEmailLabel")}
-                    rules={[{ type: "email", message: t("wish.list.contactEmailInvalid") }]}
+                    label={t("wish.list.recoveryEmailLabel")}
+                    rules={[{ type: "email", message: t("wish.list.recoveryEmailInvalid") }]}
                   >
-                    <Input placeholder={t("wish.list.contactEmailPlaceholder")} />
+                    <Input placeholder={t("wish.list.recoveryEmailPlaceholder")} />
                   </Form.Item>
                   <Form.Item name="user_name" label={t("common.name")}> 
                     <Input placeholder={t("wish.list.userNamePlaceholder")} />
                   </Form.Item>
+
+                  
 
                   <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
                     <Button onClick={() => setSettingsOpen(false)}>{t("common.cancel")}</Button>
