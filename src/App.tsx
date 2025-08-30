@@ -23,7 +23,7 @@ import { smartDataProvider } from "./providers/smartDataProvider";
 import { WishesListPage } from "./pages/wishes/WishesListPage";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
-import { LocaleGate } from "./i18n/LocaleGate";
+import { LocaleGate, ProtectedOutlet } from "./i18n/LocaleGate";
 import { fallbackLng } from "./i18n/config";
 
 function RootRedirect() {
@@ -43,7 +43,13 @@ function App() {
               <CssBaseline />
               <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto", colorScheme: "light" } }} />
               <Routes>
-                <Route path=":locale/*" element={<LocaleGate />} />
+                <Route path=":locale" element={<LocaleGate />}>
+                  <Route element={<ProtectedOutlet />}>
+                    <Route path="wishes" element={<WishesListPage />} />
+                    <Route path="new-wish" element={<NewWishPage />} />
+                  </Route>
+                  <Route path="l/:slug" element={<PublicWishlistPage />} />
+                </Route>
                 <Route path="*" element={<RootRedirect />} />
               </Routes>
             </ThemeProvider>

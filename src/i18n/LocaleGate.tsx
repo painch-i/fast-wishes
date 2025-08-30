@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useParams } from "react-router";
+import { Navigate, Outlet, useParams } from "react-router";
 import { useEffect } from "react";
 import { Authenticated, Refine } from "@refinedev/core";
 import { RefineKbar } from "@refinedev/kbar";
@@ -7,9 +7,6 @@ import { liveProvider } from "@refinedev/supabase";
 import authProvider from "../authProvider";
 import { supabaseClient } from "../utility";
 import { smartDataProvider } from "../providers/smartDataProvider";
-import { WishesListPage } from "../pages/wishes/WishesListPage";
-import { NewWishPage } from "../pages/wishes/new-wish.page";
-import { PublicWishlistPage } from "../pages/wishes/public-wishlist.page";
 import { AnonymousLogin } from "../components/auth/anonymous-login";
 import { fallbackLng, supportedLngs, Locale } from "./config";
 import { changeLocale } from "./index";
@@ -47,18 +44,17 @@ export const LocaleGate: React.FC = () => {
         },
       ]}
     >
-      <Authenticated key="protected" fallback={<AnonymousLogin />}>
-        <Routes>
-          <Route path="wishes" element={<WishesListPage />} />
-          <Route path="new-wish" element={<NewWishPage />} />
-        </Routes>
-      </Authenticated>
-      <Routes>
-        <Route path="l/:slug" element={<PublicWishlistPage />} />
-      </Routes>
+      {/* Nested routes are defined in App.tsx; render them via <Outlet /> */}
+      <Outlet />
       <RefineKbar />
       <UnsavedChangesNotifier />
       <DocumentTitleHandler />
     </Refine>
   );
 };
+
+export const ProtectedOutlet: React.FC = () => (
+  <Authenticated key="protected" fallback={<AnonymousLogin />}>
+    <Outlet />
+  </Authenticated>
+);
