@@ -1,6 +1,6 @@
 import { Authenticated, Refine } from "@refinedev/core";
 import { RefineKbar } from "@refinedev/kbar";
-import routerBindings, { DocumentTitleHandler, UnsavedChangesNotifier } from "@refinedev/react-router";
+import routerBindings, { UnsavedChangesNotifier } from "@refinedev/react-router";
 import { liveProvider } from "@refinedev/supabase";
 import { useEffect } from "react";
 import { Navigate, Outlet, useParams } from "react-router";
@@ -48,7 +48,6 @@ export const LocaleGate: React.FC = () => {
       <Outlet />
       <RefineKbar />
       <UnsavedChangesNotifier />
-      <DocumentTitleHandler />
     </Refine>
   );
 };
