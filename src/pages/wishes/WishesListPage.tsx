@@ -601,7 +601,7 @@ export const WishesListPage: React.FC = () => {
                 // Prefill form with current values
                 settingsForm.setFieldsValue({
                   slug: slugData?.data.slug || "",
-                  name: slugData?.data.name || undefined,
+                  name: slugData?.data.user_list_name || undefined,
                 });
                 setSettingsOpen(true);
               }}
@@ -783,7 +783,7 @@ export const WishesListPage: React.FC = () => {
         <Form
           form={settingsForm}
           layout="vertical"
-          initialValues={{ slug: slugData?.data.slug, name: slugData?.data.name || undefined }}
+          initialValues={{ slug: slugData?.data.slug, name: slugData?.data.user_list_name || undefined }}
           onFinish={(values) => {
             if (!identity?.id) return;
             const sanitized = (values.slug || "")
@@ -797,7 +797,7 @@ export const WishesListPage: React.FC = () => {
               {
                 resource: "users",
                 id: identity.id,
-                values: { slug: sanitized, name: values.name ?? null },
+                values: { slug: sanitized, user_list_name: values.name ?? null },
                 successNotification: false,
                 errorNotification: false,
               },

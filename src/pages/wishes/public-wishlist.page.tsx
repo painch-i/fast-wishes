@@ -37,7 +37,10 @@ export const PublicWishlistPage: React.FC = () => {
   const [selected, setSelected] = useState<Wish | null>(null);
   const { t } = useTranslation();
 
-  const ownerName = useMemo(() => userData?.data?.[0]?.name ?? undefined, [userData]);
+  const ownerName = useMemo(
+    () => (userData?.data?.[0] as any)?.user_list_name ?? undefined,
+    [userData]
+  );
   const title = ownerName
     ? t("public.header.wishlistNamed", { name: ownerName })
     : t("public.header.wishlistMine");
