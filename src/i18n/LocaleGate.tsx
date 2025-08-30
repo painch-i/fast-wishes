@@ -53,9 +53,11 @@ export const LocaleGate: React.FC = () => {
           <Route path="new-wish" element={<NewWishPage />} />
         </Routes>
       </Authenticated>
-      <Routes>
-        <Route path="l/:slug" element={<PublicWishlistPage />} />
-      </Routes>
+      <Authenticated key="public" fallback={<AnonymousLogin />}>
+        <Routes>
+          <Route path="l/:slug" element={<PublicWishlistPage />} />
+        </Routes>
+      </Authenticated>
       <RefineKbar />
       <UnsavedChangesNotifier />
       <DocumentTitleHandler />
