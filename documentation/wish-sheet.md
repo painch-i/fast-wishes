@@ -13,14 +13,13 @@ All labels, placeholders and helper text are sourced from the `i18n` bundles, al
 ## Fields
 1. **Titre** – required. Placeholder “Arrosoir inox Haws 1 L” with the
    help text “Un nom clair aide tes proches à choisir.”
-2. **Prix + Devise** – text input with `inputmode="decimal"`, a currency
-   selector pre-filled by `guessUserCurrency()` (profile → country → last
-   wish → browser locale) using `country-to-currency` with USD fallback,
-   and a toggle “≈” that sets `price_is_approx=true`. Editing an existing
-   wish preserves its stored currency. The dropdown renders in a
-   `document.body` portal with `z-index:1002`, and each option calls
-   `preventDefault()` on `mousedown` to avoid focus loss so taps and
-   clicks always register.
+2. **Prix + Devise** – text input with `inputmode="decimal"` and a
+   currency selector pre-filled by `guessUserCurrency()` (profile → country
+   → last wish → browser locale) using `country-to-currency` with USD
+   fallback. Editing an existing wish preserves its stored currency. The
+   dropdown renders in a `document.body` portal with `z-index:1002`, and
+   each option calls `preventDefault()` on `mousedown` to avoid focus loss
+   so taps and clicks always register.
 3. **Lien marchand** – single editable URL field (`type="url"`,
    `inputmode="url"`, font-size ≥16px) with a right-side **Coller**
    button using the Clipboard API. The text is the only source of truth
@@ -40,7 +39,6 @@ All labels, placeholders and helper text are sourced from the `i18n` bundles, al
    💡 Envie (default) and 🎲 Surprise.
 
 Only the title is mandatory. On submit the sheet returns a `WishUI`
-object including `price_cents`, `price_is_approx`, `merchant_domain`,
-`brand` and any metadata. The parent performs an optimistic
-creation or update then closes the sheet and shows a single success
-toast.
+object including `price_cents`, `merchant_domain`, `brand` and any
+metadata. The parent performs an optimistic creation or update then closes
+the sheet and shows a single success toast.

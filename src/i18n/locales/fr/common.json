@@ -139,8 +139,7 @@
         "placeholder": "Arrosoir inox Haws 1 L"
       },
       "price": {
-        "extra": "Indique un budget pour faciliter le choix.",
-        "approxAria": "Prix approximatif"
+        "extra": "Indique un budget pour faciliter le choix."
       },
       "url": {
         "label": "Lien marchand",
