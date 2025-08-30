@@ -10,8 +10,13 @@
     },
     "card": {
       "reserved": "✅ Reserved",
+      "reservedByYou": "✅ Reserved by you",
+      "reservedPlain": "Reserved",
+      "reservedByYouPlain": "Reserved by you",
+      "reservedByNamePlain": "Reserved by {name}",
       "reserve": "Reserve",
-      "propose": "Suggest another link"
+      "propose": "Suggest another link",
+      "cancelReservation": "Cancel my reservation"
     },
     "reserve": {
       "switchPropose": "I'd rather suggest another link",
@@ -28,7 +33,13 @@
       },
       "toast": {
         "reserved": "Reserved! Thanks 🤍 We'll keep it a surprise.",
-        "proposed": "Link sent, thanks!"
+        "proposed": "Link sent, thanks!",
+        "cancelled": "Reservation cancelled."
+      },
+      "errors": {
+        "nameRequired": "First name required",
+        "emailRequired": "Email required",
+        "emailInvalid": "Invalid email"
       }
     }
   },

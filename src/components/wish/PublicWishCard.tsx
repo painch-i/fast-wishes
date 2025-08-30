@@ -8,13 +8,18 @@ import { guessUserCurrency } from "../../utility/guessUserCurrency";
 
 interface PublicWishCardProps {
   wish: Wish;
+  reserved?: boolean;
+  reservedByMe?: boolean;
+  reservedName?: string;
+  onReserve?: (wish: Wish) => void;
+  onCancelReserve?: (wish: Wish) => void;
 }
 
-export const PublicWishCard: React.FC<PublicWishCardProps> = ({ wish }) => {
+export const PublicWishCard: React.FC<PublicWishCardProps> = ({ wish, reserved = false, reservedByMe = false, reservedName, onReserve, onCancelReserve }) => {
   const { t } = useTranslation();
   const { formatPrice } = useFormat();
   const hasUrl = !!wish.url;
-  const reservable = !wish.isReserved;
+  const reservable = !reserved;
 
   const openLink = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -48,7 +53,7 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({ wish }) => {
   }
 
   return (
-    <Card className={`public-wish-card${wish.isReserved ? " is-reserved" : ""}`} hoverable>
+    <Card className={`public-wish-card${reserved ? " is-reserved" : ""}`} hoverable>
       <div className="pw-hero">
         {wish.image ? (
           <img src={wish.image} alt="" aria-hidden className="pw-hero-img" />
@@ -76,9 +81,27 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({ wish }) => {
             </p>
           )}
         </div>
-        {reservable && (
-          <Button type="primary" size="middle" className="pw-cta-inline">
+        {reservable ? (
+          <Button
+            type="primary"
+            size="middle"
+            className="pw-cta-inline"
+            onClick={() => onReserve?.(wish)}
+          >
             {t("public.card.reserve")}
+          </Button>
+        ) : reservedByMe ? (
+          <Button
+            size="middle"
+            className="pw-cta-inline me"
+            onClick={() => onCancelReserve?.(wish)}
+            title={t("public.card.cancelReservation")}
+          >
+            {t("public.card.reservedByYouPlain")}
+          </Button>
+        ) : (
+          <Button size="middle" className="pw-cta-inline reserved" disabled>
+            {reservedName ? t("public.card.reservedByNamePlain", { name: reservedName }) : t("public.card.reservedPlain")}
           </Button>
         )}
       </div>

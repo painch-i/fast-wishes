@@ -141,9 +141,51 @@
   box-shadow: 0 6px 14px rgba(255, 107, 107, 0.22);
 }
 
+.pw-cta-inline.me {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6); /* indigo */
+  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.22);
+  color: #fff;
+}
+
+.pw-cta-inline.reserved,
+.pw-cta-inline.reserved.ant-btn[disabled] {
+  background: linear-gradient(135deg, #e5e7eb, #f3f4f6); /* gray */
+  color: #374151; /* gray-700 */
+  box-shadow: none;
+}
+
+/* CTA as text (reserved states) removed; using button variants instead */
+
 /* CTA */
 /* bottom CTA removed; action now in hero */
 
 .public-wish-card.is-reserved {
   filter: grayscale(0.1) saturate(0.8);
+}
+
+/* Reserved badge */
+.pw-reserved-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  background: #10b981; /* emerald-500 */
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1;
+  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.25);
+}
+
+.pw-reserved-badge.me {
+  background: #6366f1; /* indigo-500 */
+  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.25);
+  cursor: pointer;
+}
+
+.pw-reserved-badge.me:hover,
+.pw-reserved-badge.me:focus {
+  filter: brightness(1.05);
 }
