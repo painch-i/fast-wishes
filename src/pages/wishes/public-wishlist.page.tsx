@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useParams } from "react-router";
 import { useList } from "@refinedev/core";
 import { Tag, Skeleton } from "antd";
-import { WishCard, ReserveBottomSheet } from "../../components";
+import { PublicWishCard } from "../../components";
 import type { Wish } from "../../components";
 import "./public-wishlist.page.css";
 import { useTranslation } from "react-i18next";
@@ -34,7 +34,6 @@ export const PublicWishlistPage: React.FC = () => {
 
   const wishes = data?.data ?? [];
   const remaining = wishes.filter((w) => !w.isReserved).length;
-  const [selected, setSelected] = useState<Wish | null>(null);
   const { t } = useTranslation();
 
   // Use the list's public display name directly if available
@@ -69,19 +68,12 @@ export const PublicWishlistPage: React.FC = () => {
               />
             ))
           : wishes.map((w) => (
-              <WishCard
+              <PublicWishCard
                 key={w.id}
                 wish={w}
-                onReserve={setSelected}
-                onProposeLink={setSelected}
               />
             ))}
       </div>
-      <ReserveBottomSheet
-        open={!!selected}
-        wish={selected}
-        onClose={() => setSelected(null)}
-      />
     </div>
   );
 };

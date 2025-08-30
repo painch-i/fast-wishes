@@ -1,0 +1,149 @@
+.public-wish-card {
+  --accent: #ff6b6b;
+  --accent-2: #ff8a8a;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: none;
+  position: relative;
+}
+
+.public-wish-card .ant-card-body {
+  padding: 0;
+}
+
+/* Hero */
+.pw-hero {
+  position: relative;
+  height: 88px;
+  background: linear-gradient(135deg, #fff0f0, #ffffff);
+}
+
+.pw-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pw-emoji {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+}
+
+/* Cute price tag */
+.pw-price-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 999px;
+  padding: 4px 10px 4px 26px;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: none;
+}
+
+/* punch hole + subtle halo */
+.pw-price-tag::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 120, 120, 0.35) 0 2px, transparent 3px);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(17, 24, 39, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+/* no ambient glow to keep it flat */
+
+.pw-link {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  color: #111827;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Reserve button in hero */
+/* Reserve button at bottom-right */
+.pw-bottom-cta { /* deprecated */ }
+
+/* Body */
+.pw-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+}
+
+.pw-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.pw-title {
+  margin: 0 0 2px;
+  font-size: 16px;
+  font-weight: 700;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pw-desc {
+  color: #6b7280;
+  margin: 0 0 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* (old .pw-price-pill removed) */
+
+/* Inline CTA aligned with text */
+.pw-cta-inline {
+  flex-shrink: 0;
+  height: 34px;
+  border: none;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 6px 14px rgba(255, 107, 107, 0.22);
+}
+
+/* CTA */
+/* bottom CTA removed; action now in hero */
+
+.public-wish-card.is-reserved {
+  filter: grayscale(0.1) saturate(0.8);
+}
