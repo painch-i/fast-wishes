@@ -279,6 +279,15 @@ export const WishSheet: React.FC<WishSheetProps> = ({
           </div>
         </div>
       }
+      extra={
+        <Button
+          type="primary"
+          onClick={() => form.submit()}
+          aria-label={mode === "create" ? t("common.add") : t("common.save")}
+        >
+          {mode === "create" ? t("common.add") : t("common.save")}
+        </Button>
+      }
       headerStyle={{
         background: "#fff",
         borderBottom: "1px solid #f0f0f0",
@@ -475,27 +484,6 @@ export const WishSheet: React.FC<WishSheetProps> = ({
           />
         </Form.Item>
 
-        <div
-          style={{
-            position: "sticky",
-            bottom: 0,
-            background: "#fff",
-            padding: "8px 0",
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: 8,
-            paddingBottom: "calc(8px + env(safe-area-inset-bottom))",
-          }}
-        >
-          <Button onClick={onCancel}>{t("common.cancel")}</Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            aria-label={mode === "create" ? t("common.add") : t("common.save")}
-          >
-            {mode === "create" ? t("common.add") : t("common.save")}
-          </Button>
-        </div>
       </Form>
     </Drawer>
   );

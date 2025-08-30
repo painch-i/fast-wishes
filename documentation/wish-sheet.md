@@ -3,10 +3,10 @@
 Mobile bottom sheet used for both creating and editing a wish.
 It renders in a portal attached to `document.body` with a full-screen
 mask. A sticky header stacks a drag handle, a one-line title and a
-secondary subtitle. The body is the only scrollable area and the footer
-remains visible with safe-area padding, exposing **Annuler** and a
-primary **Ajouter/Enregistrer** button. While open, body scrolling is
-locked and `overscroll-behavior: contain` prevents pull-to-refresh.
+secondary subtitle with the primary **Ajouter/Enregistrer** action on the
+right. The body is the only scrollable area and no footer is needed. While
+open, body scrolling is locked and `overscroll-behavior: contain` prevents
+pull-to-refresh.
 
 All labels, placeholders and helper text are sourced from the `i18n` bundles, allowing the sheet to adapt to any supported locale.
 

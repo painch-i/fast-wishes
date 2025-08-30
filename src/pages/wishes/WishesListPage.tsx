@@ -444,6 +444,7 @@ export const WishesListPage: React.FC = () => {
   const [editing, setEditing] = useState<WishUI | undefined>();
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<"list" | "user">("list");
   const [settingsFormList] = Form.useForm<{ slug: string; name?: string | null }>();
   const [settingsFormUser] = Form.useForm<{ contact_email?: string; user_name?: string | null; recover_email?: string }>();
   const watchedSlug = Form.useWatch("slug", settingsFormList);
@@ -859,8 +860,15 @@ export const WishesListPage: React.FC = () => {
         height={window.matchMedia && window.matchMedia("(max-width:600px)").matches ? "60vh" : undefined}
         width={360}
         title={t("wish.list.settingsTitle")}
+        extra={
+          <Button type="primary" onClick={() => (settingsTab === "list" ? settingsFormList.submit() : settingsFormUser.submit())}>
+            {t("common.save")}
+          </Button>
+        }
       >
         <Tabs
+          activeKey={settingsTab}
+          onChange={(key) => setSettingsTab(key as "list" | "user")}
           items={[
             {
               key: "list",
@@ -943,12 +951,6 @@ export const WishesListPage: React.FC = () => {
                       <code>{`${window.location.origin}/l/${watchedSlug}`}</code>
                     </Typography.Text>
                   )}
-                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-                      <Button onClick={() => setSettingsOpen(false)}>{t("common.cancel")}</Button>
-                      <Button type="primary" onClick={() => settingsFormList.submit()}>
-                        {t("common.save")}
-                      </Button>
-                    </div>
                   </Form>
 
                   <div style={{ borderTop: "1px solid #EEF0F3", margin: "16px 0" }} />
@@ -1021,18 +1023,9 @@ export const WishesListPage: React.FC = () => {
                   >
                     <Input placeholder={t("wish.list.recoveryEmailPlaceholder")} />
                   </Form.Item>
-                  <Form.Item name="user_name" label={t("common.name")}> 
+                  <Form.Item name="user_name" label={t("common.name")}>
                     <Input placeholder={t("wish.list.userNamePlaceholder")} />
                   </Form.Item>
-
-                  
-
-                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
-                    <Button onClick={() => setSettingsOpen(false)}>{t("common.cancel")}</Button>
-                    <Button type="primary" onClick={() => settingsFormUser.submit()}>
-                      {t("common.save")}
-                    </Button>
-                  </div>
                 </Form>
               ),
             },

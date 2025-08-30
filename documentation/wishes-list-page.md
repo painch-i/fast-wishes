@@ -45,3 +45,7 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 ## Floating Action Button
 - Single centered “+” FAB opens the add sheet.
 - Hidden whenever an edit or add modal is active.
+
+## Settings Drawer
+- Accessible from the header and switches between list and user tabs.
+- The primary **Enregistrer** action sits in the drawer header; closing via the built-in close icon cancels changes.
