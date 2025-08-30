@@ -160,19 +160,6 @@
           "2": "💡 Envie",
           "3": "🎲 Surprise"
         }
-      },
-      "tag": {
-        "label": "Tag",
-        "options": [
-          "Maison",
-          "Cuisine",
-          "Sport",
-          "Lecture",
-          "Tech",
-          "Mode",
-          "Beauté",
-          "Jeux"
-        ]
       }
     },
     "list": {

@@ -38,13 +38,9 @@ All labels, placeholders and helper text are sourced from the `i18n` bundles, al
    ferait plaisir ? Couleur, taille, usage… 💌”.
 5. **Priorité** – three chips with one always selected: ⭐ Essentiel,
    💡 Envie (default) and 🎲 Surprise.
-6. **Tag** – autocomplete allowing free text with suggestions.
-   The suggestion list is sourced from the translation bundle and
-   gracefully falls back to an empty list while the locale file loads
-   (prevents runtime errors).
 
 Only the title is mandatory. On submit the sheet returns a `WishUI`
 object including `price_cents`, `price_is_approx`, `merchant_domain`,
-`brand`, `tag` and any metadata. The parent performs an optimistic
+`brand` and any metadata. The parent performs an optimistic
 creation or update then closes the sheet and shows a single success
 toast.
