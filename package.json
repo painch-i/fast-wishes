@@ -61,6 +61,7 @@
     "start": "refine start",
     "test": "vitest",
     "check:i18n": "node scripts/check-i18n.mjs",
+    "check:translations": "node scripts/check-translations.mjs",
     "refine": "refine"
   },
   "browserslist": {

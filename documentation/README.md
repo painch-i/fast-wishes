@@ -65,6 +65,7 @@ The resulting `database.types.ts` file is imported across the codebase to ensure
 - Unprefixed URLs (e.g. `/wishes`) redirect to the detected locale: `/fr/wishes` by default.
 - The `useFormat` helper exposes `formatPrice`, `formatNumber`, and `formatDate` using the active locale via `Intl`.
 - Run `yarn check:i18n` in CI to ensure French and English keys remain in sync.
+- Run `yarn check:translations` to verify every `t("...")` key used in source code exists in all locale files.
 - All user-facing components rely on semantic translation keys stored in `common.json` for French, English and pseudo locales.
 
 ## Branding
