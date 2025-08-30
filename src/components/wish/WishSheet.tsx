@@ -250,29 +250,30 @@ export const WishSheet: React.FC<WishSheetProps> = ({
               }}
             />
           )}
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Typography.Title
-              level={4}
+              level={3}
               style={{
                 margin: 0,
-                lineHeight: 1.2,
-                fontSize: "clamp(20px, 5vw, 22px)",
+                lineHeight: 1.15,
+                fontSize: "clamp(22px, 5vw, 26px)",
+                fontWeight: 700,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 display: "-webkit-box",
                 WebkitLineClamp: 1,
                 WebkitBoxOrient: "vertical",
               }}
-            >
+           >
               {mode === "create" ? t("wish.sheet.title.create") : t("wish.sheet.title.edit")}
             </Typography.Title>
             <Typography.Text
               style={{
                 margin: 0,
-                lineHeight: 1.35,
+                lineHeight: 1.4,
                 color: "#6B7280",
                 display: "block",
-                fontSize: 16,
+                fontSize: 14,
                 whiteSpace: "normal",
                 wordBreak: "normal",
                 overflowWrap: "anywhere",
@@ -513,4 +514,3 @@ export const WishSheet: React.FC<WishSheetProps> = ({
     </Drawer>
   );
 };
-

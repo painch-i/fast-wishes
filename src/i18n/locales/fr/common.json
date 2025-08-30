@@ -192,7 +192,14 @@
       "publicLinkInfo": "Ce lien ne montre que tes souhaits publics.",
       "shareTitle": "Ma liste de souhaits",
       "shareTitleNamed": "Liste de souhaits de {name}",
-      "shareTitleMine": "Ma liste de souhaits"
+      "shareTitleMine": "Ma liste de souhaits",
+      "publicLinkLabel": "Lien public",
+      "publicLinkPlaceholder": "ex : anniversaire-ismael",
+      "publicLinkRequired": "Merci de choisir un lien",
+      "slugChecking": "Vérification de la disponibilité…",
+      "slugTaken": "Déjà pris, essaie un autre",
+      "listNameLabel": "Nom de la liste",
+      "listNamePlaceholder": "Anniversaire de Ismaël 🎂"
     },
     "new": {
       "success": "Soumis avec succès !"

@@ -17,7 +17,7 @@ import { WishSheet } from "../../components/wish/WishSheet";
 import { useFormat } from "../../i18n";
 import { UserIdentity, UserSlug } from "../../types";
 import { WishUI } from "../../types/wish";
-import { getExtras, mapDbToWishUI, setExtras } from "../../utility";
+import { getExtras, mapDbToWishUI, setExtras, supabaseClient } from "../../utility";
 
 type RowProps = {
   item: WishUI;
@@ -446,6 +446,8 @@ export const WishesListPage: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsForm] = Form.useForm<{ slug: string; name?: string | null }>();
   const watchedSlug = Form.useWatch("slug", settingsForm);
+  const [slugChecking, setSlugChecking] = useState(false);
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const pendingDelete = useRef<{ item: WishUI; index: number; timeout: number } | null>(null);
 
   useEffect(() => {
@@ -453,6 +455,34 @@ export const WishesListPage: React.FC = () => {
       setBannerDismissed(true);
     }
   }, []);
+
+  // Debounced slug availability check
+  useEffect(() => {
+    const v = watchedSlug?.trim() ?? "";
+    if (!v) {
+      setSlugAvailable(null);
+      setSlugChecking(false);
+      return;
+    }
+    setSlugChecking(true);
+    const id = window.setTimeout(async () => {
+      try {
+        const { data: rows, error } = await supabaseClient
+          .from("users")
+          .select("id")
+          .eq("slug", v)
+          .neq("id", identity?.id || "");
+        if (error) throw error;
+        setSlugAvailable((rows?.length || 0) === 0);
+      } catch (e) {
+        // On error, don't block save, just mark unknown
+        setSlugAvailable(null);
+      } finally {
+        setSlugChecking(false);
+      }
+    }, 400);
+    return () => window.clearTimeout(id);
+  }, [watchedSlug, identity?.id]);
 
   // Share and external open actions removed; keep a simple anchor link.
 
@@ -793,6 +823,13 @@ export const WishesListPage: React.FC = () => {
               .replace(/--+/g, "-")
               .replace(/^-+|-+$/g, "");
             if (sanitized !== values.slug) settingsForm.setFieldsValue({ slug: sanitized });
+            if (
+              slugAvailable === false &&
+              sanitized !== (slugData?.data.slug || "")
+            ) {
+              message.error(t("wish.list.slugTaken"));
+              return;
+            }
             updateUser(
               {
                 resource: "users",
@@ -815,11 +852,20 @@ export const WishesListPage: React.FC = () => {
         >
           <Form.Item
             name="slug"
-            label={t("common.slug")}
-            rules={[{ required: true, message: t("wish.sheet.name.required") }]}
+            label={t("wish.list.publicLinkLabel")}
+            rules={[{ required: true, message: t("wish.list.publicLinkRequired") }]}
+            validateStatus={slugChecking ? "validating" : slugAvailable == null ? undefined : slugAvailable ? "success" : "error"}
+            help={
+              slugChecking
+                ? t("wish.list.slugChecking")
+                : slugAvailable === false
+                ? t("wish.list.slugTaken")
+                : undefined
+            }
           >
             <Input
-              placeholder="mon-slug"
+              placeholder={t("wish.list.publicLinkPlaceholder")}
+              addonBefore={`${window.location.origin}/l/`}
               onChange={(e) => {
                 const v = e.target.value
                   .toLowerCase()
@@ -831,8 +877,8 @@ export const WishesListPage: React.FC = () => {
               }}
             />
           </Form.Item>
-          <Form.Item name="name" label={t("common.name")}> 
-            <Input placeholder={t("common.name")} />
+          <Form.Item name="name" label={t("wish.list.listNameLabel")}>
+            <Input placeholder={t("wish.list.listNamePlaceholder")} />
           </Form.Item>
           {watchedSlug && (
             <Typography.Text type="secondary">

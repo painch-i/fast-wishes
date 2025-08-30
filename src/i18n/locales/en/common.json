@@ -192,7 +192,14 @@
       "publicLinkInfo": "This link only shows your public wishes.",
       "shareTitle": "My wishlist",
       "shareTitleNamed": "{name}'s wishlist",
-      "shareTitleMine": "My wishlist"
+      "shareTitleMine": "My wishlist",
+      "publicLinkLabel": "Public link",
+      "publicLinkPlaceholder": "ex: ismael-birthday",
+      "publicLinkRequired": "Please choose a link",
+      "slugChecking": "Checking availability…",
+      "slugTaken": "Already taken, try another",
+      "listNameLabel": "List name",
+      "listNamePlaceholder": "Ismaël's birthday 🎂"
     },
     "new": {
       "success": "Submitted successfully!"
