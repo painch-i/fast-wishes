@@ -139,8 +139,7 @@
         "placeholder": "Haws stainless watering can 1 L"
       },
       "price": {
-        "extra": "Give a budget to guide choices.",
-        "approxAria": "Approximate price"
+        "extra": "Give a budget to guide choices."
       },
       "url": {
         "label": "Merchant link",

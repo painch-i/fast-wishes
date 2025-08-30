@@ -7,7 +7,6 @@ import {
   Select,
   Space,
   Typography,
-  Checkbox,
   Segmented,
   message,
 } from "antd";
@@ -324,52 +323,40 @@ export const WishSheet: React.FC<WishSheetProps> = ({
           label={t("wish.form.price.label")}
           extra={t("wish.sheet.price.extra")}
         >
-          <Space.Compact block>
-            <Form.Item name="price" noStyle>
-              <Input
-                type="text"
-                inputMode="decimal"
-                placeholder="0"
-                style={{ fontSize: 16 }}
-              />
-            </Form.Item>
-            <Form.Item name="currency" noStyle>
-              <Select
-                aria-haspopup="listbox"
-                style={{ width: 80, fontSize: 16 }}
-                getPopupContainer={() => document.body}
-                dropdownStyle={{ zIndex: 1002 }}
-              >
-                {[currency, "EUR", "GBP", "USD"]
-                  .filter((v): v is string => !!v)
-                  .filter(
-                    (v, i, arr) => arr.indexOf(v) === i
-                  )
-                  .map((v) => (
-                    <Select.Option
-                      key={v}
-                      value={v}
-                      onMouseDown={(e: React.MouseEvent) => e.preventDefault()}
-                    >
-                      {v}
-                    </Select.Option>
-                  ))}
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name="price_is_approx"
-              valuePropName="checked"
-              noStyle
+  <Space.Compact block>
+    <Form.Item name="price" noStyle>
+      <Input
+        type="text"
+        inputMode="decimal"
+        placeholder="0"
+        style={{ fontSize: 16 }}
+      />
+    </Form.Item>
+    <Form.Item name="currency" noStyle>
+      <Select
+        aria-haspopup="listbox"
+        style={{ width: 80, fontSize: 16 }}
+        getPopupContainer={() => document.body}
+        dropdownStyle={{ zIndex: 1002 }}
+      >
+        {[currency, "EUR", "GBP", "USD"]
+          .filter((v): v is string => !!v)
+          .filter(
+            (v, i, arr) => arr.indexOf(v) === i
+          )
+          .map((v) => (
+            <Select.Option
+              key={v}
+              value={v}
+              onMouseDown={(e: React.MouseEvent) => e.preventDefault()}
             >
-              <Checkbox
-                aria-label={t("wish.sheet.price.approxAria")}
-                style={{ padding: "0 8px", fontSize: 16 }}
-              >
-                ≈
-              </Checkbox>
-            </Form.Item>
-          </Space.Compact>
-        </Form.Item>
+              {v}
+            </Select.Option>
+          ))}
+      </Select>
+    </Form.Item>
+  </Space.Compact>
+</Form.Item>
 
         <Form.Item
           name="url"
