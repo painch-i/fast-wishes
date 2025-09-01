@@ -7,7 +7,7 @@ import {
   useOne,
   useUpdate,
 } from "@refinedev/core";
-import { Alert, Button, Drawer, Form, Input, Skeleton, Tag, Tabs, Typography, message } from "antd";
+import { Alert, Button, Drawer, Form, Input, Skeleton, Tabs, Tag, Typography, message } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { colors } from "../../theme";
 import "./WishesListPage.css";

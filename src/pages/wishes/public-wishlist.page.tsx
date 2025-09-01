@@ -1,37 +1,38 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router";
 import { useList } from "@refinedev/core";
-import { Tag, Skeleton, Drawer, Button, Typography, message } from "antd";
-import { PublicWishCard, ReserveBottomSheet } from "../../components";
-import type { Wish } from "../../components";
-import "./public-wishlist.page.css";
+import { Button, Drawer, Skeleton, Tag, Typography, message } from "antd";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
 import type { Tables } from "../../../database.types";
+import type { Wish } from "../../components";
+import { PublicWishCard, ReserveBottomSheet } from "../../components";
 import { supabaseClient } from "../../utility";
+import "./public-wishlist.page.css";
 
 export const PublicWishlistPage: React.FC = () => {
   const { slug } = useParams();
-  const { data, isLoading } = useList<Wish>({
+  const { data, isLoading } = useList<Wish & { owner: Tables<"users"> }>({
     resource: "wishes",
     filters: [
       {
-        field: "users.slug",
+        field: "owner.slug",
         operator: "eq",
         value: slug,
       },
-      { field: "is_public", operator: "eq", value: true },
     ],
     meta: {
-      select: "*, users!inner(slug)",
+      select: `
+        *,
+        owner:users!wishes_user_id_fkey1!inner(slug, user_list_name),
+        reservations(
+          user:users(name)
+        )
+      `,
     },
   });
 
-  // Fetch the user by slug to get the optional name, even if no public wishes
-  const { data: userData } = useList<Tables<"users">>({
-    resource: "users",
-    filters: [{ field: "slug", operator: "eq", value: slug }],
-    meta: { select: "*" },
-  });
+  const owner = data?.data[0]?.owner;
+
 
   const wishes = data?.data ?? [];
   const [reservedIds, setReservedIds] = useState<Set<number>>(new Set());
@@ -42,8 +43,8 @@ export const PublicWishlistPage: React.FC = () => {
 
   // Use the list's public display name directly if available
   const listName = useMemo(
-    () => (userData?.data?.[0] as any)?.user_list_name ?? undefined,
-    [userData]
+    () => owner?.user_list_name ?? undefined,
+    [owner]
   );
   const title = listName || t("public.header.wishlistMine");
 

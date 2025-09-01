@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
 import { Button, Drawer, Form, Input, message } from "antd";
-import type { Wish } from "./types";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabaseClient } from "../../utility";
+import type { Wish } from "./types";
 
 interface ReserveBottomSheetProps {
   open: boolean;
@@ -23,29 +23,8 @@ export const ReserveBottomSheet: React.FC<ReserveBottomSheetProps> = ({
   const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
 
-  // Prefill from the same source as Settings => You (Supabase auth user)
-  useEffect(() => {
-    const prefill = async () => {
-      try {
-        const { data } = await supabaseClient.auth.getUser();
-        const meta = (data.user?.user_metadata as any) || {};
-        const preferredEmail = meta.contact_email || data.user?.email || undefined;
-        form.setFieldsValue({
-          name: meta.name || undefined,
-          email: preferredEmail,
-        });
-        if (autoSubmitIfPrefilled && (meta.name || "").trim()) {
-          // Auto-submit without asking again if we already have user's name
-          handleReserve();
-        }
-      } catch {
-        // ignore prefill errors silently
-      }
-    };
-    if (open) prefill();
-  }, [open, form, autoSubmitIfPrefilled]);
 
-  const handleReserve = async () => {
+  const handleReserve = useCallback(async () => {
     if (!wish) return;
     try {
       setSubmitting(true);
@@ -60,13 +39,21 @@ export const ReserveBottomSheet: React.FC<ReserveBottomSheetProps> = ({
       const userId = userData?.user?.id;
       if (!userId) throw new Error("no-user");
 
-      // Store name/email in auth metadata to keep minimal contact info
-      await supabaseClient.auth.updateUser({
-        data: { name: values.name || null, contact_email: values.email || null },
-      });
+      // Store name/email auth email
+      if (values.email) {
+        await supabaseClient.auth.updateUser({
+          email: values.email,
+        });
+      }
 
       // Insert reservation row
-      const { error } = await (supabaseClient as any).from("reservations").insert({
+      if (values.name) {
+        const { error: updateUserError } = await supabaseClient.from("users").update({ name: values.name,  }).eq('id', userId);
+        if (updateUserError) throw updateUserError;
+      }
+
+      // Insert reservation row
+      const { error } = await supabaseClient.from("reservations").insert({
         user_id: userId,
         wish_id: wish.id,
       });
@@ -83,7 +70,30 @@ export const ReserveBottomSheet: React.FC<ReserveBottomSheetProps> = ({
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [form, onClose, onReserved, t, wish]);
+
+  // Prefill from the same source as Settings => You (Supabase auth user)
+  useEffect(() => {
+    const prefill = async () => {
+      try {
+        const { data: authData } = await supabaseClient.auth.getUser();
+        const userData = authData?.user?.id ? await supabaseClient.from('users').select('name').eq('id', authData.user.id).limit(1) : undefined;
+        const name = userData?.data?.[0].name || '';
+        const email = authData.user?.email || '';
+        form.setFieldsValue({
+          name,
+          email,
+        });
+        if (autoSubmitIfPrefilled && (name || "").trim()) {
+          // Auto-submit without asking again if we already have user's name
+          handleReserve();
+        }
+      } catch {
+        // ignore prefill errors silently
+      }
+    };
+    if (open) prefill();
+  }, [open, form, autoSubmitIfPrefilled, handleReserve]);
 
   return (
     <Drawer
