@@ -1,10 +1,10 @@
+import { Button, Card } from "antd";
 import React from "react";
-import { Card, Button } from "antd";
-import type { Wish } from "./types";
-import "./PublicWishCard.css";
 import { useTranslation } from "react-i18next";
 import { useFormat } from "../../i18n/use-format";
 import { guessUserCurrency } from "../../utility/guessUserCurrency";
+import "./PublicWishCard.css";
+import type { Wish } from "./types";
 
 interface PublicWishCardProps {
   wish: Wish;
@@ -15,11 +15,17 @@ interface PublicWishCardProps {
   onCancelReserve?: (wish: Wish) => void;
 }
 
-export const PublicWishCard: React.FC<PublicWishCardProps> = ({ wish, reserved = false, reservedByMe = false, reservedName, onReserve, onCancelReserve }) => {
+export const PublicWishCard: React.FC<PublicWishCardProps> = ({
+  wish,
+  reserved = false,
+  reservedByMe = false,
+  reservedName,
+  onReserve,
+  onCancelReserve
+}) => {
   const { t } = useTranslation();
   const { formatPrice } = useFormat();
   const hasUrl = !!wish.url;
-  const reservable = !reserved;
 
   const openLink = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -40,7 +46,7 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({ wish, reserved =
     return "🎁";
   };
 
-  // Format price using locale + currency
+  // Prix
   let priceLabel: string | null = null;
   if (wish.price != null) {
     const raw = String(wish.price).replace(/\s/g, "").replace(",", ".");
@@ -52,55 +58,51 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({ wish, reserved =
     }
   }
 
-  return (
-    <Card className={`public-wish-card${reserved ? " is-reserved" : ""}`} hoverable>
-      <div className="pw-body">
-        <div className="pw-avatar">
-          {wish.image ? (
-            <img src={wish.image} alt="" aria-hidden className="pw-avatar-img" />
-          ) : (
-            <div className="pw-emoji" aria-hidden>
-              {wish.emoji || pickEmoji(wish.name)}
-            </div>
-          )}
-          {hasUrl && (
-            <button type="button" className="pw-link" aria-label="Ouvrir le lien" onClick={openLink}>
-              🔗
-            </button>
-          )}
-        </div>
+  const reservable = !reserved;
 
-        <div className="pw-text">
-          <h3 className="pw-title" title={wish.name}>
-            {wish.name}
-          </h3>
-          {wish.description && (
-            <p className="pw-desc" title={wish.description || undefined}>
-              {wish.description}
-            </p>
-          )}
-          {priceLabel && <div className="pw-price">{priceLabel}</div>}
-        </div>
+  return (
+    <Card className={`public-wish-card gallery${reserved ? " is-reserved" : ""}`} hoverable>
+      {/* MEDIA TOP */}
+      <div className="pw-media" onClick={openLink} role={hasUrl ? "button" : undefined} tabIndex={hasUrl ? 0 : -1}>
+        {wish.image ? (
+          <img className="pw-media-img" src={wish.image} alt="" loading="lazy" />
+        ) : (
+          <div className="pw-media-fallback" aria-hidden>{wish.emoji || pickEmoji(wish.name)}</div>
+        )}
+        {reserved && (
+          <div className={`pw-badge ${reservedByMe ? "me" : ""}`}>
+            {reservedByMe
+              ? t("public.card.reservedByYouPlain")
+              : reservedName
+                ? t("public.card.reservedByNamePlain", { name: reservedName })
+                : t("public.card.reservedPlain")}
+          </div>
+        )}
+        {hasUrl && <div className="pw-media-gradient" aria-hidden />}
+      </div>
+
+      {/* CONTENT */}
+      <div className="pw-content">
+        <h3 className="pw-title" title={wish.name}>{wish.name}</h3>
+        {wish.description && (
+          <p className="pw-desc" title={wish.description || undefined}>{wish.description}</p>
+        )}
+      </div>
+
+      {/* FOOTER */}
+      <div className="pw-footer">
+        {priceLabel && <div className="pw-price">{priceLabel}</div>}
         {reservable ? (
-          <Button
-            type="primary"
-            size="middle"
-            className="pw-cta-inline"
-            onClick={() => onReserve?.(wish)}
-          >
+          <Button type="primary" size="middle" className="pw-cta" onClick={() => onReserve?.(wish)}>
             {t("public.card.reserve")}
           </Button>
         ) : reservedByMe ? (
-          <Button
-            size="middle"
-            className="pw-cta-inline me"
-            onClick={() => onCancelReserve?.(wish)}
-            title={t("public.card.cancelReservation")}
-          >
+          <Button size="middle" className="pw-cta me" onClick={() => onCancelReserve?.(wish)}
+                  title={t("public.card.cancelReservation")}>
             {t("public.card.reservedByYouPlain")}
           </Button>
         ) : (
-          <Button size="middle" className="pw-cta-inline reserved" disabled>
+          <Button size="middle" className="pw-cta reserved" disabled>
             {reservedName ? t("public.card.reservedByNamePlain", { name: reservedName }) : t("public.card.reservedPlain")}
           </Button>
         )}
