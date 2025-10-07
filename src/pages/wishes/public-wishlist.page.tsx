@@ -3,7 +3,7 @@ import { Button, Drawer, Skeleton, Tag, Typography, message } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
-import type { Tables } from "../../../database.types";
+import type { Tables } from "../.././database.types";
 import type { Wish } from "../../components";
 import { PublicWishCard, ReserveBottomSheet } from "../../components";
 import { supabaseClient } from "../../utility";

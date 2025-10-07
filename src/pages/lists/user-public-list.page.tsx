@@ -7,9 +7,9 @@ import {
   useTable
 } from "@refinedev/antd";
 import { Space, Switch, Table } from "antd";
-import { useParams } from "react-router";
-import type { Tables } from "../../../database.types";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
+import type { Tables } from "../.././database.types";
 
 export type IWish = Tables<"wishes">;
 

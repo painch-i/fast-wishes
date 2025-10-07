@@ -1,5 +1,5 @@
 import { createClient } from "@refinedev/supabase";
-import type { Database } from "../../database.types";
+import type { Database } from ".././database.types";
 
 const SUPABASE_URL = "https://sxfqmmsawxxrafjfusdu.supabase.co";
 const SUPABASE_KEY =

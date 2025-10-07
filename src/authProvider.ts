@@ -1,7 +1,7 @@
 import { AuthProvider } from "@refinedev/core";
 import { customAlphabet } from "nanoid";
+import type { TablesInsert } from "./database.types";
 import { supabaseClient } from "./utility";
-import type { TablesInsert } from "../database.types";
 
 const nanoid = customAlphabet('1234567890abcdef', 5)
 
