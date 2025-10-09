@@ -53,6 +53,7 @@
       "unknownUser": "Unable to create wish: unknown user",
       "updated": "Changes saved ✨",
       "updateError": "Oops, couldn't save. Your edits are kept locally.",
+      "imageError": "Wish saved without images. Please try again.",
       "copied": "Link copied ✨",
       "copyError": "Unable to copy link"
     },
@@ -163,6 +164,14 @@
       "description": {
         "label": "Personal note",
         "placeholder": "Why would I love it? Color, size, use… 💌"
+      },
+      "images": {
+        "label": "Photos",
+        "extra": "Add up to 6 images to inspire friends.",
+        "add": "Add",
+        "invalid": "Only image files are allowed.",
+        "tooLarge": "Image is too large (max 5 MB).",
+        "limit": "You can add up to 6 images."
       },
       "priority": {
         "options": {

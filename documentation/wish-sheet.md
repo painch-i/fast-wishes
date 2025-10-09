@@ -6,14 +6,24 @@ mask. A sticky header stacks a drag handle, a one-line title and a
 secondary subtitle with the primary **Ajouter/Enregistrer** action on the
 right. The body is the only scrollable area and no footer is needed. While
 open, body scrolling is locked and `overscroll-behavior: contain` prevents
-pull-to-refresh.
+pull-to-refresh. Emoji selection has been removed: wishes now rely on
+uploaded photos or automatic fallbacks when no media is available.
 
 All labels, placeholders and helper text are sourced from the `i18n` bundles, allowing the sheet to adapt to any supported locale.
 
 ## Fields
 1. **Titre** – required. Placeholder “Arrosoir inox Haws 1 L” with the
-   help text “Un nom clair aide tes proches à choisir.”
-2. **Prix + Devise** – text input with `inputmode="decimal"` and a
+   help text “Un nom clair aide tes proches à choisir.” No emoji picker
+   is surfaced anymore.
+2. **Photos** – grid preview of already saved images with inline remove
+   actions and an Ant Design `Upload` widget configured with
+   `listType="picture-card"`. Users can add up to six images per wish;
+   the client blocks non-image MIME types and files over 5 MB with
+   localized error toasts. New uploads are deferred until submit where
+   they are pushed to Supabase storage under `wish-images/{wishId}/`. The
+   drawer also keeps track of deletions so removed photos are purged from
+   both the join table and storage.
+3. **Prix + Devise** – text input with `inputmode="decimal"` and a
    currency selector pre-filled by `guessUserCurrency()` (profile → country
    → last wish → browser locale) using `country-to-currency` with USD
    fallback. Editing an existing wish preserves its stored currency. The
@@ -38,7 +48,16 @@ All labels, placeholders and helper text are sourced from the `i18n` bundles, al
 5. **Priorité** – three chips with one always selected: ⭐ Essentiel,
    💡 Envie (default) and 🎲 Surprise.
 
-Only the title is mandatory. On submit the sheet returns a `WishUI`
-object including `price_cents`, `merchant_domain`, `brand` and any
-metadata. The parent performs an optimistic creation or update then closes
-the sheet and shows a single success toast.
+Only the title is mandatory. On submit the sheet returns a
+`WishFormValues` object including `price_cents`, `merchant_domain`,
+`brand`, existing image metadata, plus two extra arrays:
+
+| Field            | Type          | Notes                                                  |
+| ---------------- | ------------- | ------------------------------------------------------ |
+| `newImages`      | `File[]`      | Client-side files queued for upload.                   |
+| `removedImages`  | `WishImage[]` | Already persisted images the user removed in the UI.   |
+
+The parent performs the Supabase mutation, uploads/removes storage
+objects, then closes the sheet with a single success toast. When uploads
+fail, the mutation still succeeds but the drawer surfaces a dedicated
+error toast while keeping the sheet open.

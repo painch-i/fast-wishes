@@ -1,11 +1,10 @@
 import type { FormInstance } from "antd";
-import { Button, Form, Input, InputNumber, Segmented, Select, Space, Switch, Typography } from "antd";
+import { Button, Form, Input, InputNumber, Segmented, Select, Switch, Typography } from "antd";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useWishMetadata } from "../../../hooks/useWishMetadata";
 import { WishUI } from "../../../types/wish";
-import { EmojiPickerPopover } from "./EmojiPickerPopover";
 
 const { TextArea } = Input;
 
@@ -22,7 +21,6 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
   const { t } = useTranslation();
 
   const url = watch("url");
-  const emoji = watch("emoji");
   const { metadata } = useWishMetadata(url ?? undefined);
 
   useEffect(() => {
@@ -38,27 +36,15 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
     <Form layout="vertical" form={form} onFinish={handleSubmit(onSubmit)}>
       {/* Emoji + Title */}
       <Form.Item label={t("wish.form.title.label")} required>
-        <Space.Compact style={{ width: "100%" }}>
-          <EmojiPickerPopover
-            value={emoji ?? undefined}
-            onChange={(em) => setValue("emoji", (em as any) ?? null, { shouldDirty: true, shouldTouch: true })}
-          />
-          <Controller
-            name="name"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Input size="large" {...field} value={field.value ?? ""} placeholder={t("wish.form.title.label")} />
-            )}
-          />
-        </Space.Compact>
+        <Controller
+          name="name"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <Input size="large" {...field} value={field.value ?? ""} placeholder={t("wish.form.title.label")} />
+          )}
+        />
       </Form.Item>
-      {/* keep hidden field wired to RHF for emoji value in submission */}
-      <Controller
-        name="emoji"
-        control={control}
-        render={({ field }) => <input type="hidden" {...field} value={field.value ?? ""} />}
-      />
       <Controller
         name="url"
         control={control}

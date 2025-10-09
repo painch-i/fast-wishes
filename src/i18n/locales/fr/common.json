@@ -53,6 +53,7 @@
       "unknownUser": "Impossible de créer le souhait : utilisateur inconnu",
       "updated": "Modifications enregistrées ✨",
       "updateError": "Oups, on n'a pas pu enregistrer. Tes modifs sont gardées localement.",
+      "imageError": "Souhait mis à jour sans les images. Réessaie plus tard.",
       "copied": "Lien copié ✨",
       "copyError": "Impossible de copier le lien"
     },
@@ -163,6 +164,14 @@
       "description": {
         "label": "Commentaire perso",
         "placeholder": "Pourquoi ça me ferait plaisir ? Couleur, taille, usage… 💌"
+      },
+      "images": {
+        "label": "Photos",
+        "extra": "Ajoute jusqu’à 6 images pour inspirer tes proches.",
+        "add": "Ajouter",
+        "invalid": "Seules les images sont acceptées.",
+        "tooLarge": "Image trop lourde (5 Mo max).",
+        "limit": "Tu peux ajouter jusqu’à 6 images."
       },
       "priority": {
         "options": {

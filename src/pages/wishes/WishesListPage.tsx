@@ -16,13 +16,35 @@ import { useTranslation } from "react-i18next";
 import { WishSheet } from "../../components/wish/WishSheet";
 import { useFormat } from "../../i18n";
 import { UserIdentity, UserSlug } from "../../types";
-import { WishUI } from "../../types/wish";
-import { getExtras, mapDbToWishUI, setExtras, supabaseClient } from "../../utility";
+import { WishFormValues, WishUI } from "../../types/wish";
+import {
+  getExtras,
+  mapDbToWishUI,
+  mapWishImages,
+  setExtras,
+  supabaseClient,
+  syncWishImages,
+} from "../../utility";
+import type { Tables } from "../../database.types";
 
 type RowProps = {
   item: WishUI;
   onOpen: (item: WishUI, field?: keyof WishUI) => void;
   onDelete: (item: WishUI) => void;
+};
+
+type WishWithImagesRow = WishUI & {
+  wishes_images?: Tables<"wishes_images">[];
+};
+
+const normalizeWish = (row: WishWithImagesRow): WishUI => {
+  const { wishes_images, ...rest } = row as WishWithImagesRow & { wishes_images?: Tables<"wishes_images">[] };
+  const images = mapWishImages(wishes_images);
+  return {
+    ...(rest as WishUI),
+    images,
+    image_url: images[0]?.url ?? (rest as WishUI).image_url,
+  };
 };
 
 const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
@@ -77,6 +99,21 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
 
   const renderThumb = () => {
     const accent = hashColor(domain || item.name || "");
+    if (item.images?.length) {
+      return (
+        <img
+          src={item.images[0].url}
+          alt=""
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 12,
+            objectFit: "cover",
+            flexShrink: 0,
+          }}
+        />
+      );
+    }
     if (item.image_url) {
       return (
         <img
@@ -417,11 +454,17 @@ export const WishesListPage: React.FC = () => {
     filters: [
       { field: "user_id", operator: "eq", value: identity?.id },
     ],
+    meta: {
+      select: "*, wishes_images(id, storage_object_id)",
+    },
     queryOptions: { enabled: !!identity },
   });
   const [wishes, setWishes] = useState<WishUI[]>([]);
   useEffect(() => {
-    if (data?.data) setWishes(data.data);
+    if (data?.data) {
+      const normalized = (data.data as WishWithImagesRow[]).map((row) => normalizeWish(row));
+      setWishes(normalized);
+    }
   }, [data]);
 
   const { data: slugData } = useOne<UserSlug>({
@@ -522,23 +565,56 @@ export const WishesListPage: React.FC = () => {
     setSheetOpen(true);
   };
 
-  const handleSave = (values: WishUI) => {
-    const { note_private, tags, metadata, price_cents, ...dbValues } = values as any;
+  const handleSave = (values: WishFormValues) => {
+    const {
+      note_private,
+      tags,
+      metadata,
+      price_cents,
+      newImages = [],
+      removedImages = [],
+      images: _ignored,
+      ...dbValues
+    } = values as WishFormValues & Record<string, any>;
+    const removedRows = removedImages.map(({ url: _url, ...rest }) => rest) as Tables<"wishes_images">[];
+
+    const persistExtras = (id: number) => {
+      setExtras(String(id), { note_private, tags, metadata });
+    };
+
     if (values.id) {
       update(
         {
           resource: "wishes",
           id: values.id,
-          values: { ...dbValues, price: price_cents != null ? String(price_cents / 100) : null },
+          values: {
+            ...dbValues,
+            price: price_cents != null ? String(price_cents / 100) : null,
+          },
           successNotification: false,
           errorNotification: false,
         },
         {
-          onSuccess: () => {
-            setExtras(String(values.id), { note_private, tags, metadata });
-            message.success(t("wish.toast.updated"));
-            setSheetOpen(false);
-            refetch();
+          onSuccess: async () => {
+            try {
+              if (newImages.length || removedRows.length) {
+                await syncWishImages({
+                  wishId: values.id!,
+                  newFiles: newImages,
+                  removed: removedRows,
+                });
+              }
+              persistExtras(values.id!);
+              message.success(t("wish.toast.updated"));
+              setSheetOpen(false);
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error(error);
+              persistExtras(values.id!);
+              message.error(t("wish.toast.imageError"));
+            } finally {
+              refetch();
+            }
           },
           onError: () =>
             message.error(t("wish.toast.updateError")),
@@ -561,13 +637,32 @@ export const WishesListPage: React.FC = () => {
           errorNotification: false,
         },
         {
-          onSuccess: (data) => {
-            if (data?.data?.id) {
-              setExtras(String(data.data.id), { note_private, tags, metadata });
+          onSuccess: async (data) => {
+            const rawId = data?.data?.id;
+            const numericId = typeof rawId === "number" ? rawId : Number(rawId);
+            if (!Number.isFinite(numericId)) {
+              message.error(t("wish.toast.saveError"));
+              return;
             }
-            message.success(t("wish.toast.created"));
-            setSheetOpen(false);
-            refetch();
+            try {
+              if (newImages.length || removedRows.length) {
+                await syncWishImages({
+                  wishId: numericId,
+                  newFiles: newImages,
+                  removed: removedRows,
+                });
+              }
+              persistExtras(numericId);
+              message.success(t("wish.toast.created"));
+              setSheetOpen(false);
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error(error);
+              persistExtras(numericId);
+              message.error(t("wish.toast.imageError"));
+            } finally {
+              refetch();
+            }
           },
           onError: () =>
             message.error(t("wish.toast.saveError")),

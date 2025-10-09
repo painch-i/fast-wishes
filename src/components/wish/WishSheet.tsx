@@ -1,4 +1,4 @@
-import { CloseCircleFilled, ExportOutlined } from "@ant-design/icons";
+import { CloseCircleFilled, ExportOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMediaQuery } from "@mui/material";
 import { useGetIdentity } from "@refinedev/core";
 import type { InputRef } from "antd";
@@ -11,23 +11,24 @@ import {
   Select,
   Space,
   Typography,
+  Upload,
   message,
 } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLinkMetadata } from "../../hooks/useLinkMetadata";
 import { colors } from "../../theme";
-import type { WishUI } from "../../types/wish";
+import type { WishFormValues, WishImage, WishUI } from "../../types/wish";
 import { guessUserCurrency } from "../../utility";
-import { EmojiPickerPopover } from "../admin/wishes/EmojiPickerPopover";
+import type { RcFile, UploadFile } from "antd/es/upload/interface";
 
 export interface WishSheetProps {
   open: boolean;
   mode: "create" | "edit";
-  initialValues?: Partial<WishUI>;
+  initialValues?: Partial<WishFormValues>;
   previousWishCurrency?: string;
   onCancel: () => void;
-  onSubmit: (values: WishUI) => void;
+  onSubmit: (values: WishFormValues) => void;
 }
 
 export const WishSheet: React.FC<WishSheetProps> = ({
@@ -56,13 +57,22 @@ export const WishSheet: React.FC<WishSheetProps> = ({
 
   const url = Form.useWatch("url", form);
   const { metadata } = useLinkMetadata(debouncedUrl);
-  const emoji = Form.useWatch("emoji", form);
+  const [existingImages, setExistingImages] = useState<WishImage[]>([]);
+  const [removedImages, setRemovedImages] = useState<WishImage[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const activeImages = existingImages.filter(
+    (image) => !removedImages.some((removed) => removed.id === image.id)
+  );
 
   useEffect(() => {
     if (open) {
       form.resetFields();
       if (initialValues) {
         form.setFieldsValue(initialValues as any);
+        setExistingImages(initialValues.images ?? []);
+        setRemovedImages([]);
+        setFileList([]);
         if (initialValues.url) {
           try {
             const hostname = new URL(initialValues.url).hostname.replace(/^www\./, "");
@@ -89,9 +99,15 @@ export const WishSheet: React.FC<WishSheetProps> = ({
           });
           form.setFieldsValue({ currency: guessed } as any);
         }
+        setExistingImages([]);
+        setRemovedImages([]);
+        setFileList([]);
       }
     } else {
       setShowPasteTip(false);
+      setExistingImages([]);
+      setRemovedImages([]);
+      setFileList([]);
     }
   }, [open, initialValues, form, mode, identity, previousWishCurrency]);
 
@@ -160,6 +176,43 @@ export const WishSheet: React.FC<WishSheetProps> = ({
     }
   };
 
+  const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+  const MAX_TOTAL_IMAGES = 6;
+
+  const handleBeforeUpload = (file: RcFile) => {
+    if (!file.type?.startsWith("image/")) {
+      message.error(t("wish.sheet.images.invalid"));
+      return Upload.LIST_IGNORE;
+    }
+    if (file.size && file.size > MAX_IMAGE_SIZE) {
+      message.error(t("wish.sheet.images.tooLarge"));
+      return Upload.LIST_IGNORE;
+    }
+    const total = activeImages.length + fileList.length;
+    if (total >= MAX_TOTAL_IMAGES) {
+      message.warning(t("wish.sheet.images.limit"));
+      return Upload.LIST_IGNORE;
+    }
+    return false;
+  };
+
+  const handleUploadChange = ({ fileList: next }: { fileList: UploadFile[] }) => {
+    const total = activeImages.length + next.length;
+    if (total > MAX_TOTAL_IMAGES) {
+      message.warning(t("wish.sheet.images.limit"));
+      setFileList(next.slice(0, Math.max(0, MAX_TOTAL_IMAGES - activeImages.length)));
+      return;
+    }
+    setFileList(next);
+  };
+
+  const handleRemoveExisting = (image: WishImage) => {
+    setRemovedImages((prev) => {
+      if (prev.some((img) => img.id === image.id)) return prev;
+      return [...prev, image];
+    });
+  };
+
   useEffect(() => {
     const handler = setTimeout(() => {
       if (!url) {
@@ -207,13 +260,25 @@ export const WishSheet: React.FC<WishSheetProps> = ({
   };
 
   const handleFinish = (values: WishUI) => {
+    const retainedImages = existingImages.filter(
+      (img) => !removedImages.some((removed) => removed.id === img.id)
+    );
+    const newFiles = fileList.reduce<File[]>((acc, file) => {
+      if (file.originFileObj) {
+        acc.push(file.originFileObj as File);
+      }
+      return acc;
+    }, []);
     const priceNumber = values.price ? parseFloat(String(values.price)) : undefined;
     const price_cents = priceNumber != null ? Math.round(priceNumber * 100) : null;
-    const submitValues: WishUI = {
+    const submitValues: WishFormValues = {
       ...initialValues,
       ...values,
       price_cents,
-    } as WishUI;
+      images: retainedImages,
+      newImages: newFiles,
+      removedImages,
+    } as WishFormValues;
     onSubmit(submitValues);
     if (mode === "create") localStorage.removeItem("wish-draft");
   };
@@ -320,26 +385,81 @@ export const WishSheet: React.FC<WishSheetProps> = ({
         style={{ flex: 1, overflowY: "auto", padding: "0 0 16px" }}
       >
         <Form.Item label={t("wish.form.title.label")} extra={t("wish.sheet.name.extra")}>
-          <Space.Compact style={{ width: "100%" }}>
-            <EmojiPickerPopover
-              value={emoji ?? undefined}
-              onChange={(em) => form.setFieldsValue({ emoji: (em as any) ?? null } as any)}
+          <Form.Item
+            name="name"
+            noStyle
+            rules={[{ required: true, min: 2, message: t("wish.sheet.name.required") }]}
+          >
+            <Input
+              placeholder={t("wish.sheet.name.placeholder")}
+              style={{ fontSize: 16 }}
             />
-            <Form.Item
-              name="name"
-              noStyle
-              rules={[{ required: true, min: 2, message: t("wish.sheet.name.required") }]}
-            >
-              <Input
-                placeholder={t("wish.sheet.name.placeholder")}
-                style={{ fontSize: 16 }}
-              />
-            </Form.Item>
-          </Space.Compact>
+          </Form.Item>
         </Form.Item>
-        {/* Hidden field to carry emoji value */}
-        <Form.Item name="emoji" hidden>
-          <Input />
+
+        <Form.Item
+          label={t("wish.sheet.images.label")}
+          extra={t("wish.sheet.images.extra")}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 12,
+            }}
+          >
+            {activeImages.map((image) => (
+              <div
+                key={image.id}
+                style={{
+                  position: "relative",
+                  width: 96,
+                  height: 96,
+                  borderRadius: 12,
+                  overflow: "hidden",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                  background: "#f5f5f5",
+                }}
+              >
+                <img
+                  src={image.url}
+                  alt=""
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+                <Button
+                  size="small"
+                  type="default"
+                  onClick={() => handleRemoveExisting(image)}
+                  style={{
+                    position: "absolute",
+                    top: 6,
+                    right: 6,
+                    padding: "0 6px",
+                    background: "rgba(255,255,255,0.85)",
+                  }}
+                >
+                  {t("common.remove")}
+                </Button>
+              </div>
+            ))}
+            <Upload
+              accept="image/*"
+              multiple
+              listType="picture-card"
+              fileList={fileList}
+              onChange={handleUploadChange}
+              beforeUpload={handleBeforeUpload}
+            >
+              {activeImages.length + fileList.length >= MAX_TOTAL_IMAGES ? null : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <PlusOutlined />
+                  <span style={{ fontSize: 12 }}>
+                    {t("wish.sheet.images.add")}
+                  </span>
+                </div>
+              )}
+            </Upload>
+          </div>
         </Form.Item>
 
         <Form.Item

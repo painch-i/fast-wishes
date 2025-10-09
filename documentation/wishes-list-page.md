@@ -16,7 +16,7 @@ Mobile-first list of the signed-in user's wishes with gentle prompts to encourag
 ## Rows
 - Full-width tap area, minimum 64px height. Pressing briefly highlights the row with a peach tint.
 - Left: 56×56 vignette with 12px radius.
-  - Priority: `image_url` → site favicon on a hashed pastel background → initial letter → category emoji.
+  - Priority: uploaded Supabase image → scraped `image_url` → site favicon on a hashed pastel background → initial letter → category emoji.
 - Center: title on one line then a single meta-line:
   - The domain appears as plain text at the start when a link exists.
   - Description or fallback "Ajoute un petit mot pour guider 💌" truncates to the right of it.

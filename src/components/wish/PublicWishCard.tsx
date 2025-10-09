@@ -26,6 +26,7 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({
   const { t } = useTranslation();
   const { formatPrice } = useFormat();
   const hasUrl = !!wish.url;
+  const primaryImage = wish.images?.[0]?.url ?? wish.image;
 
   const openLink = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -64,8 +65,8 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({
     <Card className={`public-wish-card gallery${reserved ? " is-reserved" : ""}`} hoverable>
       {/* MEDIA TOP */}
       <div className="pw-media" onClick={openLink} role={hasUrl ? "button" : undefined} tabIndex={hasUrl ? 0 : -1}>
-        {wish.image ? (
-          <img className="pw-media-img" src={wish.image} alt="" loading="lazy" />
+        {primaryImage ? (
+          <img className="pw-media-img" src={primaryImage} alt="" loading="lazy" />
         ) : (
           <div className="pw-media-fallback" aria-hidden>{wish.emoji || pickEmoji(wish.name)}</div>
         )}

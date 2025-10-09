@@ -42,6 +42,7 @@
       "unknownUser": "Împøssîblē dè créer lè šøùħäît : ûtilîsäţèûŕ încõññû~~~",
       "updated": "Møđîfîçäţîøñš èñřèģîšţřèéš ✨~~~",
       "updateError": "Òûps, òñ ń'ä pà pû èñrègîštřèr. Tès mōđîfš sōñţ gärdèés løçälèmèñţ~~~",
+      "imageError": "Šøùħäît šäûvgärđé šänš îlļûšţřäţîøñš. Rééšsäýè plûš tôt.~~~",
       "copied": "Lîèñ çøpîé ✨~~~",
       "copyError": "Împøssîblè dè çøpîèr lè lîèñ~~~"
     },
@@ -68,6 +69,14 @@
       },
       "description": {
         "label": "Ðésçřîpţîøñ~~~"
+      },
+      "images": {
+        "label": "Phøţøs~~~",
+        "extra": "Åĵøûţé jüšqü'ä 6 îļļûšţřäţîøñš pøûŕ īñšpîrér ţès prøçħès.~~~",
+        "add": "Åĵøûţér~~~",
+        "invalid": "Šèûļès lès fîçħîèrs îmåĝè sòñţ äççèptés.~~~",
+        "tooLarge": "Îmåĝè ţrøp vøļûmînèûšè (5 Mß mäx).~~~",
+        "limit": "Ţû pèûx åĵøûţér jüšqü'ä 6 îmåĝès.~~~"
       },
       "quantity": {
         "label": "Qùäñţîţé~~~"

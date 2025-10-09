@@ -6,7 +6,7 @@ import { useParams } from "react-router";
 import type { Tables } from "../.././database.types";
 import type { Wish } from "../../components";
 import { PublicWishCard, ReserveBottomSheet } from "../../components";
-import { supabaseClient } from "../../utility";
+import { mapWishImages, supabaseClient } from "../../utility";
 import "./public-wishlist.page.css";
 
 export const PublicWishlistPage: React.FC = () => {
@@ -26,15 +26,28 @@ export const PublicWishlistPage: React.FC = () => {
         owner:users!wishes_user_id_fkey1!inner(slug, user_list_name),
         reservations(
           user:users(name)
-        )
+        ),
+        wishes_images(id, storage_object_id)
       `,
     },
   });
 
   const owner = data?.data[0]?.owner;
 
-
-  const wishes = data?.data ?? [];
+  const rawWishes = data?.data ?? [];
+  const wishes = useMemo(() => {
+    return rawWishes.map((wish) => {
+      const { wishes_images, ...rest } = wish as (Wish & {
+        wishes_images?: Tables<"wishes_images">[];
+      }) & Record<string, unknown>;
+      const images = mapWishImages(wishes_images);
+      return {
+        ...(rest as Wish),
+        images,
+        image: images[0]?.url ?? (rest as Wish).image,
+      };
+    });
+  }, [rawWishes]);
   const [reservedIds, setReservedIds] = useState<Set<number>>(new Set());
   const [reservedByMeIds, setReservedByMeIds] = useState<Set<number>>(new Set());
   const [reservedNames, setReservedNames] = useState<Record<number, string>>({});
