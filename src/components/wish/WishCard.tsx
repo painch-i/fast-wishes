@@ -13,14 +13,15 @@ export interface WishCardProps {
 export const WishCard: React.FC<WishCardProps> = ({ wish, onReserve, onProposeLink }) => {
   const reserved = wish.isReserved;
   const { t } = useTranslation();
+  const primaryImage = wish.images?.[0]?.url ?? wish.image;
   return (
     <Card
       className={`wish-card${reserved ? " reserved" : ""}`}
       hoverable
       cover={
         <div className="image-wrapper">
-          {wish.image ? (
-            <img src={wish.image} alt={wish.name} />
+          {primaryImage ? (
+            <img src={primaryImage} alt={wish.name} />
           ) : (
             <div className="placeholder" aria-hidden>
               <span role="img" aria-label="cadeau">

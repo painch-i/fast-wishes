@@ -3,6 +3,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useFormat } from "../../i18n/use-format";
 import { guessUserCurrency } from "../../utility/guessUserCurrency";
+import { getWishImageUrl } from "../../utility/wishImages";
 import "./PublicWishCard.css";
 import type { Wish } from "./types";
 
@@ -26,6 +27,44 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({
   const { t } = useTranslation();
   const { formatPrice } = useFormat();
   const hasUrl = !!wish.url;
+  const imageUrls = React.useMemo(() => {
+    const urls = [
+      ...(wish.images
+        ?.map((img) => getWishImageUrl(img.storage_object_name) || img.url || "")
+        .filter((url): url is string => Boolean(url)) ?? [])
+    ];
+    console.log({
+      urls,
+    })
+    if (wish.image) {
+      urls.push(wish.image);
+    }
+    return Array.from(new Set(urls));
+  }, [wish.images, wish.image]);
+  const hasImages = imageUrls.length > 0;
+  const showControls = imageUrls.length > 1;
+  const [activeImage, setActiveImage] = React.useState(0);
+
+  React.useEffect(() => {
+    setActiveImage(0);
+  }, [imageUrls.length, wish.id]);
+
+  const handlePrev = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (imageUrls.length < 2) return;
+    setActiveImage((prev) => (prev === 0 ? imageUrls.length - 1 : prev - 1));
+  };
+
+  const handleNext = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (imageUrls.length < 2) return;
+    setActiveImage((prev) => (prev === imageUrls.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleDotClick = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
+    event.stopPropagation();
+    setActiveImage(index);
+  };
 
   const openLink = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -64,8 +103,77 @@ export const PublicWishCard: React.FC<PublicWishCardProps> = ({
     <Card className={`public-wish-card gallery${reserved ? " is-reserved" : ""}`} hoverable>
       {/* MEDIA TOP */}
       <div className="pw-media" onClick={openLink} role={hasUrl ? "button" : undefined} tabIndex={hasUrl ? 0 : -1}>
-        {wish.image ? (
-          <img className="pw-media-img" src={wish.image} alt="" loading="lazy" />
+        {hasImages ? (
+          <div className="pw-carousel" aria-label={t("public.card.carousel.label", { defaultValue: "Images du souhait" })}>
+            <div
+              className="pw-carousel-track"
+              style={{ transform: `translateX(-${activeImage * 100}%)` }}
+            >
+              {imageUrls.map((src, index) => (
+                <img
+                  key={`${src}-${index}`}
+                  className="pw-carousel-img"
+                  src={src}
+                  alt={wish.name}
+                  loading="lazy"
+                />
+              ))}
+            </div>
+            {showControls && (
+              <>
+                <button
+                  type="button"
+                  className="pw-carousel-control prev"
+                  onClick={handlePrev}
+                  aria-label={t("public.card.carousel.prev", { defaultValue: "Image précédente" })}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path
+                      d="M15.5 4.5 8.5 12l7 7.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className="pw-carousel-control next"
+                  onClick={handleNext}
+                  aria-label={t("public.card.carousel.next", { defaultValue: "Image suivante" })}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path
+                      d="M15.5 4.5 8.5 12l7 7.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+                <div className="pw-carousel-dots">
+                  {imageUrls.map((_, index) => (
+                    <button
+                      key={`dot-${index}`}
+                      type="button"
+                      className={`pw-carousel-dot${index === activeImage ? " active" : ""}`}
+                      aria-label={t("public.card.carousel.goTo", {
+                        index: index + 1,
+                        count: imageUrls.length,
+                        defaultValue: "Voir l'image {{index}} sur {{count}}"
+                      })}
+                      aria-pressed={index === activeImage}
+                      onClick={(event) => handleDotClick(event, index)}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         ) : (
           <div className="pw-media-fallback" aria-hidden>{wish.emoji || pickEmoji(wish.name)}</div>
         )}

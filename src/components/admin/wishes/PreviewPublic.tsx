@@ -8,6 +8,7 @@ export const PreviewPublic: React.FC<{ wish: WishUI }> = ({ wish }) => {
     id: Number(wish.id),
     name: wish.name,
     image: wish.image_url,
+    images: wish.images,
     meta: wish.url ?? undefined,
     isReserved: wish.status === "reserved",
   } as Wish;

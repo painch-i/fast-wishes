@@ -19,6 +19,16 @@ export type WishUI = Tables<"wishes"> & {
   merchant_domain?: string;
   brand?: string;
   price_cents?: number | null;
+  images?: WishImage[];
 };
 
 export type WishExtraStore = Record<string, Partial<WishUI>>;
+
+export type WishImage = Tables<"wishes_images"> & {
+  url: string;
+};
+
+export type WishFormValues = WishUI & {
+  newImages?: File[];
+  removedImages?: WishImage[];
+};

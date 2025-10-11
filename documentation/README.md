@@ -20,10 +20,12 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 ## Components
 - **Header** uses a light peach gradient and balanced title wrapping. The counter badge is centered beneath the subtitle.
 - **Wish grid** displays a single column on small screens and switches to two columns from 400px width with generous gaps.
-  - **WishCard** features a 4:3 image placeholder, subdued coral CTA, secondary link styling, and a reserved state badge.
+  - **WishCard** loads the first uploaded Supabase storage image when available,
+    falls back to the scraped `image_url`, then a neutral emoji placeholder. It
+    keeps the subdued coral CTA, secondary link styling, and reserved badge.
 
   - See `admin-wishes-ui.md` for details on the administration CRUD interface including the redesigned creation wizard with a sticky action bar and mobile progress pills.
-- **Wishes List** filters Supabase queries by `user_id` to show only the signed-in user's wishes and renders a mobile-first list with image/placeholder, chevron and tappable rows. Each row shows a title, contextual prompts for missing description, link and price pills formatted with `Intl.NumberFormat` using the stored currency, or placeholders when absent. A count badge appears in the header and up to two ghost rows encourage adding more wishes. When at least one wish is public, external-link and share icon buttons in the header link to `/l/{slug}` and trigger the native share sheet or copy the link. A dismissable info banner reminds the user to make wishes public when none are. Skeleton loading, friendly empty/error states and a single centered “+” FAB round out the experience. Long press on a row reveals an inline **Supprimer → Confirmer** chip with undoable deletion, without triggering native text selection or context menus. A settings icon in the header opens a full-height bottom sheet on mobile or a 360px right-side drawer on desktop for list and account options. See `wishes-list-page.md` for details.
+- **Wishes List** filters Supabase queries by `user_id` to show only the signed-in user's wishes and renders a mobile-first list with uploaded thumbnails (first Supabase image per wish) or placeholder initials, chevron and tappable rows. Each row shows a title, contextual prompts for missing description, link and price pills formatted with `Intl.NumberFormat` using the stored currency, or placeholders when absent. A count badge appears in the header and up to two ghost rows encourage adding more wishes. When at least one wish is public, external-link and share icon buttons in the header link to `/l/{slug}` and trigger the native share sheet or copy the link. A dismissable info banner reminds the user to make wishes public when none are. Skeleton loading, friendly empty/error states and a single centered “+” FAB round out the experience. Long press on a row reveals an inline **Supprimer → Confirmer** chip with undoable deletion, without triggering native text selection or context menus. A settings icon in the header opens a full-height bottom sheet on mobile or a 360px right-side drawer on desktop for list and account options. See `wishes-list-page.md` for details.
 
 - **Wish Sheet** is a unified bottom sheet/drawer used to add or edit a wish. It captures title, price with currency, a single merchant link field with paste button and inline domain/title preview, personal comment and priority chips. The currency defaults to `guessUserCurrency()` which reads the profile, prior wishes or browser locale via `country-to-currency` and falls back to USD. The currency dropdown portals to `document.body` with a high `z-index` and prevents `mousedown` blur so options remain tappable. When a wish is saved the user's `user_id` is attached and the sheet closes with a single success toast. All copy is sourced from the i18n bundles. See `wish-sheet.md` for details.
 - **Public wishlist** at `/l/{slug}` uses `PublicWishCard` to render each wish with a 56px image or emoji avatar on the left, text details with price beneath and an inline reserve button. See `public-wishlist-page.md` for specifics.
@@ -44,6 +46,9 @@ Supabase Postgres powers persistence. The Supabase CLI requires two environment 
 
 - `SUPABASE_PROJECT_ID` – your project identifier
 - `SUPABASE_KEY` – the service role key used by the CLI
+
+Wish media lives in the public storage bucket `wish-images`, with object
+paths referenced by the `wishes_images` join table.
 
 Before starting any task, regenerate the database types to keep them in sync:
 
