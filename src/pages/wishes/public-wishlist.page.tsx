@@ -27,7 +27,7 @@ export const PublicWishlistPage: React.FC = () => {
         reservations(
           user:users(name)
         ),
-        wishes_images(id, storage_object_id)
+        wishes_images(id, storage_object_name)
       `,
     },
   });

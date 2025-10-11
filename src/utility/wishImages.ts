@@ -4,25 +4,34 @@ import type { Tables } from "../database.types";
 import type { WishImage } from "../types/wish";
 import { supabaseClient } from "./supabaseClient";
 
-const WISH_IMAGE_BUCKET = "wish-images";
+const WISH_IMAGE_BUCKET = "wishes-images";
 const MAX_RETRIES = 2;
+const AUTH_REQUIRED_ERROR = "Cannot access wish images without an authenticated user.";
 
-export const getWishImageUrl = (storageObjectId: string): string => {
-  if (!storageObjectId) return "";
+const getPublicUrl = (objectName?: string | null): string => {
+  if (!objectName) return "";
   const { data } = supabaseClient.storage
     .from(WISH_IMAGE_BUCKET)
-    .getPublicUrl(storageObjectId);
+    .getPublicUrl(objectName);
   return data?.publicUrl ?? "";
 };
 
+export const getWishImageUrl = (storageObjectName?: string | null): string => {
+  const publicUrl = getPublicUrl(storageObjectName);
+  console.log({ storageObjectName, publicUrl });
+  return publicUrl;
+}
 export const mapWishImages = (
   rows?: Tables<"wishes_images">[]
 ): WishImage[] => {
   if (!rows?.length) return [];
-  return rows.map((row) => ({
-    ...row,
-    url: getWishImageUrl(row.storage_object_id),
-  }));
+  return rows.map((row) => {
+    const objectName = row.storage_object_name ?? null;
+    return {
+      ...row,
+      url: getWishImageUrl(objectName),
+    };
+  });
 };
 
 type SyncParams = {
@@ -31,8 +40,17 @@ type SyncParams = {
   removed?: Tables<"wishes_images">[];
 };
 
+const getUserStorageRoot = async (): Promise<string> => {
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error) throw error;
+  const userId = data.session?.user?.id;
+  if (!userId) throw new Error(AUTH_REQUIRED_ERROR);
+  return userId;
+};
+
 const uploadSingleImage = async (
   wishId: number,
+  userFolder: string,
   file: File,
   attempt = 0
 ): Promise<string> => {
@@ -45,21 +63,21 @@ const uploadSingleImage = async (
     if (file.type?.includes("webp")) return "webp";
     return "jpg";
   })();
-  const objectPath = `${wishId}/${nanoid()}.${ext}`;
-  const { data, error } = await supabaseClient.storage
+  const objectName = `${userFolder}/${wishId}/${nanoid()}.${ext}`;
+  const { error } = await supabaseClient.storage
     .from(WISH_IMAGE_BUCKET)
-    .upload(objectPath, file, {
+    .upload(objectName, file, {
       cacheControl: "3600",
       upsert: false,
       contentType: file.type || undefined,
     });
   if (error) {
     if (attempt < MAX_RETRIES) {
-      return uploadSingleImage(wishId, file, attempt + 1);
+      return uploadSingleImage(wishId, userFolder, file, attempt + 1);
     }
     throw error;
   }
-  return data?.path ?? objectPath;
+  return objectName;
 };
 
 export const syncWishImages = async ({
@@ -68,36 +86,39 @@ export const syncWishImages = async ({
   removed = [],
 }: SyncParams): Promise<void> => {
   const uploads: string[] = [];
+  const userFolder = newFiles.length ? await getUserStorageRoot() : null;
 
   for (const file of newFiles) {
-    const path = await uploadSingleImage(wishId, file);
-    uploads.push(path);
+    const objectName = await uploadSingleImage(wishId, userFolder!, file);
+    uploads.push(objectName);
   }
 
   if (uploads.length) {
     const { error } = await supabaseClient
       .from("wishes_images")
-      .insert(uploads.map((storage_object_id) => ({
-        wish_id: wishId,
-        storage_object_id,
-      })));
+      .insert(
+        uploads.map((storage_object_name) => ({
+          wish_id: wishId,
+          storage_object_name,
+        }))
+      );
     if (error) throw error;
   }
 
   if (removed.length) {
     const ids = removed.map((img) => img.id);
-    const paths = removed
-      .map((img) => img.storage_object_id)
-      .filter((path): path is string => !!path);
+    const names = removed
+      .map((img) => img.storage_object_name ?? null)
+      .filter((value): value is string => !!value);
     const { error: deleteError } = await supabaseClient
       .from("wishes_images")
       .delete()
       .in("id", ids);
     if (deleteError) throw deleteError;
-    if (paths.length) {
+    if (names.length) {
       const { error: removeError } = await supabaseClient.storage
         .from(WISH_IMAGE_BUCKET)
-        .remove(paths);
+        .remove(names);
       if (removeError) throw removeError;
     }
   }

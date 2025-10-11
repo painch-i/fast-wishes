@@ -137,19 +137,19 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          storage_object_id: string
+          storage_object_name: string
           wish_id: number
         }
         Insert: {
           created_at?: string
           id?: number
-          storage_object_id: string
+          storage_object_name: string
           wish_id: number
         }
         Update: {
           created_at?: string
           id?: number
-          storage_object_id?: string
+          storage_object_name?: string
           wish_id?: number
         }
         Relationships: [

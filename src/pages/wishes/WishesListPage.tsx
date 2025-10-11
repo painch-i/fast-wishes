@@ -455,7 +455,7 @@ export const WishesListPage: React.FC = () => {
       { field: "user_id", operator: "eq", value: identity?.id },
     ],
     meta: {
-      select: "*, wishes_images(id, storage_object_id)",
+      select: "*, wishes_images(id, storage_object_name)",
     },
     queryOptions: { enabled: !!identity },
   });
@@ -464,6 +464,8 @@ export const WishesListPage: React.FC = () => {
     if (data?.data) {
       const normalized = (data.data as WishWithImagesRow[]).map((row) => normalizeWish(row));
       setWishes(normalized);
+    } else {
+      setWishes([]);
     }
   }, [data]);
 
