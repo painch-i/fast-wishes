@@ -17,14 +17,7 @@ import { WishSheet } from "../../components/wish/WishSheet";
 import { useFormat } from "../../i18n";
 import { UserIdentity, UserSlug } from "../../types";
 import { WishFormValues, WishUI } from "../../types/wish";
-import {
-  getExtras,
-  mapDbToWishUI,
-  mapWishImages,
-  setExtras,
-  supabaseClient,
-  syncWishImages,
-} from "../../utility";
+import { mapWishImages, supabaseClient, syncWishImages } from "../../utility";
 import type { Tables } from "../../database.types";
 
 type RowProps = {
@@ -33,29 +26,28 @@ type RowProps = {
   onDelete: (item: WishUI) => void;
 };
 
-type WishWithImagesRow = WishUI & {
+type WishWithImagesRow = Tables<"wishes"> & {
   wishes_images?: Tables<"wishes_images">[];
 };
 
 const normalizeWish = (row: WishWithImagesRow): WishUI => {
-  const { wishes_images, ...rest } = row as WishWithImagesRow & { wishes_images?: Tables<"wishes_images">[] };
-  const images = mapWishImages(wishes_images);
+  const { wishes_images, ...rest } = row;
   return {
-    ...(rest as WishUI),
-    images,
-    image_url: images[0]?.url ?? (rest as WishUI).image_url,
+    ...(rest as Tables<"wishes">),
+    images: mapWishImages(wishes_images),
   };
 };
 
 const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
   const { formatPrice } = useFormat();
   const { t } = useTranslation();
-  const priceCents =
-    item.price_cents != null
-      ? item.price_cents
-      : item.price
-      ? Math.round(parseFloat(String(item.price)) * 100)
-      : null;
+  const priceNumber =
+    item.price != null && item.price !== ""
+      ? Number.parseFloat(String(item.price))
+      : Number.NaN;
+  const priceCents = Number.isFinite(priceNumber)
+    ? Math.round(priceNumber * 100)
+    : null;
   const price = formatPrice(priceCents, item.currency || undefined);
   const domain = (() => {
     try {
@@ -114,41 +106,8 @@ const Row: React.FC<RowProps> = ({ item, onOpen, onDelete }) => {
         />
       );
     }
-    if (item.image_url) {
-      return (
-        <img
-          src={item.image_url}
-          alt=""
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 12,
-            objectFit: "cover",
-            flexShrink: 0,
-          }}
-        />
-      );
-    }
-    if (item.metadata?.favicon) {
-      return (
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 12,
-            background: accent,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <img src={item.metadata.favicon} alt="" style={{ width: 24, height: 24 }} />
-        </div>
-      );
-    }
-    const emoji = getEmoji(item.name);
-    if (emoji !== "🎁") {
+    const emoji = (item.emoji && item.emoji.trim()) || getEmoji(item.name);
+    if (emoji && emoji !== "🎁") {
       return (
         <div
           style={{
@@ -449,7 +408,7 @@ export const WishesListPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { data: identity } = useGetIdentity<UserIdentity>();
 
-  const { data, isLoading, isError, refetch } = useList<WishUI>({
+  const { data, isLoading, isError, refetch } = useList<WishWithImagesRow>({
     resource: "wishes",
     filters: [
       { field: "user_id", operator: "eq", value: identity?.id },
@@ -462,7 +421,7 @@ export const WishesListPage: React.FC = () => {
   const [wishes, setWishes] = useState<WishUI[]>([]);
   useEffect(() => {
     if (data?.data) {
-      const normalized = (data.data as WishWithImagesRow[]).map((row) => normalizeWish(row));
+      const normalized = data.data.map((row) => normalizeWish(row));
       setWishes(normalized);
     } else {
       setWishes([]);
@@ -557,8 +516,7 @@ export const WishesListPage: React.FC = () => {
   };
 
   const openEdit = (record: WishUI, _field?: keyof WishUI) => {
-    const extras = getExtras(String(record.id));
-    setEditing(mapDbToWishUI(record, extras));
+    setEditing(record);
     setSheetOpen(true);
   };
 
@@ -569,10 +527,6 @@ export const WishesListPage: React.FC = () => {
 
   const handleSave = (values: WishFormValues) => {
     const {
-      note_private,
-      tags,
-      metadata,
-      price_cents,
       newImages = [],
       removedImages = [],
       images: _ignored,
@@ -580,9 +534,13 @@ export const WishesListPage: React.FC = () => {
     } = values as WishFormValues & Record<string, any>;
     const removedRows = removedImages.map(({ url: _url, ...rest }) => rest) as Tables<"wishes_images">[];
 
-    const persistExtras = (id: number) => {
-      setExtras(String(id), { note_private, tags, metadata });
-    };
+    const priceNumber =
+      dbValues.price != null && dbValues.price !== ""
+        ? Number.parseFloat(String(dbValues.price).replace(",", "."))
+        : Number.NaN;
+    const normalizedPrice = Number.isFinite(priceNumber)
+      ? priceNumber.toFixed(2)
+      : null;
 
     if (values.id) {
       update(
@@ -591,7 +549,7 @@ export const WishesListPage: React.FC = () => {
           id: values.id,
           values: {
             ...dbValues,
-            price: price_cents != null ? String(price_cents / 100) : null,
+            price: normalizedPrice,
           },
           successNotification: false,
           errorNotification: false,
@@ -606,13 +564,11 @@ export const WishesListPage: React.FC = () => {
                   removed: removedRows,
                 });
               }
-              persistExtras(values.id!);
               message.success(t("wish.toast.updated"));
               setSheetOpen(false);
             } catch (error) {
               // eslint-disable-next-line no-console
               console.error(error);
-              persistExtras(values.id!);
               message.error(t("wish.toast.imageError"));
             } finally {
               refetch();
@@ -632,7 +588,7 @@ export const WishesListPage: React.FC = () => {
           resource: "wishes",
           values: {
             ...dbValues,
-            price: price_cents != null ? String(price_cents / 100) : null,
+            price: normalizedPrice,
             user_id: identity.id,
           },
           successNotification: false,
@@ -654,13 +610,11 @@ export const WishesListPage: React.FC = () => {
                   removed: removedRows,
                 });
               }
-              persistExtras(numericId);
               message.success(t("wish.toast.created"));
               setSheetOpen(false);
             } catch (error) {
               // eslint-disable-next-line no-console
               console.error(error);
-              persistExtras(numericId);
               message.error(t("wish.toast.imageError"));
             } finally {
               refetch();

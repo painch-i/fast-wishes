@@ -1,5 +1,5 @@
 import type { FormInstance } from "antd";
-import { Button, Form, Input, InputNumber, Segmented, Select, Switch, Typography } from "antd";
+import { Form, Input, Segmented, Select, Switch, Typography } from "antd";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -16,7 +16,7 @@ export type WishFormProps = {
 
 export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, form }) => {
   const { control, handleSubmit, watch, setValue } = useForm<WishUI>({
-    defaultValues: { quantity: 1, priority: 2, ...initialValues },
+    defaultValues: { priority: 2, ...initialValues },
   });
   const { t } = useTranslation();
 
@@ -27,13 +27,24 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
     if (metadata?.title && !watch("name")) {
       setValue("name", metadata.title);
     }
-    if (metadata?.image && !watch("image_url")) {
-      setValue("image_url", metadata.image);
-    }
   }, [metadata, watch, setValue]);
 
+  const handleInternalSubmit = (values: WishUI) => {
+    const priceNumber =
+      values.price != null && values.price !== ""
+        ? Number.parseFloat(String(values.price).replace(",", "."))
+        : Number.NaN;
+    const normalizedPrice = Number.isFinite(priceNumber)
+      ? priceNumber.toFixed(2)
+      : null;
+    onSubmit({
+      ...values,
+      price: normalizedPrice,
+    });
+  };
+
   return (
-    <Form layout="vertical" form={form} onFinish={handleSubmit(onSubmit)}>
+    <Form layout="vertical" form={form} onFinish={handleSubmit(handleInternalSubmit)}>
       {/* Emoji + Title */}
       <Form.Item label={t("wish.form.title.label")} required>
         <Controller
@@ -58,20 +69,11 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         <Typography.Text type="secondary">{metadata.site_name}</Typography.Text>
       )}
       <Controller
-        name="image_url"
-        control={control}
-        render={({ field }) => (
-          <Form.Item label={t("wish.form.image.label")}>
-              <Input size="large" {...field} value={field.value ?? ""} />
-          </Form.Item>
-        )}
-      />
-      <Controller
         name="price"
         control={control}
         render={({ field }) => (
           <Form.Item label={t("wish.form.price.label")}>
-            <InputNumber min={0} style={{ width: "100%" }} {...field} />
+            <Input size="large" type="text" inputMode="decimal" {...field} value={field.value ?? ""} />
           </Form.Item>
         )}
       />
@@ -100,38 +102,11 @@ export const WishForm: React.FC<WishFormProps> = ({ initialValues, onSubmit, for
         )}
       />
       <Controller
-        name="quantity"
-        control={control}
-        render={({ field }) => (
-          <Form.Item label={t("wish.form.quantity.label")}>
-            <InputNumber min={1} style={{ width: "100%" }} {...field} />
-          </Form.Item>
-        )}
-      />
-      <Controller
         name="priority"
         control={control}
         render={({ field }) => (
           <Form.Item label={t("wish.form.priority.label")}>
             <Segmented {...field} options={[1, 2, 3]} />
-          </Form.Item>
-        )}
-      />
-      <Controller
-        name="tags"
-        control={control}
-        render={({ field }) => (
-          <Form.Item label={t("wish.form.tags.label")}>
-            <Select mode="tags" tokenSeparators={[","]} {...field} />
-          </Form.Item>
-        )}
-      />
-      <Controller
-        name="note_private"
-        control={control}
-        render={({ field }) => (
-          <Form.Item label={t("wish.form.notePrivate.label")}>
-            <TextArea rows={3} {...field} />
           </Form.Item>
         )}
       />

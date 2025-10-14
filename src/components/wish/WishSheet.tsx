@@ -132,15 +132,11 @@ export const WishSheet: React.FC<WishSheetProps> = ({
 
   // apply metadata
   useEffect(() => {
-    if (!metadata) return;
-    const updates: Partial<WishUI> = {};
-    if (metadata.image && !form.getFieldValue("image_url")) {
-      updates.image_url = metadata.image;
+    if (!metadata?.title) return;
+    const currentName = form.getFieldValue("name");
+    if (!currentName) {
+      form.setFieldsValue({ name: metadata.title } as any);
     }
-    if ((metadata.site_name || metadata.title) && !form.getFieldValue("brand")) {
-      updates.brand = metadata.site_name || metadata.title;
-    }
-    if (Object.keys(updates).length > 0) form.setFieldsValue(updates as any);
   }, [metadata, form]);
 
   // lock background scroll
@@ -217,7 +213,6 @@ export const WishSheet: React.FC<WishSheetProps> = ({
     const handler = setTimeout(() => {
       if (!url) {
         setLinkDomain(null);
-        form.setFieldsValue({ merchant_domain: undefined } as any);
         setIsUrlValid(true);
         setDebouncedUrl(undefined);
         return;
@@ -231,12 +226,10 @@ export const WishSheet: React.FC<WishSheetProps> = ({
         const parsed = new URL(value);
         const domain = parsed.hostname.replace(/^www\./, "");
         setLinkDomain(domain);
-        form.setFieldsValue({ merchant_domain: domain } as any);
         setIsUrlValid(true);
         setDebouncedUrl(value);
       } catch {
         setLinkDomain(null);
-        form.setFieldsValue({ merchant_domain: undefined } as any);
         setIsUrlValid(false);
         setDebouncedUrl(undefined);
       }
@@ -269,12 +262,17 @@ export const WishSheet: React.FC<WishSheetProps> = ({
       }
       return acc;
     }, []);
-    const priceNumber = values.price ? parseFloat(String(values.price)) : undefined;
-    const price_cents = priceNumber != null ? Math.round(priceNumber * 100) : null;
+    const priceNumber =
+      values.price != null && values.price !== ""
+        ? Number.parseFloat(String(values.price).replace(",", "."))
+        : Number.NaN;
+    const normalizedPrice = Number.isFinite(priceNumber)
+      ? priceNumber.toFixed(2)
+      : null;
     const submitValues: WishFormValues = {
       ...initialValues,
       ...values,
-      price_cents,
+      price: normalizedPrice,
       images: retainedImages,
       newImages: newFiles,
       removedImages,
@@ -526,7 +524,7 @@ export const WishSheet: React.FC<WishSheetProps> = ({
                     <CloseCircleFilled
                       onClick={(e: React.MouseEvent) => {
                         e.stopPropagation();
-                        form.setFieldsValue({ url: undefined, merchant_domain: undefined } as any);
+                        form.setFieldsValue({ url: undefined } as any);
                         setLinkDomain(null);
                         setIsUrlValid(true);
                         setShowPasteTip(false);
