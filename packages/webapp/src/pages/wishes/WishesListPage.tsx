@@ -14,11 +14,11 @@ import "./WishesListPage.css";
 
 import { useTranslation } from "react-i18next";
 import { WishSheet } from "../../components/wish/WishSheet";
+import type { Tables } from "../../database.types";
 import { useFormat } from "../../i18n";
 import { UserIdentity, UserSlug } from "../../types";
 import { WishFormValues, WishUI } from "../../types/wish";
 import { mapWishImages, supabaseClient, syncWishImages } from "../../utility";
-import type { Tables } from "../../database.types";
 
 type RowProps = {
   item: WishUI;
@@ -701,6 +701,8 @@ export const WishesListPage: React.FC = () => {
     }
   };
 
+  const previousWishCurrency = wishes.find((w) => w.currency)?.currency;
+
   return (
     <div style={{ padding: "0 16px" }}>
       <div style={{ margin: "16px 0" }}>
@@ -899,7 +901,7 @@ export const WishesListPage: React.FC = () => {
         open={sheetOpen}
         mode={editing ? "edit" : "create"}
         initialValues={editing}
-        previousWishCurrency={wishes.find((w) => w.currency)?.currency}
+        previousWishCurrency={previousWishCurrency || undefined}
         onCancel={() => setSheetOpen(false)}
         onSubmit={handleSave}
       />
