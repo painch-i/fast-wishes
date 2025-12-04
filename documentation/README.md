@@ -29,6 +29,7 @@ This document tracks high-level technical decisions and UI guidelines for the pr
 
 - **Wish Sheet** is a unified bottom sheet/drawer used to add or edit a wish. It captures title, price with currency, a single merchant link field with paste button and inline domain/title preview, personal comment and priority chips. The currency defaults to `guessUserCurrency()` which reads the profile, prior wishes or browser locale via `country-to-currency` and falls back to USD. The currency dropdown portals to `document.body` with a high `z-index` and prevents `mousedown` blur so options remain tappable. When a wish is saved the user's `user_id` is attached and the sheet closes with a single success toast. All copy is sourced from the i18n bundles. See `wish-sheet.md` for details.
 - **Public wishlist** at `/l/{slug}` uses `PublicWishCard` to render each wish with a 56px image or emoji avatar on the left, text details with price beneath and an inline reserve button. See `public-wishlist-page.md` for specifics.
+- **Baby wishlist demo** at `/en/demo/baby-wishlist` is a static, login-free showcase aimed at parents-to-be campaigns. It uses curated `PublicWishCard` entries with Unsplash imagery, English copy, and a hero banner for clean marketing screenshots. See `demo-baby-wishlist.md` for layout and usage notes.
 
 ## Notifications
 - Built-in Refine snackbars are disabled so only our custom toasts appear.
