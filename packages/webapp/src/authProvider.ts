@@ -30,6 +30,9 @@ const authProvider: AuthProvider = {
           id: data.user.id,
           slug: nanoid(),
         });
+
+      // Trigger artist stream initialization without blocking the login flow.
+      supabaseClient.functions.invoke("update-first-streams-on-artists").catch(console.error);
     }
 
     return {

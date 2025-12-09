@@ -68,3 +68,17 @@ Notes
 - This changes the primary auth email immediately and marks it confirmed. Use with care.
 - If you don't want to bypass confirmation, use `supabase.auth.updateUser({ email })` directly from the client instead.
 
+
+Supabase Edge Function: update-first-streams-on-artists
+
+Goal: Initialize artist streaming metadata when a user signs in.
+
+- Invoked automatically during anonymous login in `src/authProvider.ts` to keep artist stream data fresh.
+- Non-blocking: the login flow succeeds even if the function fails, but errors are logged to the console for visibility.
+- Call pattern from the client:
+
+```ts
+supabaseClient.functions.invoke("update-first-streams-on-artists").catch(console.error);
+```
+
+Ensure the edge function is deployed and accessible to authenticated users.
