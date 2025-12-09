@@ -11,6 +11,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-route
 import i18n from "./i18n";
 import { LocaleGate, ProtectedOutlet } from "./i18n/LocaleGate";
 import { fallbackLng } from "./i18n/config";
+import { BabyWishlistDemoPage } from "./pages/demo/BabyWishlistDemoPage";
 import { WishesListPage } from "./pages/wishes/WishesListPage";
 import { PublicWishlistPage } from "./pages/wishes/public-wishlist.page";
 import { theme } from "./theme";
@@ -33,6 +34,7 @@ function App() {
               <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto", colorScheme: "light" } }} />
               <Routes>
                 <Route path=":locale" element={<LocaleGate />}>
+                  <Route path="demo/baby-wishlist" element={<BabyWishlistDemoPage />} />
                   <Route element={<ProtectedOutlet />}>
                     <Route path="wishes" element={<WishesListPage />} />
                     <Route path="l/:slug" element={<PublicWishlistPage />} />
